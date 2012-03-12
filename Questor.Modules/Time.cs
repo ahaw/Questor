@@ -12,6 +12,7 @@ namespace Questor.Modules
     public enum Time
     {
         QuestorPulse_milliseconds = 1500,                        // Used to delay the next pulse, units: milliseconds. Default is 1500
+        DefenceDelay_milliseconds = 1500,
         ValidateSettings_seconds = 15,                           // This is the delay between character settings validation attempts. The settings will be reloaded at this interval if they have changed. Default is 15
         SetupLogPathDelay_seconds = 10,                          // Why is this delay here? this can likely be removed with some testing... Default is 10
         SessionRunningTimeUpdate_seconds = 15,                   // This is used to update the session running time couter every x seconds: default is 15 seconds

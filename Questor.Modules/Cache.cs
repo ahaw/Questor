@@ -274,6 +274,7 @@ namespace Questor.Modules
         public bool IsAgentLoop { get; set; }
         private string AgentName = "";
 
+        public DateTime _lastDefence;
         public DateTime _lastModuleActivation;
         public int panic_attempts_this_mission { get; set; }
         public double lowest_shield_percentage_this_pocket { get; set; }
@@ -720,10 +721,12 @@ namespace Questor.Modules
         }
         public void Sleep(int SleepTime)
         {
-            DateTime NowTime = DateTime.Now;
-            while (DateTime.Now.Subtract(NowTime).TotalMilliseconds < (int)SleepTime)
+            DateTime SleepStartedTime = DateTime.Now;
+
+            while (DateTime.Now.Subtract(SleepStartedTime).TotalMilliseconds < (int)SleepTime)
             {
-                NowTime = DateTime.Now;
+                if (DateTime.Now.Subtract(_lastDefence).TotalMilliseconds < (int)Time.DefenceDelay_milliseconds)
+                    _lastDefence = DateTime.Now;
             }
 
         }
