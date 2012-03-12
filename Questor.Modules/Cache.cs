@@ -718,7 +718,15 @@ namespace Questor.Modules
             _priorityTargets.ForEach(pt => pt.ClearCache());
             _entitiesById.Clear();
         }
+        public void Sleep(int SleepTime)
+        {
+            DateTime NowTime = DateTime.Now;
+            while (DateTime.Now.Subtract(NowTime).TotalMilliseconds < (int)SleepTime)
+            {
+                NowTime = DateTime.Now;
+            }
 
+        }
         public string FilterPath(string path)
         {
             if (path == null)
