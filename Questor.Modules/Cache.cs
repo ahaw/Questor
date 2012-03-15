@@ -163,6 +163,7 @@ namespace Questor.Modules
         }
 
         public bool DoNotBreakInvul = false;
+        public bool UseDrones = true;
 
         public bool LootAlreadyUnloaded = false;
 

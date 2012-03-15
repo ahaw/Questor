@@ -142,6 +142,7 @@ namespace Questor.Modules
                     // Always launch if we're scrambled
                     if (!Cache.Instance.PriorityTargets.Any(pt => pt.IsWarpScramblingMe))
                     {
+                        launch &= Cache.Instance.UseDrones;
                         // Are we done with this mission pocket?
                         launch &= !Cache.Instance.IsMissionPocketDone;
 

@@ -52,7 +52,7 @@
             _storylines.Add("Whispers in the Dark - The Outpost (4 of 4)", new GenericCombatStoryline());
             _storylines.Add("Transaction Data Delivery", new TransactionDataDelivery());
             _storylines.Add("Innocents in the Crossfire", new GenericCombatStoryline());
-			_storylines.Add("Patient Zero", new GenericCombatStoryline());
+            //_storylines.Add("Patient Zero", new GenericCombatStoryline());
             _storylines.Add("Soothe the Salvage Beast", new GenericCombatStoryline());
             _storylines.Add("Forgotten Outpost", new GenericCombatStoryline());
             _storylines.Add("Stem the Flow", new GenericCombatStoryline());

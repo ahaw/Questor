@@ -20,6 +20,7 @@ namespace Questor.Modules
         AggroOnly,
         Kill,
         KillOnce,
+        UseDrones,
         AttackClosestByName,
         AttackClosest,
         Ignore,
