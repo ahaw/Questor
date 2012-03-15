@@ -93,6 +93,7 @@ namespace Questor.Modules
 		public string LootContainer { get; set; }
 
         public bool CreateSalvageBookmarks { get; set; }
+        public string CreateSalvageBookmarksIn { get; set; }
         public bool SalvageMultpleMissionsinOnePass { get; set; }
         public string BookmarkPrefix { get; set; }
         public string UndockPrefix { get; set; }
@@ -387,6 +388,7 @@ namespace Questor.Modules
             LootContainer = (string)xml.Element("lootContainer");
 
             CreateSalvageBookmarks = (bool?) xml.Element("createSalvageBookmarks") ?? false;
+            CreateSalvageBookmarksIn = (string)xml.Element("createSalvageBookmarksIn") ?? "Player";
             BookmarkPrefix = (string) xml.Element("bookmarkPrefix") ?? "Salvage:";
             MinimumWreckCount = (int?) xml.Element("minimumWreckCount") ?? 1;
             AfterMissionSalvaging = (bool?) xml.Element("afterMissionSalvaging") ?? false;

@@ -955,7 +955,11 @@ namespace Questor.Modules
         /// <param name = "label"></param>
         public void CreateBookmark(string label)
         {
-            DirectEve.BookmarkCurrentLocation(label, "", null);
+            if (Settings.Instance.CreateSalvageBookmarksIn=="Corp")
+                DirectEve.CorpBookmarkCurrentLocation(label, "", null);
+            else
+                DirectEve.BookmarkCurrentLocation(label, "", null);
+            
         }
 
         /// <summary>
