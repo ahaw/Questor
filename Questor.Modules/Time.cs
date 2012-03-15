@@ -11,8 +11,9 @@ namespace Questor.Modules
 {
     public enum Time
     {
-        QuestorPulse_milliseconds = 1500,                        // Used to delay the next pulse, units: milliseconds. Default is 1500
-        DefenceDelay_milliseconds = 1500,
+        QuestorPulse_milliseconds = 250,                        // Used to delay the next pulse, units: milliseconds. Default is 1500
+        DefenceDelay_milliseconds = 500,
+        TargetDelay_miliseconds = 220,
         ValidateSettings_seconds = 15,                           // This is the delay between character settings validation attempts. The settings will be reloaded at this interval if they have changed. Default is 15
         SetupLogPathDelay_seconds = 10,                          // Why is this delay here? this can likely be removed with some testing... Default is 10
         SessionRunningTimeUpdate_seconds = 15,                   // This is used to update the session running time couter every x seconds: default is 15 seconds
@@ -33,7 +34,8 @@ namespace Questor.Modules
         DelayBetweenJetcans_seconds = 185,                       // Once you have made a jetcan you cannot make another for 3 minutes, units: seconds. Default is 185 (to account for lag)
         SalvageStackItemsDelayBeforeResuming_seconds = 5,        // When stacking items in cargohold delay before proceeding, units: seconds. Default is 5
         SalvageStackItems_seconds = 150,                         // When salvaging stack items in your cargo every x seconds, units: seconds. Default is 180
-        TravelerExitStationAmIInSpaceYet_seconds = 7,            // Traveler - Exit Station before you are in spce delay, units: seconds. Default is 7
+        SalvageDelayBetweenActions_miliseconds=200,
+        TravelerExitStationAmIInSpaceYet_seconds = 17,            // Traveler - Exit Station before you are in spce delay, units: seconds. Default is 7
         TravelerNoStargatesFoundRetryDelay_seconds = 15,         // Traveler could not find any stargates, retry when this time has elapsed, units: seconds. Default is 15
         TravelerJumpedGateNextCommandDelay_seconds = 15,         // Traveler jumped a gate - delay before assuming we have loaded grid, units: seconds. Default is 15
         TravelerInWarpedNextCommandDelay_seconds = 15,           // Traveler is in warp - delay before processing another command, units: seconds. Default is 15

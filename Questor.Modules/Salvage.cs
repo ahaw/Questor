@@ -21,7 +21,8 @@ namespace Questor.Modules
         public static HashSet<int> TractorBeams = new HashSet<int> { 24348, 24620, 24622, 24644, 4250 };
 
         private DateTime _lastJettison = DateTime.MinValue;
-        private DateTime _nextSalvageAction;
+        private DateTime _nextSalvageAction= DateTime.Now;
+        private DateTime _nextTargetAction = DateTime.MinValue;
 
         /// <summary>
         ///   Keep a list of times that we have tried to open a container (do not try to open the same container twice within 10 seconds)
@@ -45,6 +46,10 @@ namespace Questor.Modules
         /// </summary>
         private void ActivateTractorBeams()
         {
+            Logging.Log("Activate tractor beam" + _nextSalvageAction + " " + DateTime.Now);
+            if (_nextSalvageAction > DateTime.Now) return;
+
+            
             var tractorBeams = Cache.Instance.Modules.Where(m => TractorBeams.Contains(m.TypeId)).ToList();
             if (tractorBeams.Count == 0)
                 return;
@@ -64,6 +69,8 @@ namespace Questor.Modules
                 if (tractorBeam.IsActive && (wreck == null || wreck.Distance <= (int)Distance.SafeScoopRange))
                 {
                     tractorBeam.Deactivate();
+                    _nextSalvageAction = DateTime.Now.AddMilliseconds((int)Time.SalvageDelayBetweenActions_miliseconds);
+                    return;
                     //More human behaviour
                     //System.Threading.Thread.Sleep(333);
                 }
@@ -92,7 +99,8 @@ namespace Questor.Modules
                 Logging.Log("Salvage: Activating tractorbeam [" + tractorBeam.ItemId + "] on [" + wreck.Name + "][" + wreck.Id + "]");
                 //More human behaviour
                 //System.Threading.Thread.Sleep(333);
-
+                _nextSalvageAction = DateTime.Now.AddMilliseconds((int)Time.SalvageDelayBetweenActions_miliseconds);
+                return;
 
             }
         }
@@ -102,6 +110,7 @@ namespace Questor.Modules
         /// </summary>
         private void ActivateSalvagers()
         {
+            if (_nextSalvageAction > DateTime.Now) return;
             var salvagers = Cache.Instance.Modules.Where(m => Salvagers.Contains(m.TypeId)).ToList();
             if (salvagers.Count == 0)
                 return;
@@ -126,6 +135,8 @@ namespace Questor.Modules
 
                 Logging.Log("Salvage: Activating salvager [" + salvager.ItemId + "] on [" + wreck.Name + "][" + wreck.Id + "]");
                 salvager.Activate(wreck.Id);
+                _nextSalvageAction = DateTime.Now.AddMilliseconds((int)Time.SalvageDelayBetweenActions_miliseconds);
+                return;
                 //More human behaviour
                 //System.Threading.Thread.Sleep(333);
             }
@@ -136,6 +147,7 @@ namespace Questor.Modules
         /// </summary>
         private void TargetWrecks()
         {
+            if (_nextTargetAction > DateTime.Now) return;
             // We are jammed, we do not need to log (Combat does this already)
             if (Cache.Instance.DirectEve.ActiveShip.MaxLockedTargets == 0)
                 return;
@@ -154,6 +166,7 @@ namespace Questor.Modules
                 {
                     Logging.Log("Salvage: Cargo Container [" + wreck.Name + "][" + wreck.Id + "] on the ignore list, ignoring.");
                     wreck.UnlockTarget();
+                    _nextTargetAction = DateTime.Now.AddMilliseconds((int)Time.TargetDelay_miliseconds);
                     continue;
                 }
 
@@ -162,6 +175,7 @@ namespace Questor.Modules
                     if(Settings.Instance.WreckBlackList.Any(a => a == wreck.TypeId) && (wreck.Distance < (int)Distance.SafeScoopRange || wreck.IsWreckEmpty))
                     {
                         wreck.UnlockTarget();
+                        _nextTargetAction = DateTime.Now.AddMilliseconds((int)Time.TargetDelay_miliseconds);
                         continue;
                     }
                 }
@@ -174,6 +188,8 @@ namespace Questor.Modules
                 {
                     Logging.Log("Salvage: Cargo Container [" + wreck.Name + "][" + wreck.Id + "] within loot range, unlocking container.");
                     wreck.UnlockTarget();
+                    _nextTargetAction = DateTime.Now.AddMilliseconds((int)Time.TargetDelay_miliseconds);
+                    return;
                 }
             }
 
@@ -231,7 +247,7 @@ namespace Questor.Modules
 
                 wreck.LockTarget();
                 wreckTargets.Add(wreck);
-
+                _nextTargetAction = DateTime.Now.AddMilliseconds((int)Time.TargetDelay_miliseconds);
                 if(Cache.Instance.MissionLoot)
                 {
                     if(wreckTargets.Count >= Math.Min(Cache.Instance.DirectEve.ActiveShip.MaxLockedTargets, Cache.Instance.DirectEve.Me.MaxLockedTargets))
@@ -240,6 +256,7 @@ namespace Questor.Modules
                 else
                 if (wreckTargets.Count >= MaximumWreckTargets)
                         return;
+                return;
             }
         }
 
@@ -508,7 +525,7 @@ namespace Questor.Modules
                     break;
 
                 case SalvageState.SalvageWrecks:
-                    ActivateTractorBeams();
+                     ActivateTractorBeams();
                     ActivateSalvagers();
 
                     // Default action
@@ -519,13 +536,12 @@ namespace Questor.Modules
                         var duplicates = cargo.Items.Where(i => i.Quantity > 0).GroupBy(i => i.TypeId).Any(t => t.Count() > 1);
                         if (duplicates)
                             State = SalvageState.StackItems;
-                        else
-                            _nextSalvageAction = DateTime.Now.AddSeconds((int)Time.SalvageStackItems_seconds);
+                        //else
+                        //    _nextSalvageAction = DateTime.Now.AddMi((int)Time.SalvageDelayBetweenActions_miliseconds);
                     }
                     break;
 
                 case SalvageState.StackItems:
-                    Logging.Log("Salvage: Stacking items");
 
                     if (cargo.IsReady)
                         cargo.StackAll();
@@ -535,7 +551,6 @@ namespace Questor.Modules
                     break;
 
                 case SalvageState.WaitForStacking:
-                    // Wait 5 seconds after stacking
                     if (_nextSalvageAction > DateTime.Now)
                         break;
 
