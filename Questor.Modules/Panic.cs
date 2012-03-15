@@ -166,7 +166,7 @@ namespace Questor.Modules
                     }
 
                     // We leave the panicking state once we actually start warping off
-                    var station = Cache.Instance.Stations.FirstOrDefault();
+                    var station = Cache.Instance.Stations.OrderBy(x => x.Distance).FirstOrDefault();
                     if (station != null)
                     {
                         if (Cache.Instance.InWarp)
@@ -176,14 +176,27 @@ namespace Questor.Modules
                         {
                             if (DateTime.Now.Subtract(_lastWarpTo).TotalSeconds > 5)
                             {
-                                station.WarpTo();
+                                station.WarpToAndDock();
                                 _lastWarpTo = DateTime.Now;
                             }
                         }
                         else
                             station.Dock();
-
-                        break;
+                            if (station.Distance < 1900)
+                            {
+                                station.Dock();
+                                
+                            }
+                            else
+                            {
+                                if (Cache.Instance.DirectEve.ActiveShip.Entity.Mode == 1)
+                                {
+                                    if (Cache.Instance.Approaching.Id != station.Id)
+                                        station.Approach();
+                                }
+                                else station.Approach();
+                            }
+                            break;
                     }
 
                     // Whats this you say?  No star?
