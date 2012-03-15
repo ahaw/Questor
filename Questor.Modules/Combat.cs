@@ -24,11 +24,11 @@ namespace Questor.Modules
         private readonly Dictionary<long, DateTime> _lastWeaponReload = new Dictionary<long, DateTime>();
         private bool _isJammed;
         public CombatState State { get; set; }
-        private DateTime _lastOrbit  { get; set; }
-        private DateTime _lastLoggingAction { get; set; }
-
+        private DateTime _lastOrbit = DateTime.MinValue;
+        private DateTime _lastLoggingAction = DateTime.MinValue;
+        private DateTime _nextTargetAction = DateTime.MinValue;
         private int MaxCharges { get; set; }
-
+                //private DateTime _nextTargetAction = DateTime.MinValue;
         /// <summary> Reload correct (tm) ammo for the NPC
         /// </summary>
         /// <param name = "weapon"></param>
@@ -542,6 +542,7 @@ namespace Questor.Modules
         /// </remarks>
         private void TargetCombatants()
         {
+            if (_nextTargetAction > DateTime.Now) return;
             // We are jammed, forget targeting anything...
             if (Cache.Instance.DirectEve.ActiveShip.MaxLockedTargets == 0)
             {
@@ -590,9 +591,9 @@ namespace Questor.Modules
                 else continue;
 
                 target.UnlockTarget();
-                //More human behaviour
-                //System.Threading.Thread.Sleep(333);
-                combatTargets.RemoveAt(i);
+                _nextTargetAction = DateTime.Now.AddMilliseconds((int)Time.TargetDelay_miliseconds);
+                combatTargets.RemoveAt(i); 
+                return;
             }
 
             // Get a list of current high and low value targets
@@ -618,6 +619,8 @@ namespace Questor.Modules
 
                 target.UnlockTarget();
                 highValueTargets.Remove(target);
+                _nextTargetAction = DateTime.Now.AddMilliseconds((int)Time.TargetDelay_miliseconds);
+                return;
             }
 
             // Do we have too many low value targets targeted?
@@ -627,6 +630,8 @@ namespace Questor.Modules
                 var target = lowValueTargets.OrderByDescending(t => t.Distance).First();
                 target.UnlockTarget();
                 lowValueTargets.Remove(target);
+                _nextTargetAction = DateTime.Now.AddMilliseconds((int)Time.TargetDelay_miliseconds);
+                return;
             }
 
             // Do we have enough targeted?
@@ -651,6 +656,8 @@ namespace Questor.Modules
                     Logging.Log("Combat: Targeting priority target [" + entity.Name + "][" + entity.Id + "]{" + highValueTargets.Count + "} - Distance [" + entity.Distance + "]");
                     entity.LockTarget();
                     highValueTargets.Add(entity);
+                    _nextTargetAction = DateTime.Now.AddMilliseconds((int)Time.TargetDelay_miliseconds);
+                    return;
                 }
                 
             }
@@ -670,6 +677,8 @@ namespace Questor.Modules
                     Logging.Log("Combat: Targeting high value target [" + entity.Name + "][" + entity.Id + "]{" + highValueTargets.Count + "} - Distance [" + entity.Distance + "]");
                     entity.LockTarget();
                     highValueTargets.Add(entity);
+                    _nextTargetAction = DateTime.Now.AddMilliseconds((int)Time.TargetDelay_miliseconds);
+                    return;
                 }
             }
 
@@ -688,6 +697,8 @@ namespace Questor.Modules
                     Logging.Log("Combat: Targeting low value target [" + entity.Name + "][" + entity.Id + "]{" + lowValueTargets.Count + "} - Distance [" + entity.Distance + "]");
                     entity.LockTarget();
                     lowValueTargets.Add(entity);
+                    _nextTargetAction = DateTime.Now.AddMilliseconds((int)Time.TargetDelay_miliseconds);
+                    return;
                 }
                 
             }
