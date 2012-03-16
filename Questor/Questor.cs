@@ -1501,6 +1501,8 @@ namespace Questor
                             }
                             else // Normal Salvaging
                             {
+                                if (Settings.Instance.CharacterMode=="Salvager")
+                                    State=QuestorState.SalvageOnlyBookmarks;
                                 State = QuestorState.BeginAfterMissionSalvaging;
                             }
                             return;
@@ -1976,6 +1978,10 @@ namespace Questor
 
                 case QuestorState.SalvageOnlyBookmarks:
                     var SalvageOnlyBookmarksCargo = Cache.Instance.DirectEve.GetShipsCargo();
+                    if (Cache.Instance.BookmarksByLabel(Settings.Instance.BookmarkPrefix + " ").FirstOrDefault() == null)
+                    {   
+                        break;
+                    }
                     if (Cache.Instance.InStation)
                     {
                         // We are in a station,
@@ -1992,8 +1998,10 @@ namespace Questor
                     if (Settings.Instance.UnloadLootAtStation && SalvageOnlyBookmarksCargo.IsReady && (SalvageOnlyBookmarksCargo.Capacity - SalvageOnlyBookmarksCargo.UsedCapacity) < 100)
                     {
                         Logging.Log("Salvage: We are full");
-                        State = QuestorState.Error;
-                        return;
+                        //Goint to any station is better than staying in space
+                        State = QuestorState.GotoNearestStation;
+                        //Here should unload loot
+                        break;
                     }
                     if (Cache.Instance.UnlootedContainers.Count() == 0)
                     {
@@ -2117,7 +2125,7 @@ namespace Questor
                         if (station.Distance > (int)Distance.WarptoDistance)
                         {
                             station.WarpToAndDock();
-                            State = QuestorState.Salvage;
+                            State = QuestorState.SalvageOnlyBookmarks;
                             break;
                         }
                         else

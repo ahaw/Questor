@@ -57,6 +57,12 @@ namespace Questor.Modules
             var tractorBeamRange = tractorBeams.Min(t => t.OptimalRange);
 
             var wrecks = Cache.Instance.Targets.Where(t => (t.GroupId == (int)Group.Wreck || t.GroupId == (int)Group.CargoContainer) && t.Distance < tractorBeamRange).ToList();
+            if (wrecks.FirstOrDefault() == null)
+            {
+                var wrecksFars = Cache.Instance.Targets.Where(t => (t.GroupId == (int)Group.Wreck || t.GroupId == (int)Group.CargoContainer)).ToList();
+                if (Cache.Instance.DirectEve.ActiveShip.Entity.Mode != 2 && wrecksFars.FirstOrDefault() != null)
+                    wrecksFars.FirstOrDefault().Approach();
+            }
 
             for (var i = tractorBeams.Count - 1; i >= 0; i--)
             {
