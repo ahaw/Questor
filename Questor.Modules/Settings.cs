@@ -590,8 +590,8 @@ namespace Questor.Modules
 
             logpath = (Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\log\\" + Cache.Instance.DirectEve.Me.Name + "\\");
             logpath_s = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\log\\";
-            ConsoleLogPath = logpath;
-            ConsoleLogFile = (logpath + "\\Console\\" + string.Format("{0:MM-dd-yyyy}", DateTime.Today) + "-" + Cache.Instance.DirectEve.Me.Name + "-" + "console" + ".log");
+            ConsoleLogPath = Path.Combine(logpath, "Console\\");
+            ConsoleLogFile = (ConsoleLogPath + string.Format("{0:MM-dd-yyyy}", DateTime.Today) + "-" + Cache.Instance.DirectEve.Me.Name + "-" + "console" + ".log");
             SessionsLogPath = logpath_s;
             SessionsLogFile = (SessionsLogPath + Cache.Instance.DirectEve.Me.Name + ".Sessions.log");
             DroneStatsLogPath = logpath;
