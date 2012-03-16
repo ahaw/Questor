@@ -46,23 +46,25 @@ namespace Questor.Modules
         /// </summary>
         private void ActivateTractorBeams()
         {
-            Logging.Log("Activate tractor beam" + _nextSalvageAction + " " + DateTime.Now);
             if (_nextSalvageAction > DateTime.Now) return;
 
-            
             var tractorBeams = Cache.Instance.Modules.Where(m => TractorBeams.Contains(m.TypeId)).ToList();
             if (tractorBeams.Count == 0)
                 return;
 
             var tractorBeamRange = tractorBeams.Min(t => t.OptimalRange);
-
             var wrecks = Cache.Instance.Targets.Where(t => (t.GroupId == (int)Group.Wreck || t.GroupId == (int)Group.CargoContainer) && t.Distance < tractorBeamRange).ToList();
+            
+            Logging.Log(Cache.Instance.DirectEve.ActiveShip.Entity.Mode.ToString());
             if (wrecks.FirstOrDefault() == null)
             {
-                var wrecksFars = Cache.Instance.Targets.Where(t => (t.GroupId == (int)Group.Wreck || t.GroupId == (int)Group.CargoContainer)).ToList();
-                if (Cache.Instance.DirectEve.ActiveShip.Entity.Mode != 2 && wrecksFars.FirstOrDefault() != null)
-                    wrecksFars.FirstOrDefault().Approach();
-            }
+                var wrecksFar = Cache.Instance.Entities.Where(t => (t.GroupId == (int)Group.Wreck || t.GroupId == (int)Group.CargoContainer) && t.Distance > tractorBeamRange).ToList();
+                if (wrecksFar.Count > 0)
+                    if (Cache.Instance.DirectEve.ActiveShip.Entity.Mode != 1)
+                        wrecksFar.FirstOrDefault().Approach();
+                State = SalvageState.TargetWrecks;
+                return;
+            };
 
             for (var i = tractorBeams.Count - 1; i >= 0; i--)
             {
