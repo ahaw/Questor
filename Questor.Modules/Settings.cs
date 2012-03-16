@@ -85,6 +85,7 @@ namespace Questor.Modules
         public string CombatShipName { get; set; }
         public string SalvageShipName { get; set; }
         public string TransportShipName { get; set; }
+        public string MaterialShipName { get; set; }
         public bool MultiAgentSupport { get; private set; }
 
         public string LootHangar { get; set; }
@@ -382,6 +383,7 @@ namespace Questor.Modules
             CombatShipName = (string) xml.Element("combatShipName") ?? "";
             SalvageShipName = (string) xml.Element("salvageShipName") ?? "";
             TransportShipName = (string)xml.Element("transportShipName") ?? "";
+            MaterialShipName = (string)xml.Element("materialShipName") ?? "";
 
             LootHangar = (string) xml.Element("lootHangar");
             AmmoHangar = (string) xml.Element("ammoHangar");

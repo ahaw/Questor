@@ -8,21 +8,23 @@
     public class MaterialsForWarPreparation : IStoryline
     {
         private DateTime _nextAction;
-
+      
         /// <summary>
         ///   Arm does nothing but get into a (assembled) shuttle
         /// </summary>
         /// <returns></returns>
         public StorylineState Arm(Storyline storyline)
-        {
+        {         
             if (_nextAction > DateTime.Now)
                 return StorylineState.Arm; 
             
             // Are we in a shuttle?  Yes, goto the agent
             var directEve = Cache.Instance.DirectEve;
-            if (directEve.ActiveShip.GroupId == 31)
-                return StorylineState.GotoAgent;
+            string materialshipName = Settings.Instance.MaterialShipName.ToLower();
 
+            if (directEve.ActiveShip.GroupId == 31 || directEve.ActiveShip.GivenName == materialshipName)
+                return StorylineState.GotoAgent;
+            
             // Open the ship hangar
             var ships = directEve.GetShipHangar();
             if (ships.Window == null)
@@ -39,16 +41,23 @@
             // If the ship hangar is not ready then wait for it
             if (!ships.IsReady)
                 return StorylineState.Arm;
-            
-            //  Look for a shuttle
-            var item = ships.Items.FirstOrDefault(i => i.Quantity == -1 && i.GroupId == 31);
-            if (item != null)
+        
+            var ship = ships.Items.FirstOrDefault(i => i.Quantity == -1 && i.GroupId == 31);
+
+            if (string.IsNullOrEmpty(materialshipName))
             {
-                Logging.Log("MaterialsForWarPreparation: Switching to shuttle");
+                Logging.Log("MaterialsForWarPreparation: Could not find MaterialshipName: " + materialshipName + " in settings!");
+            }
+            else
+                ship = ships.Items.FirstOrDefault(i => i.GivenName.ToLower() == materialshipName);
+
+            if (ship != null)
+            {
+                Logging.Log("MaterialsForWarPreparation: Switching to ship");
 
                 _nextAction = DateTime.Now.AddSeconds(10);
 
-                item.ActivateShip();
+                ship.ActivateShip();
                 return StorylineState.Arm;
             }
             else
