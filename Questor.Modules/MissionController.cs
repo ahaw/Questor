@@ -271,7 +271,7 @@ namespace Questor.Modules
                     closest.Activate();
 
                     // Do not change actions, if NextPocket gets a timeout (>2 mins) then it reverts to the last action
-                    
+                    Logging.Log("MissionController.Activate: Activate [" + closest.Name + "] and change state to 'NextPocket'");
 
                     _lastActivateAction = DateTime.Now;
                     State = MissionControllerState.NextPocket;
@@ -300,7 +300,7 @@ namespace Questor.Modules
                 if (DateTime.Now.Subtract(_lastAlign ).TotalMinutes > (int)Time.LastAlignDelay_minutes)
                 {
                     // Only happens if we are asked to Activate something that is outside Distance.CloseToGateActivationRange (default is: 6k)
-                    Logging.Log("MissionController: closest.AlignTo: [" + closest.Name + "] This only happens if we are asked to Activate something that is outside [" + Distance.CloseToGateActivationRange + "]");
+                    Logging.Log("MissionController: closest.AlignTo: [" + closest.Name + "] This only happens if we are asked to Activate something that is outside [6km]");
                     closest.AlignTo();
                     _lastAlign = DateTime.Now;
                 }
@@ -452,15 +452,15 @@ namespace Questor.Modules
             {
                 if (Cache.Instance.DirectEve.ActiveShip.MaxLockedTargets > 0)
                 {
-                        if (target.IsTarget) //This target is already targeted no need to target it again
-                        {
-                            return;
-                        }
-                        else
-                        {
-                            Logging.Log("MissionController.ClearwithinWeaponsRange: Targeting [" + target.Name + "][" + target.Id + "] - Distance [" + target.Distance + "]");
-                            target.LockTarget();
-                        }
+                    if (target.IsTarget) //This target is already targeted no need to target it again
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        Logging.Log("MissionController.ClearwithinWeaponsRange: Targeting [" + target.Name + "][" + target.Id + "] - Distance [" + target.Distance + "]");
+                        target.LockTarget();
+                    }
                 }
                 return;
             }
@@ -1349,6 +1349,10 @@ namespace Questor.Modules
 
                 case ActionState.MoveToBackground:
                     MoveToBackgroundAction(action);
+                    break;
+
+                case ActionState.ClearWithinWeaponsRangeOnly:
+                    ClearWithinWeaponsRangeOnlyAction(action);
                     break;
                 
                 case ActionState.ClearWithinWeaponsRangeOnly:

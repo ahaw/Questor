@@ -174,6 +174,7 @@ namespace Questor.Modules
         public double Wealth { get; set; }
         public bool OpenWrecks = false;
         public bool NormalApproch = true;
+
         public bool CourierMission = false;
         public string MissionName = "";
         public bool ConsoleLogOpened = false;
@@ -291,6 +292,7 @@ namespace Questor.Modules
         public DateTime lastKnownGoodConnectedTime { get; set; }
         public long totalMegaBytesOfMemoryUsed { get; set; }
         public double MyWalletBalance { get; set; }
+
         public string CurrentAgent
         {
             get
@@ -341,7 +343,7 @@ namespace Questor.Modules
         {
             get
             {
-				_agent = DirectEve.GetAgentByName(CurrentAgent);
+                _agent = DirectEve.GetAgentByName(CurrentAgent);
                 _agentId = _agent.AgentId;
 
                 if (_agent == null)
@@ -377,11 +379,11 @@ namespace Questor.Modules
             get
             {
                 if (_containers == null)
-				
-				//
-				// edit 12-18-2011
-				//
-                    _containers = Entities.Where(e => e.IsContainer && e.HaveLootRights && (e.GroupId != (int) Group.Wreck || !e.IsWreckEmpty) && (e.Name != (String) "Abandoned Container")).ToList();
+
+                    //
+                    // edit 12-18-2011
+                    //
+                    _containers = Entities.Where(e => e.IsContainer && e.HaveLootRights && (e.GroupId != (int)Group.Wreck || !e.IsWreckEmpty) && (e.Name != (String)"Abandoned Container")).ToList();
 
                 return _containers;
             }
@@ -600,7 +602,7 @@ namespace Questor.Modules
         public bool ArmLoadedCache { get; set; } // flags whether arm has already loaded the mission
         public bool UseMissionShip { get; set; } // flags whether we're using a mission specific ship
         public bool ChangeMissionShipFittings { get; set; } // used for situations in which missionShip's specified, but no faction or mission fittings are; prevents default
-                                                            // fitting from being loaded in arm.cs
+        // fitting from being loaded in arm.cs
         public List<Ammo> missionAmmo;
         public int MissionWeaponGroupId = 0;
         public bool? MissionUseDrones;
@@ -774,15 +776,15 @@ namespace Questor.Modules
                         continue;
 
                     if (pocket.Element("damagetype") != null)
-                        DamageType = (DamageType) Enum.Parse(typeof (DamageType), (string) pocket.Element("damagetype"), true);
+                        DamageType = (DamageType)Enum.Parse(typeof(DamageType), (string)pocket.Element("damagetype"), true);
 
-					if (pocket.Element("orbitdistance") != null) 	//Load OrbitDistance from mission.xml, if present
+                    if (pocket.Element("orbitdistance") != null) 	//Load OrbitDistance from mission.xml, if present
                     {
                         
                         OrbitDistance = (int) pocket.Element("orbitdistance");
                         Logging.Log(string.Format("Cache: Using Mission Orbit distance {0}",OrbitDistance));
                     }
-					else											//Otherwise, use value defined in charname.xml file
+                    else											//Otherwise, use value defined in charname.xml file
                     {
 						OrbitDistance = Settings.Instance.OrbitDistance;
                         Logging.Log(string.Format("Cache: Using Settings Orbit distance {0}",OrbitDistance));

@@ -662,6 +662,8 @@ namespace Questor.Modules
                 
             }
 
+            }
+
             foreach (var entity in highValueTargetingMe)
             {
                 // Have we reached the limit of high value targets?
@@ -680,6 +682,7 @@ namespace Questor.Modules
                     _nextTargetAction = DateTime.Now.AddMilliseconds((int)Time.TargetDelay_miliseconds);
                     return;
                 }
+            }
             }
 
             foreach (var entity in lowValueTargetingMe)

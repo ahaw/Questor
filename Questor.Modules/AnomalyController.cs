@@ -234,7 +234,7 @@ namespace Questor.Modules
                         {
                             Logging.Log("AnomalyController.ClearPocket: Targeting [" + target.Name + "][" + target.Id + "] - Distance [" + target.Distance + "]");
                             target.LockTarget();
-                        }
+                    }
                     }
                     return;
                 }

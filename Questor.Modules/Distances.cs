@@ -23,7 +23,7 @@ namespace Questor.Modules
         OrbitDistanceCushion = 5000, // This is used to determine when to stop orbitingor approaching, if not speed tanking (orbit distance + orbitdistancecushion)
         OptimalRangeCushion = 5000, // This is used to determine when to stop approaching, if not speed tanking (optimal distance + optimaldistancecushion)
         InsideThisRangeIsLIkelyToBeMostlyFrigates = 9000, // 9k - overall this assumption works, use with caution
-        DecloakRange = 1900,
+        DecloakRange = 2050,
         SafeToCloakDistance = 2300,
         DockingRange = 1900,
         MissionWarpLimit = 150000000, // Mission bookmarks have a 1.000.000 distance warp-to limit (changed it to 150.000.000 as there are some bugged missions around)  

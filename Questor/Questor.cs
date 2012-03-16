@@ -1503,7 +1503,19 @@ namespace Questor
                             {
                                 if (Settings.Instance.CharacterMode=="Salvager")
                                     State=QuestorState.SalvageOnlyBookmarks;
-                                State = QuestorState.BeginAfterMissionSalvaging;
+                                    State = QuestorState.BeginAfterMissionSalvaging;
+                                }
+                                else
+                                {
+                                    Logging.Log("Questor: UnloadLoot: The last after mission salvaging session was [" + DateTime.Now.Subtract(FinishedSalvaging).Minutes + "] ago ");
+                                    Logging.Log("Questor: UnloadLoot: we are going to the next mission because it has not been [" + ((int)Time.WrecksDisappearAfter_minutes - (int)Time.AverageTimeToCompleteAMission_minutes - (int)Time.AverageTimetoSalvageMultipleMissions_minutes) + "] min since the last session. ");
+                                    FinishedMission = DateTime.Now;
+                                    State = QuestorState.Idle;
+                                }
+                            }
+                            else // Normal Salvaging
+                            {
+                            State = QuestorState.BeginAfterMissionSalvaging;
                             }
                             return;
                         }
