@@ -1502,6 +1502,7 @@ namespace Questor
                             else // Normal Salvaging
                             {
                                 if (Settings.Instance.CharacterMode=="Salvager")
+                                {
                                     State=QuestorState.SalvageOnlyBookmarks;
                                     State = QuestorState.BeginAfterMissionSalvaging;
                                 }
@@ -1512,10 +1513,6 @@ namespace Questor
                                     FinishedMission = DateTime.Now;
                                     State = QuestorState.Idle;
                                 }
-                            }
-                            else // Normal Salvaging
-                            {
-                            State = QuestorState.BeginAfterMissionSalvaging;
                             }
                             return;
                         }

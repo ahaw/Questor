@@ -24,9 +24,15 @@ namespace Questor.Modules
         private readonly Dictionary<long, DateTime> _lastWeaponReload = new Dictionary<long, DateTime>();
         private bool _isJammed;
         public CombatState State { get; set; }
+<<<<<<< HEAD
         private DateTime _lastOrbit = DateTime.MinValue;
         private DateTime _lastLoggingAction = DateTime.MinValue;
         private DateTime _nextTargetAction = DateTime.MinValue;
+=======
+        private DateTime _lastOrbit  { get; set; }
+        private DateTime _lastLoggingAction { get; set; }
+
+>>>>>>> 41d5883... fix & import some stuff from iseeded
         private int MaxCharges { get; set; }
                 //private DateTime _nextTargetAction = DateTime.MinValue;
         /// <summary> Reload correct (tm) ammo for the NPC
@@ -299,7 +305,11 @@ namespace Questor.Modules
             {
                 if ((DateTime.Now.Subtract(_lastOrbit).TotalSeconds > 15))
                 {
+<<<<<<< HEAD
                     target.Orbit(Cache.Instance.OrbitDistance);
+=======
+                target.Orbit(Cache.Instance.OrbitDistance);
+>>>>>>> 41d5883... fix & import some stuff from iseeded
                     Logging.Log("Combat.ActivateWeapons: Initiating Orbit [" + target.Name + "][" + target.Id + "]");
                     _lastOrbit = DateTime.Now;
                 }
@@ -351,6 +361,11 @@ namespace Questor.Modules
             {
                 // dont waste ammo on small target if you use autocannon or siege i hope you use drone
                 if (Settings.Instance.DontShootFrigatesWithSiegeorAutoCannons) //this defaults to false and needs to be changed in your characters settings xml file if you want to enable this option
+<<<<<<< HEAD
+=======
+                {
+                if (Settings.Instance.WeaponGroupId == 55 || Settings.Instance.WeaponGroupId == 508 || Settings.Instance.WeaponGroupId == 506)
+>>>>>>> 41d5883... fix & import some stuff from iseeded
                 {
                     if (Settings.Instance.WeaponGroupId == 55 || Settings.Instance.WeaponGroupId == 508 || Settings.Instance.WeaponGroupId == 506)
                     {
@@ -653,6 +668,7 @@ namespace Questor.Modules
                 }
                 else
                 {
+<<<<<<< HEAD
                     Logging.Log("Combat: Targeting priority target [" + entity.Name + "][" + entity.Id + "]{" + highValueTargets.Count + "} - Distance [" + entity.Distance + "]");
                     entity.LockTarget();
                     highValueTargets.Add(entity);
@@ -660,7 +676,12 @@ namespace Questor.Modules
                     return;
                 }
                 
-            
+=======
+                Logging.Log("Combat: Targeting priority target [" + entity.Name + "][" + entity.Id + "]{" + highValueTargets.Count + "} - Distance [" + entity.Distance + "]");
+                entity.LockTarget();
+                highValueTargets.Add(entity);
+>>>>>>> 41d5883... fix & import some stuff from iseeded
+            }
 
             }
 
@@ -676,14 +697,20 @@ namespace Questor.Modules
                 }
                 else
                 {
+<<<<<<< HEAD
                     Logging.Log("Combat: Targeting high value target [" + entity.Name + "][" + entity.Id + "]{" + highValueTargets.Count + "} - Distance [" + entity.Distance + "]");
                     entity.LockTarget();
                     highValueTargets.Add(entity);
                     _nextTargetAction = DateTime.Now.AddMilliseconds((int)Time.TargetDelay_miliseconds);
                     return;
                 }
+=======
+                Logging.Log("Combat: Targeting high value target [" + entity.Name + "][" + entity.Id + "]{" + highValueTargets.Count + "} - Distance [" + entity.Distance + "]");
+                entity.LockTarget();
+                highValueTargets.Add(entity);
+>>>>>>> 41d5883... fix & import some stuff from iseeded
             }
-            
+            }
 
             foreach (var entity in lowValueTargetingMe)
             {
@@ -697,12 +724,20 @@ namespace Questor.Modules
                 }
                 else
                 {
+<<<<<<< HEAD
                     Logging.Log("Combat: Targeting low value target [" + entity.Name + "][" + entity.Id + "]{" + lowValueTargets.Count + "} - Distance [" + entity.Distance + "]");
                     entity.LockTarget();
                     lowValueTargets.Add(entity);
                     _nextTargetAction = DateTime.Now.AddMilliseconds((int)Time.TargetDelay_miliseconds);
                     return;
                 }
+                
+=======
+                Logging.Log("Combat: Targeting low value target [" + entity.Name + "][" + entity.Id + "]{" + lowValueTargets.Count + "} - Distance [" + entity.Distance + "]");
+                entity.LockTarget();
+                lowValueTargets.Add(entity);
+>>>>>>> 41d5883... fix & import some stuff from iseeded
+            }
                 
             }
         }
