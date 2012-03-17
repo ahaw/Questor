@@ -50,6 +50,7 @@ namespace Questor
         private DateTime _lastLocalWatchAction;
         private DateTime _lastWalletCheck;
         private DateTime _lastupdateofSessionRunningTime;
+        private DateTime _lastCheckWindowsAction;
         private DateTime _lastTimeCheckAction;
         private DateTime _lastWarpTo;
         private DateTime _questorStarted;
@@ -117,6 +118,7 @@ namespace Questor
         public bool CloseQuestorflag = true;
         public DateTime _CloseQuestorDelay { get; set; }
         private bool CloseQuestor10SecWarningDone = false;
+        private bool MissionLoggingCompleted = false;
 
         public string CharacterName { get; set; }
 
@@ -286,7 +288,7 @@ namespace Questor
                 }
             }
 
-
+            
             foreach (var window in Cache.Instance.Windows)
             {
                 // Telecom messages are generally mission info messages
@@ -532,7 +534,7 @@ namespace Questor
                         }
                         if (Cache.Instance.StopTimeSpecified)
                         {
-                            if (DateTime.Now >= Cache.Instance.StopTime)
+                             if (DateTime.Now >= Cache.Instance.StopTime)
                             {
                                 Logging.Log("Questor: Time to stop.  Quitting game.");
                                 Cache.Instance.ReasonToStopQuestor = "StopTimeSpecified and reached.";
@@ -546,7 +548,7 @@ namespace Questor
                         }
                         if (ExitWhenIdle && !AutoStart)
                         {
-
+                            
                             //LavishScript.ExecuteCommand("exit");
                             Cache.Instance.ReasonToStopQuestor = "Settings: ExitWhenIdle is true, and we are idle... exiting";
                             Logging.Log(Cache.Instance.ReasonToStopQuestor);
@@ -568,6 +570,9 @@ namespace Questor
                         break;
                     }
                     
+                    if (MissionLoggingCompleted == false)
+                    {
+                        MissionLoggingCompleted = true;
                         mission = Cache.Instance.GetAgentMission(Cache.Instance.AgentId);
                         if (!string.IsNullOrEmpty(Mission) && (mission == null || mission.Name != Mission || mission.State != (int)MissionState.Accepted))
                         {
@@ -600,7 +605,7 @@ namespace Questor
 
                                 // The mission is finished
                                 File.AppendAllText(Settings.Instance.MissionStats1LogFile, line);
-                            Logging.Log("Questor: writing mission log1 to  [ " + Settings.Instance.MissionStats1LogFile);
+                                Logging.Log("Questor: writing mission log1 to  [ " + Settings.Instance.MissionStats1LogFile);
                             }
                             if (Settings.Instance.MissionStats2Log)
                             {
@@ -623,7 +628,7 @@ namespace Questor
                                 line2 += ((int)AmmoValue) + ";\r\n";                                                // Ammo Value
 
                                 // The mission is finished
-                            Logging.Log("Questor: writing mission log2 to [ " + Settings.Instance.MissionStats2LogFile);
+                                Logging.Log("Questor: writing mission log2 to [ " + Settings.Instance.MissionStats2LogFile);
                                 File.AppendAllText(Settings.Instance.MissionStats2LogFile, line2);
                             }
                             if (Settings.Instance.MissionStats3Log)
@@ -654,12 +659,13 @@ namespace Questor
                                 line3 += ((int)FinishedSalvaging.Subtract(StartedSalvaging).TotalMinutes) + ((int)FinishedMission.Subtract(StartedMission).TotalMinutes) + ";\r\n"; // Total Time, Mission + After Mission Salvaging (if any)
 
                                 // The mission is finished
-                            Logging.Log("Questor: writing mission log3 to  [ " + Settings.Instance.MissionStats3LogFile);
+                                Logging.Log("Questor: writing mission log3 to  [ " + Settings.Instance.MissionStats3LogFile);
                                 File.AppendAllText(Settings.Instance.MissionStats3LogFile, line3);
                             }
                             // Disable next log line
                             Mission = null;
                         }
+                    }
 
                     if (AutoStart)
                     {
@@ -1477,7 +1483,7 @@ namespace Questor
                         {
                             FinishedMission = DateTime.Now;
                             if (Settings.Instance.SalvageMultpleMissionsinOnePass) // Salvage only after multiple missions have been completed
-                            {
+                            {   
                                 //if we can still complete another mission before the Wrecks disappear and still have time to salvage
                                 if (DateTime.Now.Subtract(FinishedSalvaging).Minutes > ((int)Time.WrecksDisappearAfter_minutes - (int)Time.AverageTimeToCompleteAMission_minutes - (int)Time.AverageTimetoSalvageMultipleMissions_minutes))
                                 {
@@ -1538,11 +1544,15 @@ namespace Questor
                     {
                         _arm.State = ArmState.Idle;
 
-                        var bookmark = Cache.Instance.BookmarksByLabel(Settings.Instance.BookmarkPrefix + " ").OrderBy(b => b.CreatedOn).FirstOrDefault();
+                        var bookmark = Cache.Instance.BookmarksByLabel(Settings.Instance.BookmarkPrefix + " ").OrderBy(b => b.CreatedOn).Where(c => c.LocationId == Cache.Instance.DirectEve.Session.SolarSystemId).FirstOrDefault();
                         if (bookmark == null)
                         {
-                            State = QuestorState.Idle;
-                            return;
+                            bookmark = Cache.Instance.BookmarksByLabel(Settings.Instance.BookmarkPrefix + " ").OrderBy(b => b.CreatedOn).FirstOrDefault();
+                            if (bookmark == null)
+                            {
+                                State = QuestorState.Idle;
+                                return;
+                            }
                         }
 
                         State = QuestorState.GotoSalvageBookmark;
@@ -1595,7 +1605,8 @@ namespace Questor
                         Logging.Log("Salvage: Finished salvaging the room");
 
                         bool GatesInRoom = GateInSalvage();
-                        var bookmarks = Cache.Instance.BookmarksByLabel(Settings.Instance.BookmarkPrefix + " ");
+                        var bookmarks = Cache.Instance.BookmarksByLabel(Settings.Instance.BookmarkPrefix + " ").OrderBy(b => b.CreatedOn).ToList();
+
                         do
                         {
                             // Remove all bookmarks from address book
@@ -1624,9 +1635,12 @@ namespace Questor
                             if (!GatesInRoom)
                             {
                                 Logging.Log("Salvage: Goto the next salvage bookmark");
-
+                                var bookmark = bookmarks.Where(c => c.LocationId == Cache.Instance.DirectEve.Session.SolarSystemId).FirstOrDefault();
+                                if (bookmark==null)
+                                    bookmark = bookmarks.FirstOrDefault();
+                                
                                 State = QuestorState.GotoSalvageBookmark;
-                                _traveler.Destination = new BookmarkDestination(bookmarks.OrderBy(b => b.CreatedOn).First());
+                                _traveler.Destination = new BookmarkDestination(bookmark);
                             }
                             else if (Settings.Instance.UseGatesInSalvage)
                             {
@@ -1945,8 +1959,8 @@ namespace Questor
                                 closestWreck.WarpTo();
                                 _lastWarpTo = DateTime.Now;
                             }
-                            else
-                                closestWreck.Approach();
+                        else
+                            closestWreck.Approach();
                     }
                     else if (closestWreck.Distance <= (int)Distance.SafeScoopRange && Cache.Instance.Approaching != null)
                     {
@@ -2042,8 +2056,8 @@ namespace Questor
                                 closestWreck.WarpTo();
                                 _lastWarpTo = DateTime.Now;
                             }
-                            else
-                                closestWreck.Approach();
+                        else
+                            closestWreck.Approach();
                     }
                     else if (closestWreck.Distance <= (int)Distance.SafeScoopRange && Cache.Instance.Approaching != null)
                     {
@@ -2150,7 +2164,7 @@ namespace Questor
                             }
                         }
                     }
-                    else State = QuestorState.Error;
+                    else State=QuestorState.Error;
                     break;
             }
         }
