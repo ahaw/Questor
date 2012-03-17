@@ -13,6 +13,7 @@ namespace Questor.Modules
     {
         QuestorPulse_milliseconds = 250,                        // Used to delay the next pulse, units: milliseconds. Default is 1500
         DefenceDelay_milliseconds = 500,
+        ApproachDelay_seconds = 2,
         TargetDelay_miliseconds = 220,
         ValidateSettings_seconds = 15,                           // This is the delay between character settings validation attempts. The settings will be reloaded at this interval if they have changed. Default is 15
         SetupLogPathDelay_seconds = 10,                          // Why is this delay here? this can likely be removed with some testing... Default is 10
@@ -41,7 +42,7 @@ namespace Questor.Modules
         TravelerInWarpedNextCommandDelay_seconds = 15,           // Traveler is in warp - delay before processing another command, units: seconds. Default is 15
         WrecksDisappearAfter_minutes = 110,                      // used to determine how long a wreck will be in space: usually to delay salvaging until a later time, units: minutes. Default is 120 minutes (2 hours)
         AverageTimeToCompleteAMission_minutes = 30,              // average time for all missions, all races, all shiptypes (guestimated)... it is used to determine whn to do things like salvage. units: minutes. Default is 30 
-        AverageTimetoSalvageMultipleMissions_minutes = 15,       // average time it will take to salvage the multiple mission chain we plan on salvaging all in one go.
+        AverageTimetoSalvageMultipleMissions_minutes = 30,       // average time it will take to salvage the multiple mission chain we plan on salvaging all in one go.
         CheckForWindows_seconds = 15                             // Check for and deal with modal windows every x seconds, units: seconds. Default is 15
      }
 }

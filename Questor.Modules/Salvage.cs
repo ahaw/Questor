@@ -21,7 +21,8 @@ namespace Questor.Modules
         public static HashSet<int> TractorBeams = new HashSet<int> { 24348, 24620, 24622, 24644, 4250 };
 
         private DateTime _lastJettison = DateTime.MinValue;
-        private DateTime _nextSalvageAction= DateTime.Now;
+        private DateTime _nextSalvageAction = DateTime.MinValue;
+        private DateTime _nextApproachAction = DateTime.MinValue;
         private DateTime _nextTargetAction = DateTime.MinValue;
 
         /// <summary>
@@ -61,7 +62,13 @@ namespace Questor.Modules
                 var wrecksFar = Cache.Instance.Entities.Where(t => (t.GroupId == (int)Group.Wreck || t.GroupId == (int)Group.CargoContainer) && t.Distance > tractorBeamRange).ToList();
                 if (wrecksFar.Count > 0)
                     if (Cache.Instance.DirectEve.ActiveShip.Entity.Mode != 1)
-                        wrecksFar.FirstOrDefault().Approach();
+                    {
+                        if (_nextApproachAction < DateTime.Now)
+                        {
+                            _nextApproachAction = DateTime.Now.AddSeconds((int)Time.ApproachDelay_seconds);
+                            wrecksFar.FirstOrDefault().Approach();
+                        }
+                    }
                 State = SalvageState.TargetWrecks;
                 return;
             };
