@@ -2122,7 +2122,7 @@ namespace Questor
                     }
                     break;
                 case QuestorState.GotoNearestStation:
-                    var station = Cache.Instance.Stations.OrderBy(x => x.Distance).FirstOrDefault();
+                    var station = Cache.Instance.Stations.OrderBy(x=>x.Distance).FirstOrDefault();
                     if (station != null)
                     {
                         if (station.Distance > (int)Distance.WarptoDistance)
@@ -2133,11 +2133,11 @@ namespace Questor
                         }
                         else
                         {
-
+                           
                             if (station.Distance < 1900)
                             {
                                 station.Dock();
-
+ 
                             }
                             else
                             {
