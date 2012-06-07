@@ -63,7 +63,11 @@ namespace Questor.Storylines
                                {"Nine Tenths of the Wormhole", new GenericCombatStoryline()},
                                {"Blood Farm", new GenericCombatStoryline()},
                                {"Jealous Rivals", new GenericCombatStoryline()},
+                               
                                {"Quota Season", new GenericCombatStoryline()},
+                               {"Pirate Radio", new GenericCombatStoryline()},
+                               {"Operation Doorstop", new GenericCourier()},
+                               {"Black Ops Crisis", new GenericCourier()},
                                //{"Matriarch", new GenericCombatStoryline()},
                                //{"Diplomatic Incident", new GenericCombatStoryline()},
                                //these work but are against other factions that I generally like to avoid

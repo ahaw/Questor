@@ -961,14 +961,19 @@ namespace Questor.Behaviors
                     _arm.ProcessState();
                     if (_States.CurrentArmState == ArmState.Done)
                     {
-                        DirectBookmark bookmark = Cache.Instance.BookmarksByLabel(Settings.Instance.BookmarkPrefix + " ").OrderBy(b => b.CreatedOn).FirstOrDefault();
+                        DirectBookmark bookmark;
                         _States.CurrentArmState = ArmState.Idle;
                         if (Settings.Instance.FirstSalvageBookmarksInSystem)
                         {
                             Logging.Log("CombatMissionsBehavior.BeginAftermissionSalvaging", "Salvaging at first bookmark from system", Logging.white);
                             bookmark = Cache.Instance.BookmarksByLabel(Settings.Instance.BookmarkPrefix + " ").OrderBy(b => b.CreatedOn).FirstOrDefault(c => c.LocationId == Cache.Instance.DirectEve.Session.SolarSystemId);
                         }
-                        else Logging.Log("CombatMissionsBehavior.BeginAftermissionSalvaging", "Salvaging at first oldest bookmarks", Logging.white);
+                        else
+                        {
+                            Logging.Log("CombatMissionsBehavior.BeginAftermissionSalvaging", "Salvaging at first oldest bookmarks", Logging.white);
+                            bookmark = Cache.Instance.BookmarksByLabel(Settings.Instance.BookmarkPrefix + " ").OrderBy(b => b.CreatedOn).FirstOrDefault();
+                        
+                        }
                         if (bookmark == null)
                         {
                             bookmark = Cache.Instance.BookmarksByLabel(Settings.Instance.BookmarkPrefix + " ").OrderBy(b => b.CreatedOn).FirstOrDefault();
@@ -1102,10 +1107,19 @@ namespace Questor.Behaviors
                             }
                             else
                             {
+
                                 if (!gatesInRoom)
                                 {
                                     Logging.Log("CombatMissionsBehavior.Salvage", "Go to the next salvage bookmark", Logging.white);
-                                    var bookmark = bookmarks.FirstOrDefault(c => c.LocationId == Cache.Instance.DirectEve.Session.SolarSystemId) ?? bookmarks.FirstOrDefault();
+                                    DirectBookmark bookmark;
+                                    if (Settings.Instance.FirstSalvageBookmarksInSystem)
+                                    {
+                                         bookmark = bookmarks.FirstOrDefault(c => c.LocationId == Cache.Instance.DirectEve.Session.SolarSystemId) ?? bookmarks.FirstOrDefault();
+                                    }
+                                    else
+                                    {
+                                        bookmark = bookmarks.OrderBy(i=> i.CreatedOn).FirstOrDefault()?? bookmarks.FirstOrDefault();
+                                    }
                                     if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.Salvage)
                                     {
                                         _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.GotoSalvageBookmark;

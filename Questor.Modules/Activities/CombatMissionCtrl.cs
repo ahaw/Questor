@@ -75,14 +75,24 @@ namespace Questor.Modules.Activities
                         //Logging.Log("CombatMissionCtrl." + _pocketActions[_currentAction] ,"StartOrbiting: Target in range");
                         if (!Cache.Instance.IsApproachingOrOrbiting)
                         {
-                            Logging.Log("CombatMissionCtrl.NavigateIntoRange", "We are not approaching nor orbiting", Logging.teal);
-                            
-                            EntityCache structure = Cache.Instance.Entities.Where(i => i.Name.Contains("Gate")).OrderBy(t => t.Distance).OrderBy(t => t.Distance).FirstOrDefault();
-                            
-                            if (Settings.Instance.OrbitStructure && structure != null)
+                            Logging.Log("CombatMissionCtrl.NavigateIntoRange", "We are not approaching nor orbiting", Logging.teal);                            
+                            if (Settings.Instance.OrbitStructure)
                             {
-                                structure.Orbit((int)Cache.Instance.OrbitDistance);
-                                Logging.Log("CombatMissionCtrl." + _pocketActions[_currentAction], "Initiating Orbit [" + structure.Name + "][ID: " + structure.Id + "]", Logging.teal);
+                                EntityCache structure = Cache.Instance.Entities.Where(i => i.Name.Contains("Gate")).OrderBy(t => t.Distance).OrderBy(t => t.Distance).FirstOrDefault();
+                                if (structure != null)
+                                {
+                                    structure.Orbit((int)Cache.Instance.OrbitDistance);
+                                    Logging.Log("CombatMissionCtrl." + _pocketActions[_currentAction], "Initiating Orbit around Gate [" + structure.Name + "][ID: " + structure.Id + "]", Logging.teal);
+                                }
+                                else
+                                {
+                                    structure = Cache.Instance.Entities.Where(i => i.GroupId == (int)Group.LargeCollidableStructure || i.Name.Contains("Beacon")).OrderBy(t => t.Distance).OrderBy(t => t.Distance).FirstOrDefault();
+                                    if (structure != null)
+                                    {
+                                        structure.Orbit((int)Cache.Instance.OrbitDistance);
+                                        Logging.Log("CombatMissionCtrl." + _pocketActions[_currentAction], "Initiating Orbit around Beacon or LCS [" + structure.Name + "][ID: " + structure.Id + "]", Logging.teal);
+                                    }
+                                }
                             }
                             else
                             {
@@ -160,18 +170,29 @@ namespace Questor.Modules.Activities
                         if (!Cache.Instance.IsApproachingOrOrbiting)
                         {
                             Logging.Log("CombatMissionCtrl.NavigateToObject", "We are not approaching nor orbiting", Logging.teal);
-                            const bool orbitStructure = true;
-                            var structure = Cache.Instance.Entities.Where(i => i.GroupId == (int)Group.LargeCollidableStructure || i.Name.Contains("Gate") || i.Name.Contains("Beacon")).OrderBy(t => t.Distance).OrderBy(t => t.Distance).FirstOrDefault();
-
-                            if (orbitStructure && structure != null)
+                            if (Settings.Instance.OrbitStructure)
                             {
-                                structure.Orbit((int)Cache.Instance.OrbitDistance);
-                                Logging.Log("CombatMission." + _pocketActions[_currentAction], "Initiating Orbit [" + structure.Name + "][ID: " + structure.Id + "]", Logging.teal);
+                                EntityCache structure = Cache.Instance.Entities.Where(i => i.Name.Contains("Gate")).OrderBy(t => t.Distance).OrderBy(t => t.Distance).FirstOrDefault();
+
+                                if (structure != null)
+                                {
+                                    structure.Orbit((int)Cache.Instance.OrbitDistance);
+                                    Logging.Log("CombatMissionCtrl." + _pocketActions[_currentAction], "Initiating Orbit around Gate [" + structure.Name + "][ID: " + structure.Id + "]", Logging.teal);
+                                }
+                                else
+                                {
+                                    structure = Cache.Instance.Entities.Where(i => i.GroupId == (int)Group.LargeCollidableStructure || i.Name.Contains("Beacon")).OrderBy(t => t.Distance).OrderBy(t => t.Distance).FirstOrDefault();
+                                    if (structure != null)
+                                    {
+                                        structure.Orbit((int)Cache.Instance.OrbitDistance);
+                                        Logging.Log("CombatMissionCtrl." + _pocketActions[_currentAction], "Initiating Orbit around Beacon or LCS [" + structure.Name + "][ID: " + structure.Id + "]", Logging.teal);
+                                    }
+                                }
                             }
                             else
                             {
                                 target.Orbit(Cache.Instance.OrbitDistance);
-                                Logging.Log("CombatMission." + _pocketActions[_currentAction], "Initiating Orbit [" + target.Name + "][ID: " + target.Id + "]", Logging.teal);
+                                Logging.Log("CombatMissionCtrl." + _pocketActions[_currentAction], "Initiating Orbit [" + target.Name + "][ID: " + target.Id + "]", Logging.teal);
                             }
                             Cache.Instance.NextOrbit = DateTime.Now.AddSeconds((int)Time.OrbitDelay_seconds);
                             return;

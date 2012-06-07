@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Questor.Modules.Actions;
 using Questor.Modules.Activities;
 using Questor.Modules.Caching;
@@ -24,31 +25,66 @@ namespace Questor.Storylines
         {
             if (_nextAction > DateTime.Now)
                 return StorylineState.Arm;
+            if (!Cache.Instance.OpenShipsHangar("Arm"))
+                return StorylineState.Arm; ;
 
             // Are we in an industrial?  Yes, goto the agent
-            var directEve = Cache.Instance.DirectEve;
-            if (directEve.ActiveShip.TypeId == 648 || directEve.ActiveShip.TypeId == 649 || directEve.ActiveShip.TypeId == 650 || directEve.ActiveShip.TypeId == 651 || directEve.ActiveShip.TypeId == 652 || directEve.ActiveShip.TypeId == 653 || directEve.ActiveShip.TypeId == 654 || directEve.ActiveShip.TypeId == 655 || directEve.ActiveShip.TypeId == 656 || directEve.ActiveShip.TypeId == 657 || directEve.ActiveShip.TypeId == 1944 || directEve.ActiveShip.TypeId == 19744)
-                return StorylineState.GotoAgent;
+            //var directEve = Cache.Instance.DirectEve;
+            //if (directEve.ActiveShip.TypeId == 648 || directEve.ActiveShip.TypeId == 649 || directEve.ActiveShip.TypeId == 650 || directEve.ActiveShip.TypeId == 651 || directEve.ActiveShip.TypeId == 652 || directEve.ActiveShip.TypeId == 653 || directEve.ActiveShip.TypeId == 654 || directEve.ActiveShip.TypeId == 655 || directEve.ActiveShip.TypeId == 656 || directEve.ActiveShip.TypeId == 657 || directEve.ActiveShip.TypeId == 1944 || directEve.ActiveShip.TypeId == 19744)
+            //    return StorylineState.GotoAgent;
 
-            // Open the ship hangar
-            if (!Cache.Instance.OpenItemsHangar("GenericCourierStoryline: Arm")) return StorylineState.Arm;
+            //// Open the ship hangar
+            //if (!Cache.Instance.OpenItemsHangar("GenericCourierStoryline: Arm")) return StorylineState.Arm;
             
-            //  Look for an industrial
-            var item = Cache.Instance.ShipHangar.Items.FirstOrDefault(i => i.Quantity == -1 && (i.TypeId == 648 || i.TypeId == 649 || i.TypeId == 650 || i.TypeId == 651 || i.TypeId == 652 || i.TypeId == 653 || i.TypeId == 654 || i.TypeId == 655 || i.TypeId == 656 || i.TypeId == 657 || i.TypeId == 1944 || i.TypeId == 19744));
-            if (item != null)
+            ////  Look for an industrial
+            //var item = Cache.Instance.ShipHangar.Items.FirstOrDefault(i => i.Quantity == -1 && (i.TypeId == 648 || i.TypeId == 649 || i.TypeId == 650 || i.TypeId == 651 || i.TypeId == 652 || i.TypeId == 653 || i.TypeId == 654 || i.TypeId == 655 || i.TypeId == 656 || i.TypeId == 657 || i.TypeId == 1944 || i.TypeId == 19744));
+            //if (item != null)
+            //{
+            //    Logging.Log("GenericCourier", "Switching to an industrial", Logging.white);
+
+            //    _nextAction = DateTime.Now.AddSeconds(10);
+
+            //    item.ActivateShip();
+            //    return StorylineState.Arm;
+            //}
+            //else
+            //{
+            //    Logging.Log("GenericCourier", "No industrial found, going in active ship", Logging.white);
+            //    return StorylineState.GotoAgent;
+            //}
+            string transportshipName = Modules.Lookup.Settings.Instance.TransportShipName.ToLower();
+
+            if (string.IsNullOrEmpty(transportshipName))
             {
-                Logging.Log("GenericCourier", "Switching to an industrial", Logging.white);
-
-                _nextAction = DateTime.Now.AddSeconds(10);
-
-                item.ActivateShip();
+                _States.CurrentArmState = ArmState.NotEnoughAmmo;
+                Logging.Log("Arm.ActivateTransportShip", "Could not find transportshipName: " + transportshipName + " in settings!", Logging.orange);
+                return StorylineState.BlacklistAgent;
+            }
+            if (Cache.Instance.DirectEve.ActiveShip.GivenName.ToLower() != transportshipName)
+            {
+                List<DirectItem> ships = Cache.Instance.ShipHangar.Items;
+                foreach (DirectItem ship in ships.Where(ship => ship.GivenName != null && ship.GivenName.ToLower() == transportshipName))
+                {
+                    Logging.Log("Arm", "Making [" + ship.GivenName + "] active", Logging.white);
+                    ship.ActivateShip();
+                    Cache.Instance.NextArmAction = DateTime.Now.AddSeconds((int)Modules.Lookup.Time.SwitchShipsDelay_seconds);
+                }
                 return StorylineState.Arm;
             }
-            else
+            if (DateTime.Now > Cache.Instance.NextArmAction) //default 7 seconds
             {
-                Logging.Log("GenericCourier", "No industrial found, going in active ship", Logging.white);
-                return StorylineState.GotoAgent;
+                if (Cache.Instance.DirectEve.ActiveShip.GivenName.ToLower() == transportshipName)
+                {
+                    Logging.Log("Arm.ActivateTransportShip", "Done", Logging.white);
+                    _States.CurrentArmState = ArmState.Done;
+                    return StorylineState.GotoAgent;
+                }
             }
+
+            return StorylineState.Arm;
+
+
+
         }
 
         /// <summary>
