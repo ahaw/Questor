@@ -29,6 +29,7 @@ namespace Questor
 
         public QuestorfrmMain()
         {
+            this.Show();
             InitializeComponent();
             _questor = new Questor(this);
 

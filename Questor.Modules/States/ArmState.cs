@@ -32,5 +32,6 @@ namespace Questor.Modules.States
         OpenFittingWindow,
         WaitForFittingWindow,
         ChoseFitting,
+        Cleanup
     }
 }

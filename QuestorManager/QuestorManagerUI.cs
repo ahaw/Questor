@@ -70,6 +70,7 @@ namespace QuestorManager
         private readonly Sell _sell;
         private readonly ValueDump _valuedump;
         private readonly BuyLPI _buylpi;
+        private readonly Defense _defense;
         private readonly ListItems _item;
 
         private DateTime _lastAction;
@@ -91,6 +92,7 @@ namespace QuestorManager
             //_valuedump = new ValueDump();
             _buylpi = new BuyLPI(this);
             //_buylpi = new BuyLPI();
+            _defense = new Defense();
             List = new List<ListItems>();
             Items = new List<ItemCache>();
             ItemsToSell = new List<ItemCache>();
@@ -519,6 +521,7 @@ namespace QuestorManager
                         _traveler.Destination = travelerDestination;
 
                     _traveler.ProcessState();
+                    _defense.ProcessState();
 
                     // Record number of jumps
                     _jumps = Cache.Instance.DirectEve.Navigation.GetDestinationPath().Count;
