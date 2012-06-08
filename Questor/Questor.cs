@@ -613,11 +613,13 @@ namespace Questor
                                             {
                                                 _closeQuestor10SecWarningDone = true;
                                                 Logging.Log("Questor", "Exiting eve in 10 seconds", Logging.white);
+                                                    Cache.Instance.DirecteveDispose();
                                                 Cache.Instance.DirectEve.ExecuteCommand(DirectCmd.CmdQuitGame);
                                             }
                                             if (CloseQuestorDelay < DateTime.Now)
                                             {
                                                 Logging.Log("Questor", "Exiting eve now.", Logging.white);
+                                                    Cache.Instance.DirecteveDispose();
                                                 Cache.Instance.DirectEve.ExecuteCommand(DirectCmd.CmdQuitGame);
                                             }
                                             return;
@@ -650,11 +652,13 @@ namespace Questor
                                             {
                                                 _closeQuestor10SecWarningDone = true;
                                                 Logging.Log("Questor", "Exiting eve in 10 seconds", Logging.white);
+                                                    Cache.Instance.DirecteveDispose();
                                                 Cache.Instance.DirectEve.ExecuteCommand(DirectCmd.CmdQuitGame);
                                             }
                                             if (CloseQuestorDelay < DateTime.Now)
                                             {
                                                 Logging.Log("Questor", "Exiting eve now.", Logging.white);
+                                                    Cache.Instance.DirecteveDispose();
                                                 Cache.Instance.DirectEve.ExecuteCommand(DirectCmd.CmdQuitGame);
                                             }
                                             return;
@@ -692,6 +696,7 @@ namespace Questor
                                             if (CloseQuestorDelay < DateTime.Now)
                                             {
                                                 Logging.Log("Questor", "Exiting eve now.", Logging.white);
+                                                    Cache.Instance.DirecteveDispose();
                                                 Cache.Instance.DirectEve.ExecuteCommand(DirectCmd.CmdQuitGame);
                                             }
                                             return;
@@ -714,12 +719,14 @@ namespace Questor
                                             {
                                                 _closeQuestor10SecWarningDone = true;
                                                 Logging.Log("Questor", "Exiting eve in 10 seconds", Logging.white);
+                                                    Cache.Instance.DirecteveDispose();
                                                 Cache.Instance.DirectEve.ExecuteCommand(
                                                     DirectCmd.CmdQuitGame);
                                             }
                                             if (CloseQuestorDelay < DateTime.Now)
                                             {
                                                 Logging.Log("Questor", "Exiting eve now.", Logging.white);
+                                                    Cache.Instance.DirecteveDispose();
                                                 Cache.Instance.DirectEve.ExecuteCommand(
                                                     DirectCmd.CmdQuitGame);
                                             }
@@ -737,11 +744,13 @@ namespace Questor
                                 {
                                     _closeQuestor10SecWarningDone = true;
                                     Logging.Log("Questor", "Exiting eve in 10 seconds", Logging.white);
+                                        Cache.Instance.DirecteveDispose();
                                     Cache.Instance.DirectEve.ExecuteCommand(DirectCmd.CmdQuitGame);
                                 }
                                 if (CloseQuestorDelay < DateTime.Now)
                                 {
                                     Logging.Log("Questor", "Exiting eve now.", Logging.white);
+                                        Cache.Instance.DirecteveDispose();
                                     Cache.Instance.DirectEve.ExecuteCommand(DirectCmd.CmdQuitGame);
                                 }
                             }

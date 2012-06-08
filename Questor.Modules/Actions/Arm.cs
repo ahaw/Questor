@@ -73,7 +73,6 @@ namespace Questor.Modules.Actions
                     break;
                     
                 case ArmState.Done:
-
                     break;
 
                 case ArmState.NotEnoughDrones:
@@ -554,7 +553,7 @@ namespace Questor.Modules.Actions
                             Logging.Log("Arm", "Moving MissionItem [" + optionalmissionItem.TypeName + "] to CargoHold", Logging.white);
 
                             Cache.Instance.CargoHold.Add(optionalmissionItem, 1);
-                            _missionItemMoved = true;
+                            _optionalMissionItemMoved = true;
                             break;
                         }
                     }

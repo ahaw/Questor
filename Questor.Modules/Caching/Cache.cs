@@ -2291,24 +2291,22 @@ namespace Questor.Modules.Caching
                 if (!string.IsNullOrEmpty(Settings.Instance.AmmoHangar))
                 {
                     Cache.Instance.AmmoHangar = Cache.Instance.DirectEve.GetCorporationHangar(Settings.Instance.AmmoHangar);
+                    if (Settings.Instance.DebugHangars) Logging.Log(module, "Ammo Hangar Should be assigned...", Logging.white);
 
                     // Is the corp ammo Hangar open?
-                    if (Cache.Instance.AmmoHangar != null)
-                    {
-                        if (Cache.Instance.AmmoHangar.Window == null)
+                    if ((Cache.Instance.AmmoHangar != null) && (Cache.Instance.AmmoHangar.Window != null))
                         {
-                            // No, command it to open
-                            Cache.Instance.DirectEve.OpenInventory();
-                            Cache.Instance.NextOpenHangarAction = DateTime.Now.AddSeconds(Cache.Instance.RandomNumber(1, 3));
-                            Logging.Log(module, "Opening Corporate Ammo Hangar: waiting [" + Math.Round(Cache.Instance.NextOpenHangarAction.Subtract(DateTime.Now).TotalSeconds, 0) + "sec]", Logging.white);
-                            return false;
-                        }
+                        if (Settings.Instance.DebugHangars) Logging.Log(module, "Ammo Hangar is not null and windows is not null...", Logging.white);
+                    
                         if (!Cache.Instance.AmmoHangar.Window.IsReady)
                         {
+                            if (InventoryWindow != null)
+                            {
                             if (Cache.Instance._corpHangarExpand)
                             {
-                                Cache.Instance.AmmoHangar.Window.ExpandCorpHangarView();
-                                Cache.Instance.NextOpenHangarAction = DateTime.Now.AddSeconds(Cache.Instance.RandomNumber(1, 3));
+                                    Cache.Instance.InventoryWindow.ExpandCorpHangarView();
+                                    Cache.Instance.NextOpenHangarAction =
+                                        DateTime.Now.AddSeconds(Cache.Instance.RandomNumber(1, 3));
                                 Cache.Instance._corpHangarExpand = false;
                                 return false;
                             }
@@ -2316,46 +2314,47 @@ namespace Questor.Modules.Caching
                             {
                                 if (Cache.Instance._corpHangarSelect)
                                 {
-                                    long hangarID;
-                                    try
-                                    {
-                                        hangarID = Cache.Instance.DirectEve.GetCorpHangarId(Settings.Instance.AmmoHangar) - 1;
-                                    }
-                                    catch (Exception)
-                                    {
-                                        Logging.Log("Cache.OpenCorporateHangar", "Unable to Find Corporate Hangar Tab Named [" + Settings.Instance.AmmoHangar + "]", Logging.orange);
-                                        return false;
-                                    }
-                                    Cache.Instance.AmmoHangar.Window.SelectTreeEntryByID(hangarID);
-                                    Cache.Instance.NextOpenHangarAction = DateTime.Now.AddSeconds(Cache.Instance.RandomNumber(1, 3));
+                                        long HangarID =
+                                            Cache.Instance.DirectEve.GetCorpHangarId(Settings.Instance.AmmoHangar) - 1;
+                                        Cache.Instance.InventoryWindow.SelectTreeEntryByID(HangarID);
+                                        Cache.Instance.NextOpenHangarAction =
+                                            DateTime.Now.AddSeconds(Cache.Instance.RandomNumber(1, 3));
                                     Cache.Instance._corpHangarSelect = false;
                                     return false;
                                 }
                             }
-
-                            Logging.Log(module, "OpenCorpAmmoHangar: Cache.Instance.AmmoHangar.Window is not ready", Logging.white);
+                            }
+                            Logging.Log(module, "OpenCorpAmmoHangar: Cache.Instance.AmmoHangar.Window is not ready",
+                                        Logging.white);
                             return false;
                         }
                         if (Cache.Instance.AmmoHangar.Window.IsReady)
                         {
                             Cache.Instance._corpHangarExpand = true;
                             Cache.Instance._corpHangarSelect = true;
-                            Logging.Log(module, "OpenCorpAmmoHangar: Cache.Instance.AmmoHangar.Window is ready", Logging.white);
+                            Logging.Log(module, "OpenCorpAmmoHangar: Cache.Instance.AmmoHangar.Window is ready",
+                                        Logging.white);
                             if (Cache.Instance.AmmoHangar.Window.IsPrimary())
                             {
-                                Logging.Log(module, "OpenCorpAmmoHangar: Cache.Instance.AmmoHangar.Window.Name is: " + Cache.Instance.AmmoHangar.Window.Name, Logging.white);
+                                Logging.Log(module,
+                                            "OpenCorpAmmoHangar: Cache.Instance.AmmoHangar.Window.Name is: " +
+                                            Cache.Instance.AmmoHangar.Window.Name, Logging.white);
                                 Cache.Instance.AmmoHangar.Window.OpenAsSecondary();
                                 return false;
                             }
                             return true;
                         }
+                        return false;
                     }
                     if (Cache.Instance.AmmoHangar == null)
                     {
                         if (!string.IsNullOrEmpty(Settings.Instance.AmmoHangar))
-                            Logging.Log(module, "Opening Corporate Ammo Hangar: failed! No Corporate Hangar in this station! lag?", Logging.orange);
+                            Logging.Log(module,
+                                        "Opening Corporate Ammo Hangar: failed! No Corporate Hangar in this station! lag?",
+                                        Logging.orange);
                         return false;
                     }
+                    return false;
                 }
                 else
                 {
@@ -2395,9 +2394,124 @@ namespace Questor.Modules.Caching
             return false;
         }
 
-        //public DirectContainer CorpLootHangar { get; set; 
+        //public DirectContainer CorpLootHangar { get; set; }
+        public DirectContainerWindow InventoryWindow { get; set; }
+
+        public bool OpenInventoryWindow(String module)
+        {
+            Cache.Instance.InventoryWindow = (DirectContainerWindow)Cache.Instance.DirectEve.Windows.OfType<DirectWindow>().FirstOrDefault(
+                            w => w.Type == "form.Inventory" &&
+                                 w.Name.Contains("Inventory") &&
+                                 !w.Name.Contains("Secondary"));
+            
+            if (Cache.Instance.InventoryWindow == null)
+            {
+                if (Settings.Instance.DebugHangars) Logging.Log("debug", "Cache.Instance.InventoryWindow is null, opening InventoryWindow", Logging.teal);
+                // No, command it to open
+                Cache.Instance.DirectEve.OpenInventory();
+                Cache.Instance.NextOpenHangarAction = DateTime.Now.AddSeconds(Cache.Instance.RandomNumber(1, 3));
+                Logging.Log(module, "Opening Inventory Window: waiting [" + Math.Round(Cache.Instance.NextOpenHangarAction.Subtract(DateTime.Now).TotalSeconds, 0) +"sec]", Logging.white);
+                return false;
+            }
+            if (Cache.Instance.InventoryWindow != null)
+            {
+                if (Settings.Instance.DebugHangars) Logging.Log("debug", "Cache.Instance.InventoryWindow exists", Logging.teal);
+                if (Cache.Instance.InventoryWindow.IsReady)
+                {
+                    if (Settings.Instance.DebugHangars) Logging.Log("debug", "Cache.Instance.InventoryWindow exists and is ready", Logging.teal);
+                    return true;
+                }
+                //
+                // if the InventoryWindow "hangs" and is never ready we will hang... it would be better if we set a timer
+                // and closed the inventorywindow that is not ready after 10-20seconds. (can we close a window that is in a state if !window.isready?)
+                //
+                return false;
+            }
+            return false;
+        }
 
         public bool OpenCorpLootHangar(String module)
+        {
+            if (DateTime.Now < Cache.Instance.NextOpenHangarAction)
+                return false;
+            if (Cache.Instance.InStation)
+            {
+                if (!string.IsNullOrEmpty(Settings.Instance.LootHangar))
+                {
+                    Cache.Instance.LootHangar = Cache.Instance.DirectEve.GetCorporationHangar(Settings.Instance.LootHangar);
+                    // Is the corp loot Hangar open?
+
+                    if (!Cache.Instance.OpenInventoryWindow("Cache.OpenCorpLootHangar")) return false;
+
+                    if (Cache.Instance.LootHangar != null)
+                    {
+                        if (!Cache.Instance.LootHangar.Window.IsReady)
+                        {
+                            if (InventoryWindow != null)
+                            {
+                                if (Cache.Instance._corpHangarExpand)
+                                {
+                                    Cache.Instance.InventoryWindow.ExpandCorpHangarView();
+                                    Cache.Instance.NextOpenHangarAction =
+                                        DateTime.Now.AddSeconds(Cache.Instance.RandomNumber(1,3));
+                                    Cache.Instance._corpHangarExpand = false;
+                                    return false;
+                                }
+                                else
+                                {
+                                    if (Cache.Instance._corpHangarSelect)
+                                    {
+                                        long HangarID =
+                                            Cache.Instance.DirectEve.GetCorpHangarId(Settings.Instance.LootHangar) - 1;
+                                        Cache.Instance.InventoryWindow.SelectTreeEntryByID(HangarID);
+                                        Cache.Instance.NextOpenHangarAction =
+                                            DateTime.Now.AddSeconds(Cache.Instance.RandomNumber(1,3));
+                                        Cache.Instance._corpHangarSelect = false;
+                                        return false;
+                                    }
+                                }
+                            }
+                            Logging.Log(module, "OpenCorpLootHangar: Cache.Instance.LootHangar.Window is not ready",
+                                        Logging.white);
+                            return false;
+                        }
+                        if (Cache.Instance.LootHangar.Window.IsReady)
+                        {
+                            Cache.Instance._corpHangarExpand = true;
+                            Cache.Instance._corpHangarSelect = true;
+                            Logging.Log(module, "OpenCorpLootHangar: Cache.Instance.LootHangar.Window is ready",
+                                        Logging.white);
+                            if (Cache.Instance.LootHangar.Window.IsPrimary())
+                            {
+                                Logging.Log(module,
+                                            "OpenCorpLootHangar: Cache.Instance.LootHangar.Window.Name is: " +
+                                            Cache.Instance.LootHangar.Window.Name, Logging.white);
+                                Cache.Instance.LootHangar.Window.OpenAsSecondary();
+                                return false;
+                            }
+                            return true;
+                        }
+                        return false;
+                    }
+                    if (Cache.Instance.LootHangar == null)
+                    {
+                        if (!string.IsNullOrEmpty(Settings.Instance.LootHangar))
+                            Logging.Log(module,
+                                        "Opening Corporate Loot Hangar: failed! No Corporate Hangar in this station! lag?",
+                                        Logging.orange);
+                        return false;
+                    }
+                }
+                else
+                {
+                    Cache.Instance.LootHangar = null;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool OpenCorpLootHangar2(String module)
         {
             if (DateTime.Now < Cache.Instance.NextOpenHangarAction)
                 return false;
@@ -2793,10 +2907,12 @@ namespace Questor.Modules.Caching
             {
                 if (!string.IsNullOrEmpty(Settings.Instance.AmmoHangar))
                 {
+                    if (Settings.Instance.DebugHangars) Logging.Log(module, "using Corporate hangar as Ammo hangar",Logging.white);
                     if (!Cache.Instance.OpenCorpAmmoHangar("Cache.OpenAmmoHangar")) return false;
                 }
                 else
                 {
+                    if (Settings.Instance.DebugHangars) Logging.Log(module, "using Local items hangar as Ammo hangar", Logging.white);
                     if (!Cache.Instance.OpenItemsHangarAsAmmoHangar("Cache.OpenAmmoHangar")) return false;
                 }
             }

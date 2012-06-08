@@ -80,7 +80,7 @@ namespace Questor.Modules.Lookup
         public bool DebugIdle { get; set; }
 
         public bool DebugAutoStart { get; set; }
-
+        public bool DebugHangars { get; set; }
         public bool UseInnerspace { get; set; }
 
         //
@@ -514,6 +514,7 @@ namespace Questor.Modules.Lookup
                 DebugGotobase = false;
                 DebugIdle = false;
                 DebugAutoStart = false;
+                DebugHangars = false;
                 UseInnerspace = true;
                 //
                 // Misc Settings
@@ -783,6 +784,7 @@ namespace Questor.Modules.Lookup
                     DebugGotobase = (bool?)xml.Element("debugGotobase") ?? false;
                     DebugIdle = (bool?)xml.Element("debugIdle") ?? false;
                     DebugAutoStart = (bool?)xml.Element("debugAutoStart") ?? false;
+                    DebugHangars = (bool?)xml.Element("debugHangars") ?? false;
                     UseInnerspace = (bool?)xml.Element("useInnerspace") ?? true;
 
                     //

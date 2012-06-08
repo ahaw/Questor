@@ -335,6 +335,7 @@ namespace Questor
             Logging.Log("QuestorUI",
                         "Autostart is false: Stopping EVE with quit command (if EVE is going to restart it will do so externally)",
                         Logging.white);
+            Cache.Instance.DirecteveDispose();
             Process.GetCurrentProcess().Kill();
             Application.Exit();
             return;
