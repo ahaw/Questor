@@ -67,6 +67,8 @@ namespace Questor.Behaviors
 
         //DateTime _nextAction = DateTime.Now;
 
+        private DateTime _nextBookmarkRefreshCheck = DateTime.MinValue;
+        private DateTime _nextBookmarksrefresh = DateTime.MinValue;
         public CombatMissionsBehavior()
         {
             _lastPulse = DateTime.MinValue;
@@ -954,6 +956,23 @@ namespace Questor.Behaviors
                         Logging.Log("CombatMissionsBehavior.BeginAftermissionSalvaging", "Too early for next salvage trip", Logging.white);
                         break;
                     }
+                    if (DateTime.Now > _nextBookmarkRefreshCheck)
+                    {
+                        _nextBookmarkRefreshCheck = DateTime.Now.AddMinutes(1);
+                        if (Cache.Instance.InStation && (DateTime.Now > _nextBookmarksrefresh))
+                        {
+                            _nextBookmarksrefresh = DateTime.Now.AddMinutes(Cache.Instance.RandomNumber(2, 4));
+                            Logging.Log("CombatMissionsBehavior.BeginAftermissionSalvaging", "Next Bookmark refresh in [" +
+                                           Math.Round(_nextBookmarksrefresh.Subtract(DateTime.Now).TotalMinutes, 0) + "min]", Logging.white);
+                            Cache.Instance.DirectEve.RefreshBookmarks();
+                        }
+                        else
+                        {
+                            Logging.Log("CombatMissionsBehavior.BeginAftermissionSalvaging", "Next Bookmark refresh in [" +
+                                           Math.Round(_nextBookmarksrefresh.Subtract(DateTime.Now).TotalMinutes, 0) + "min]", Logging.white);
+                        }
+                    }
+
                     Cache.Instance.OpenWrecks = true;
                     if (_States.CurrentArmState == ArmState.Idle)
                         _States.CurrentArmState = ArmState.SwitchToSalvageShip;
