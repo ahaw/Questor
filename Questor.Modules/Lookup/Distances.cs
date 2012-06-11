@@ -32,7 +32,9 @@ namespace Questor.Modules.Lookup
         OnGridWithMe = 250000, //250k by default - (used by after mission salvaging)
         //AU = 149598000000, // 1 AU - 1 Astronomical Unit = 149 598 000 000 meters
         DirectionalScannerCloseRange = 2147483647,
+        MaxPocketsDistance = 7000000,
         HalfAU = 2147483647,
+        
         OneAU = 149598000000,
     }
 }

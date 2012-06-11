@@ -1052,16 +1052,18 @@ namespace Questor.Behaviors
 
                     if (deadlyNPC != null)
                     {
+
                         // found NPCs that will likely kill out fragile salvage boat!
                         List<DirectBookmark> missionSalvageBookmarks = Cache.Instance.BookmarksByLabel(Settings.Instance.BookmarkPrefix + " ");
                         Logging.Log("CombatMissionsBehavior.Salvage", "could not be completed because of NPCs left in the mission: deleting salvage bookmarks", Logging.white);
+                        Logging.Log("CombatMissionsBehavior.Salvage", "Npc name:["+deadlyNPC.Name+"] with groupId:["+deadlyNPC.GroupId+"].", Logging.white);
                         bool _deleteBookmarkWithNpc_tmp = true;
                         if (_deleteBookmarkWithNpc_tmp)
                         {
                             while (true)
                             {
                                 // Remove all bookmarks from address book
-                                DirectBookmark pocketSalvageBookmark = missionSalvageBookmarks.FirstOrDefault(b => Cache.Instance.DistanceFromMe(b.X ?? 0, b.Y ?? 0, b.Z ?? 0) < (int)Distance.DirectionalScannerCloseRange);
+                                DirectBookmark pocketSalvageBookmark = missionSalvageBookmarks.FirstOrDefault(b => Cache.Instance.DistanceFromMe(b.X ?? 0, b.Y ?? 0, b.Z ?? 0) < (int)Distance.MaxPocketsDistance);
                                 if (pocketSalvageBookmark == null)
                                     break;
                                 else
@@ -1115,7 +1117,8 @@ namespace Questor.Behaviors
                                     break;
                                 if (bookmark == null)
                                     break;
-
+                                Logging.Log("CombatMissionsBehavior.Salvage", "Deleting grid bookmarks", Logging.white);
+                                
                                 bookmark.Delete();
                                 bookmarks.Remove(bookmark);
                                 Cache.Instance.NextRemoveBookmarkAction = DateTime.Now.AddSeconds((int)Time.RemoveBookmarkDelay_seconds);

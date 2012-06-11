@@ -14,13 +14,13 @@ namespace Questor.Modules.Lookup
         LootingDelay_milliseconds = 3500,                        // Delay between loot attempts
         WarpScrambledNoDelay_seconds = 10,                       // Time after you are no longer warp scrambled to consider it IMPORTANT That you warp soon
         RemoveBookmarkDelay_seconds = 5,                         // Delay between each removal of a bookmark
-        QuestorPulse_milliseconds = 1000,                        // Used to delay the next pulse, units: milliseconds. Default is 1500
+        QuestorPulse_milliseconds = 500,                        // Used to delay the next pulse, units: milliseconds. Default is 1500
         DefenceDelay_milliseconds = 1500,                        // Delay between defence actions
         AfterburnerDelay_milliseconds = 3500,                    //
         RepModuleDelay_milliseconds = 2500,                      //
         ApproachDelay_seconds = 15,                              //
-        TargetDelay_milliseconds = 1000,                         //
-        DelayBetweenSalvagingSessions_minutes = 10,              //
+        TargetDelay_milliseconds = 400,                         //
+        DelayBetweenSalvagingSessions_minutes = 15,              //
         OrbitDelay_seconds = 15,                                 // This is the delay between orbit commands, units: seconds. Default is 15
         DockingDelay_seconds = 5,                                // This is the delay between docking attempts, units: seconds. Default is 5
         WarptoDelay_seconds = 5,                                 // This is the delay between warpto commands, units: seconds. Default is 5
@@ -32,7 +32,7 @@ namespace Questor.Modules.Lookup
         SetupLogPathDelay_seconds = 10,                          // Why is this delay here? this can likely be removed with some testing... Default is 10
         SessionRunningTimeUpdate_seconds = 15,                   // This is used to update the session running time counter every x seconds: default is 15 seconds
         WalletCheck_minutes = 1,                                 // Used to delay the next wallet balance check, units: minutes. Default is 1
-        DelayedGotoBase_seconds = 15,                            // Delay before going back to base, usually after a disconnect / reconnect. units: seconds. Default is 15
+        DelayedGotoBase_seconds = 10,                            // Delay before going back to base, usually after a disconnect / reconnect. units: seconds. Default is 15
         WaitforBadGuytoGoAway_minutes = 25,                       // Stay docked for this amount of time before checking local again, units: minutes. Default is 5
         CloseQuestorDelayBeforeExit_seconds = 20,                // Delay before closing eve, units: seconds. Default is 20
         QuestorBeforeLoginPulseDelay_seconds = 40,               // Pulse Delay for Program.cs: Used to control the speed at which the program will retry logging in and retry checking the schedule
@@ -48,7 +48,7 @@ namespace Questor.Modules.Lookup
         DelayBetweenJetcans_seconds = 185,                       // Once you have made a jetcan you cannot make another for 3 minutes, units: seconds. Default is 185 (to account for lag)
         SalvageStackItemsDelayBeforeResuming_seconds = 5,        // When stacking items in cargohold delay before proceeding, units: seconds. Default is 5
         SalvageStackItems_seconds = 150,                         // When salvaging stack items in your cargo every x seconds, units: seconds. Default is 180
-        SalvageDelayBetweenActions_milliseconds = 1500,             //
+        SalvageDelayBetweenActions_milliseconds = 500,             //
         TravelerExitStationAmIInSpaceYet_seconds = 17,           // Traveler - Exit Station before you are in space delay, units: seconds. Default is 7
         TravelerNoStargatesFoundRetryDelay_seconds = 15,         // Traveler could not find any stargates, retry when this time has elapsed, units: seconds. Default is 15
         TravelerJumpedGateNextCommandDelay_seconds = 15,          // Traveler jumped a gate - delay before assuming we have loaded grid, units: seconds. Default is 15
