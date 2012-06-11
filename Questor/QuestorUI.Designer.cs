@@ -84,6 +84,8 @@
             this.label6 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.Schedule = new System.Windows.Forms.TabPage();
+            this.ScheduleWarninglabel1 = new System.Windows.Forms.Label();
+            this.ExitWhenIdleCheckBox = new System.Windows.Forms.CheckBox();
             this.Targets = new System.Windows.Forms.TabPage();
             this.lblDistance3 = new System.Windows.Forms.Label();
             this.lblDistanceDroneTarget = new System.Windows.Forms.Label();
@@ -127,11 +129,14 @@
             this.buttonQuestormanager = new System.Windows.Forms.Button();
             this.label25 = new System.Windows.Forms.Label();
             this.label26 = new System.Windows.Forms.Label();
+            this.label27 = new System.Windows.Forms.Label();
+            
             this.Console.SuspendLayout();
             this.Tabs.SuspendLayout();
             this.States.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel1.SuspendLayout();
+            this.Schedule.SuspendLayout();
             this.Targets.SuspendLayout();
             this.EWar.SuspendLayout();
             this.SuspendLayout();
@@ -656,6 +661,9 @@
             // 
             // Schedule
             // 
+            this.Schedule.Controls.Add(this.label27);
+            this.Schedule.Controls.Add(this.ScheduleWarninglabel1);
+            this.Schedule.Controls.Add(this.ExitWhenIdleCheckBox);
             this.Schedule.Location = new System.Drawing.Point(4, 22);
             this.Schedule.Name = "Schedule";
             this.Schedule.Padding = new System.Windows.Forms.Padding(3);
@@ -663,6 +671,28 @@
             this.Schedule.TabIndex = 2;
             this.Schedule.Text = "Schedule";
             this.Schedule.UseVisualStyleBackColor = true;
+            // 
+            // ScheduleWarninglabel1
+            // 
+            this.ScheduleWarninglabel1.AutoSize = true;
+            this.ScheduleWarninglabel1.Location = new System.Drawing.Point(28, 15);
+            this.ScheduleWarninglabel1.Name = "ScheduleWarninglabel1";
+            this.ScheduleWarninglabel1.Size = new System.Drawing.Size(460, 13);
+            this.ScheduleWarninglabel1.TabIndex = 168;
+            this.ScheduleWarninglabel1.Text = "These values are used this session only and will be overwritten if questor restar" +
+                "ts for ANY reason";
+            // 
+            // ExitWhenIdleCheckBox
+            // 
+            this.ExitWhenIdleCheckBox.Appearance = System.Windows.Forms.Appearance.Button;
+            this.ExitWhenIdleCheckBox.Location = new System.Drawing.Point(6, 42);
+            this.ExitWhenIdleCheckBox.Name = "ExitWhenIdleCheckBox";
+            this.ExitWhenIdleCheckBox.Size = new System.Drawing.Size(92, 23);
+            this.ExitWhenIdleCheckBox.TabIndex = 3;
+            this.ExitWhenIdleCheckBox.Text = "ExitWhenIdle";
+            this.ExitWhenIdleCheckBox.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.ExitWhenIdleCheckBox.UseVisualStyleBackColor = true;
+            this.ExitWhenIdleCheckBox.CheckedChanged += new System.EventHandler(this.ExitWhenIdleCheckBoxCheckedChanged);
             // 
             // Targets
             // 
@@ -1096,6 +1126,15 @@
             this.label26.Text = "State:";
             this.label26.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
+            // label27
+            // 
+            this.label27.AutoSize = true;
+            this.label27.Location = new System.Drawing.Point(28, 251);
+            this.label27.Name = "label27";
+            this.label27.Size = new System.Drawing.Size(460, 13);
+            this.label27.TabIndex = 169;
+            this.label27.Text = "These values are used this session only and will be overwritten if questor restar" +
+                "ts for ANY reason";
             // QuestorfrmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1130,6 +1169,7 @@
             this.MaximizeBox = false;
             this.Name = "QuestorfrmMain";
             this.Text = "Questor";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.QuestorfrmMainFormClosed);
             this.Load += new System.EventHandler(this.FrmMainLoad);
             this.Console.ResumeLayout(false);
             this.Console.PerformLayout();
@@ -1140,6 +1180,8 @@
             this.panel2.PerformLayout();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            this.Schedule.ResumeLayout(false);
+            this.Schedule.PerformLayout();
             this.Targets.ResumeLayout(false);
             this.Targets.PerformLayout();
             this.EWar.ResumeLayout(false);
@@ -1253,6 +1295,9 @@
         private System.Windows.Forms.Label dataEntitiesTargetPaintingMe;
         private System.Windows.Forms.Label label25;
         private System.Windows.Forms.Label label26;
+        private System.Windows.Forms.CheckBox ExitWhenIdleCheckBox;
+        private System.Windows.Forms.Label ScheduleWarninglabel1;
+        private System.Windows.Forms.Label label27;
     }
 }
 

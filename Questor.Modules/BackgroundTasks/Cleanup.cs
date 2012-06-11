@@ -16,7 +16,7 @@ namespace Questor.Modules.BackgroundTasks
     {
         private static DateTime _lastCleanupAction;
         private DateTime _lastCleanupProcessState;
-      private int _dronebayclosingattempts = 0;
+        private int _dronebayclosingattempts = 0;
         //private DateTime _lastChatWindowAction;
         //private bool _newprivateconvowindowhandled;
 
@@ -74,6 +74,7 @@ namespace Questor.Modules.BackgroundTasks
                 // add ship hangar, items hangar, corp hangar, etc... as at least come of those may be open in space (pos?) or may someday be bugged by ccp. 
                 //
             }
+            Cache.Instance.NextArmAction = DateTime.Now.AddSeconds(4);
             return true;
         }
 

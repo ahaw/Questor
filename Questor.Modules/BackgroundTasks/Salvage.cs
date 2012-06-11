@@ -46,6 +46,8 @@ namespace Questor.Modules.BackgroundTasks
 
         public List<Ammo> Ammo { get; set; }
 
+        private int ModuleNumber { get; set; }
+
         public static void MoveIntoRangeOfWrecks() // DO NOT USE THIS ANYWHERE EXCEPT A PURPOSEFUL SALVAGE BEHAVIOR! - if you use this while in combat it will make you go poof quickly.
         {
             EntityCache closestWreck = Cache.Instance.UnlootedContainers.First();
@@ -90,9 +92,10 @@ namespace Questor.Modules.BackgroundTasks
             List<EntityCache> wrecks = Cache.Instance.Targets.Where(t => (t.GroupId == (int)Group.Wreck || t.GroupId == (int)Group.CargoContainer) && t.Distance < tractorBeamRange).ToList();
 
             int tractorsProcessedThisTick = 0;
-
+            ModuleNumber = 0;
             for (int i = tractorBeams.Count - 1; i >= 0; i--)
             {
+                ModuleNumber++;
                 ModuleCache tractorBeam = tractorBeams[i];
                 if (!tractorBeam.IsActive && !tractorBeam.IsDeactivating || tractorBeam.InLimboState)
                     continue;
@@ -135,7 +138,7 @@ namespace Questor.Modules.BackgroundTasks
                 tractorBeams.RemoveAt(0);
                 tractorBeam.Activate(wreck.Id);
 
-                Logging.Log("Salvage", "Activating tractorbeam [" + tractorBeam.ItemId + "] on [" + wreck.Name + "]["+ Math.Round(wreck.Distance/1000,0) +"k][ID: " + wreck.Id + "]", Logging.white);
+                Logging.Log("Salvage", "Activating tractorbeam [" + ModuleNumber + "] on [" + wreck.Name + "]["+ Math.Round(wreck.Distance/1000,0) +"k][ID: " + wreck.Id + "]", Logging.white);
                 Cache.Instance.NextSalvageAction = DateTime.Now.AddMilliseconds((int)Time.SalvageDelayBetweenActions_milliseconds);
                 continue;
             }
@@ -159,17 +162,20 @@ namespace Questor.Modules.BackgroundTasks
             if (wrecks.Count == 0)
                 return;
             int salvagersProcessedThisTick = 0;
+            ModuleNumber = 0;
             foreach (ModuleCache salvager in salvagers)
             {
                 if (salvager.IsActive || salvager.InLimboState)
                     continue;
+
+                ModuleNumber++;
 
                 // Spread the salvagers around
                 EntityCache wreck = wrecks.OrderBy(w => salvagers.Count(s => s.LastTargetId == w.Id)).First();
                 if (wreck == null)
                     return;
 
-                Logging.Log("Salvage", "Activating salvager [" + salvager.ItemId + "] on [" + wreck.Name + "][ID: " + wreck.Id + "]", Logging.white);
+                Logging.Log("Salvage", "Activating salvager [" + ModuleNumber + "] on [" + wreck.Name + "][ID: " + wreck.Id + "]", Logging.white);
                 salvager.Activate(wreck.Id);
                 salvagersProcessedThisTick++;
                 Cache.Instance.NextSalvageAction = DateTime.Now.AddMilliseconds((int)Time.SalvageDelayBetweenActions_milliseconds);
@@ -609,7 +615,8 @@ namespace Questor.Modules.BackgroundTasks
                 return;
             }
 
-            DirectContainer cargo = Cache.Instance.DirectEve.GetShipsCargo();
+            if (!Cache.Instance.OpenCargoHold("Salvge")) return;
+
             switch (_States.CurrentSalvageState)
             {
                 case SalvageState.TargetWrecks:
@@ -631,10 +638,10 @@ namespace Questor.Modules.BackgroundTasks
 
                     // Default action
                     _States.CurrentSalvageState = SalvageState.TargetWrecks;
-                    if (cargo.Window.IsReady && cargo.Items.Any() && Cache.Instance.NextSalvageAction < DateTime.Now)
+                    if (Cache.Instance.CargoHold.Window.IsReady && Cache.Instance.CargoHold.Items.Any() && Cache.Instance.NextSalvageAction < DateTime.Now)
                     {
                         // Check if there are actually duplicates
-                        bool duplicates = cargo.Items.Where(i => i.Quantity > 0).GroupBy(i => i.TypeId).Any(t => t.Count() > 1);
+                        bool duplicates = Cache.Instance.CargoHold.Items.Where(i => i.Quantity > 0).GroupBy(i => i.TypeId).Any(t => t.Count() > 1);
                         if (duplicates)
                         {
                             _States.CurrentSalvageState = SalvageState.StackItems;
@@ -646,8 +653,8 @@ namespace Questor.Modules.BackgroundTasks
                 case SalvageState.StackItems:
                     Logging.Log("Salvage", "Stacking items", Logging.white);
 
-                    if (cargo.Window.IsReady)
-                        cargo.StackAll();
+                    if (Cache.Instance.CargoHold.Window.IsReady)
+                        Cache.Instance.CargoHold.StackAll();
 
                     Cache.Instance.NextSalvageAction = DateTime.Now.AddSeconds((int)Time.SalvageStackItemsDelayBeforeResuming_seconds);
                     _States.CurrentSalvageState = SalvageState.WaitForStacking;

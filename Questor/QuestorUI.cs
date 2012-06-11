@@ -29,13 +29,18 @@ namespace Questor
 
         public QuestorfrmMain()
         {
-            this.Show();
             InitializeComponent();
             _questor = new Questor(this);
-
             PopulateStateComboBoxes();
             PopulateBehaviorStateComboBox();
             CreateLavishCommands();
+            this.Show();
+        }
+
+        private void QuestorfrmMainFormClosed(object sender, FormClosedEventArgs e)
+        {
+            Cache.Instance.DirectEve.Dispose();
+            Cache.Instance.DirectEve = null;
         }
 
         private void PopulateStateComboBoxes()
@@ -381,7 +386,7 @@ namespace Questor
                 return -1;
             }
 
-            //_questor.ExitWhenIdle = value;
+            Cache.Instance.ExitWhenIdle = value;
 
             Logging.Log("QuestorUI", "ExitWhenIdle is turned " + (value ? "[on]" : "[off]"), Logging.white);
 
@@ -1202,6 +1207,12 @@ namespace Questor
 
         }
 
+        private void ExitWhenIdleCheckBoxCheckedChanged(object sender, EventArgs e)
+        {
+            Cache.Instance.ExitWhenIdle = ExitWhenIdleCheckBox.Checked;
+            AutoStartCheckBox.Checked = false;
+            Settings.Instance.AutoStart = false;
+        }
 
         //private void comboBoxQuestorMode_SelectedIndexChanged(object sender, EventArgs e)
         //{

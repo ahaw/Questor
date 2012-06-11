@@ -20,12 +20,13 @@ namespace Questor.Modules.BackgroundTasks
     public class Defense
     {
         private DateTime _lastSessionChange = DateTime.MinValue;
+        private int ModuleNumber { get; set; }
 
         private void ActivateOnce()
         {
             if (DateTime.Now < Cache.Instance.NextActivateSupportModules) //if we just did something wait a fraction of a second
                 return;
-
+            ModuleNumber = 0;
             foreach (ModuleCache module in Cache.Instance.Modules)
             {
                 if (!module.IsActivatable)
@@ -42,6 +43,8 @@ namespace Questor.Modules.BackgroundTasks
 
                 if (!activate)
                     continue;
+
+                ModuleNumber++;
 
                 if (module.IsActive | module.InLimboState)
                     continue;
@@ -68,9 +71,11 @@ namespace Questor.Modules.BackgroundTasks
                 //
                 module.Click();
                 Cache.Instance.NextActivateSupportModules = DateTime.Now.AddMilliseconds((int)Time.DefenceDelay_milliseconds);
-                Logging.Log("Defense", "Defensive module activated: [" + module.ItemId + "] waiting [" + Math.Round(Cache.Instance.NextActivateSupportModules.Subtract(DateTime.Now).TotalSeconds, 0) + " sec]", Logging.white);
+                Logging.Log("Defense", "Defensive module activated: [" + ModuleNumber + "] waiting [" + Math.Round(Cache.Instance.NextActivateSupportModules.Subtract(DateTime.Now).TotalSeconds, 0) + " sec]", Logging.white);
+                
                 return;
             }
+            ModuleNumber = 0;
         }
 
         private void ActivateRepairModules()
@@ -79,6 +84,7 @@ namespace Questor.Modules.BackgroundTasks
             if (DateTime.Now < Cache.Instance.NextRepModuleAction) //if we just did something wait a fraction of a second
                 return;
 
+            ModuleNumber = 0;
             foreach (ModuleCache module in Cache.Instance.Modules)
             {
                 if (module.InLimboState)
@@ -88,11 +94,13 @@ namespace Questor.Modules.BackgroundTasks
                 double cap;
                 if (module.GroupId == (int)Group.ShieldBoosters)
                 {
+                    ModuleNumber++;
                     perc = Cache.Instance.DirectEve.ActiveShip.ShieldPercentage;
                     cap = Cache.Instance.DirectEve.ActiveShip.CapacitorPercentage;
                 }
                 else if (module.GroupId == (int)Group.ArmorRepairer)
                 {
+                    ModuleNumber++;
                     perc = Cache.Instance.DirectEve.ActiveShip.ArmorPercentage;
                     cap = Cache.Instance.DirectEve.ActiveShip.CapacitorPercentage;
                 }
@@ -129,12 +137,12 @@ namespace Questor.Modules.BackgroundTasks
                     if (module.GroupId == (int)Group.ShieldBoosters)
                     {
                         perc = Cache.Instance.DirectEve.ActiveShip.ShieldPercentage;
-                        Logging.Log("Defense", "Shields: [" + Math.Round(perc, 0) + "%] Cap: [" + Math.Round(cap, 0) + "%] Shield Booster: [" + module.ItemId + "] activated", Logging.white);
+                        Logging.Log("Defense", "Shields: [" + Math.Round(perc, 0) + "%] Cap: [" + Math.Round(cap, 0) + "%] Shield Booster: [" + ModuleNumber + "] activated", Logging.white);
                     }
                     else if (module.GroupId == (int)Group.ArmorRepairer)
                     {
                         perc = Cache.Instance.DirectEve.ActiveShip.ArmorPercentage;
-                        Logging.Log("Defense", "Armor: [" + Math.Round(perc, 0) + "%] Cap: [" + Math.Round(cap, 0) + "%] Armor Repairer: [" + module.ItemId + "] activated", Logging.white);
+                        Logging.Log("Defense", "Armor: [" + Math.Round(perc, 0) + "%] Cap: [" + Math.Round(cap, 0) + "%] Armor Repairer: [" + ModuleNumber + "] activated", Logging.white);
                     }
 
                     //Logging.Log("LowestShieldPercentage(pocket) [ " + Cache.Instance.lowest_shield_percentage_this_pocket + " ] ");
@@ -154,12 +162,12 @@ namespace Questor.Modules.BackgroundTasks
                     if (module.GroupId == (int)Group.ShieldBoosters)
                     {
                         perc = Cache.Instance.DirectEve.ActiveShip.ShieldPercentage;
-                        Logging.Log("Defense", "Shields: [" + Math.Round(perc, 0) + "%] Cap: [" + Math.Round(cap, 0) + "%] Shield Booster: [" + module.ItemId + "] deactivated [" + Math.Round(Cache.Instance.NextRepModuleAction.Subtract(DateTime.Now).TotalSeconds, 0) + "] sec reactivation delay", Logging.white);
+                        Logging.Log("Defense", "Shields: [" + Math.Round(perc, 0) + "%] Cap: [" + Math.Round(cap, 0) + "%] Shield Booster: [" + ModuleNumber + "] deactivated [" + Math.Round(Cache.Instance.NextRepModuleAction.Subtract(DateTime.Now).TotalSeconds, 0) + "] sec reactivation delay", Logging.white);
                     }
                     else if (module.GroupId == (int)Group.ArmorRepairer)
                     {
                         perc = Cache.Instance.DirectEve.ActiveShip.ArmorPercentage;
-                        Logging.Log("Defense", "Armor: [" + Math.Round(perc, 0) + "%] Cap: [" + Math.Round(cap, 0) + "%] Armor Repairer: [" + module.ItemId + "] deactivated [" + Math.Round(Cache.Instance.NextRepModuleAction.Subtract(DateTime.Now).TotalSeconds, 0) + "] sec reactivation delay", Logging.white);
+                        Logging.Log("Defense", "Armor: [" + Math.Round(perc, 0) + "%] Cap: [" + Math.Round(cap, 0) + "%] Armor Repairer: [" + ModuleNumber + "] deactivated [" + Math.Round(Cache.Instance.NextRepModuleAction.Subtract(DateTime.Now).TotalSeconds, 0) + "] sec reactivation delay", Logging.white);
                     }
                     //Cache.Instance.repair_cycle_time_this_pocket = Cache.Instance.repair_cycle_time_this_pocket + ((int)watch.Elapsed);
                     //Cache.Instance.repair_cycle_time_this_mission = Cache.Instance.repair_cycle_time_this_mission + watch.Elapsed.TotalMinutes;
@@ -174,11 +182,14 @@ namespace Questor.Modules.BackgroundTasks
             if (DateTime.Now < Cache.Instance.NextAfterburnerAction) //if we just did something wait a fraction of a second
                 return;
 
+            ModuleNumber = 0;
             foreach (ModuleCache module in Cache.Instance.Modules)
             {
                 if (module.GroupId != (int)Group.Afterburner)
                     continue;
-
+                
+                ModuleNumber++;
+                
                 if (module.InLimboState)
                     continue;
 

@@ -52,6 +52,8 @@ namespace Questor.Modules.Lookup
         }
 
         public bool AtLoginScreen { get; set; }
+        public string LoginUsername;
+        public string LoginCharacter;
 
         public bool CharacterXMLExists = true;
         public bool SchedulesXMLExists = true;
@@ -81,6 +83,8 @@ namespace Questor.Modules.Lookup
 
         public bool DebugAutoStart { get; set; }
         public bool DebugHangars { get; set; }
+        public bool DebugLogging { get; set; }
+        public bool DebugSalvage { get; set; }
         public bool UseInnerspace { get; set; }
 
         //
@@ -284,7 +288,9 @@ namespace Questor.Modules.Lookup
         public string ConsoleLogPath { get; set; }
 
         public string ConsoleLogFile { get; set; }
-
+        public bool ConsoleLogRedacted { get; set; }
+        public string ConsoleLogPathRedacted { get; set; }
+        public string ConsoleLogFileRedacted { get; set; }
         public bool DroneStatsLog { get; set; }
 
         public string DroneStatsLogPath { get; set; }
@@ -516,6 +522,8 @@ namespace Questor.Modules.Lookup
                 DebugIdle = false;
                 DebugAutoStart = false;
                 DebugHangars = false;
+                DebugLogging = false;
+                DebugSalvage = false;
                 UseInnerspace = true;
                 //
                 // Misc Settings
@@ -786,6 +794,8 @@ namespace Questor.Modules.Lookup
                     DebugIdle = (bool?)xml.Element("debugIdle") ?? false;
                     DebugAutoStart = (bool?)xml.Element("debugAutoStart") ?? false;
                     DebugHangars = (bool?)xml.Element("debugHangars") ?? false;
+                    DebugLogging = (bool?) xml.Element("debugLogging") ?? false;
+                    DebugSalvage = (bool?) xml.Element("debugSalvage") ?? false;
                     UseInnerspace = (bool?)xml.Element("useInnerspace") ?? true;
 
                     //
@@ -799,7 +809,6 @@ namespace Questor.Modules.Lookup
                         Settings.Instance.CharacterMode = "Combat Missions".ToLower();
                     }
                     AutoStart = (bool?)xml.Element("autoStart") ?? false; // auto Start enabled or disabled by default?
-                    SaveConsoleLog = (bool?)xml.Element("saveLog") ?? true; // save the console log to file
                     MaxLineConsole = (int?)xml.Element("maxLineConsole") ?? 1000;
                     // maximum console log lines to show in the GUI
                     Disable3D = (bool?)xml.Element("disable3D") ?? false; // Disable3d graphics while in space
@@ -952,6 +961,8 @@ namespace Questor.Modules.Lookup
                     //
                     // Enable / Disable the different types of logging that are available
                     //
+                    SaveConsoleLog = (bool?)xml.Element("saveLog") ?? true; // save the console log to file
+                    ConsoleLogRedacted = (bool?)xml.Element("saveLogRedacted") ?? true; // save the console log redacted to file
                     SessionsLog = (bool?)xml.Element("SessionsLog") ?? true;
                     DroneStatsLog = (bool?)xml.Element("DroneStatsLog") ?? true;
                     WreckLootStatistics = (bool?)xml.Element("WreckLootStatistics") ?? true;
@@ -1195,6 +1206,8 @@ namespace Questor.Modules.Lookup
             //logpath_s = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\log\\";
             ConsoleLogPath = System.IO.Path.Combine(Logpath, "Console\\");
             ConsoleLogFile = System.IO.Path.Combine(ConsoleLogPath, string.Format("{0:MM-dd-yyyy}", DateTime.Today) + "-" + characterNameForLogs + "-" + "console" + ".log");
+            ConsoleLogPathRedacted = System.IO.Path.Combine(Logpath, "Console\\");
+            ConsoleLogFileRedacted = System.IO.Path.Combine(ConsoleLogPath, string.Format("{0:MM-dd-yyyy}", DateTime.Today) + "-" + "redacted" + "-" + "console" + ".log");
             SessionsLogPath = Logpath;
             SessionsLogFile = System.IO.Path.Combine(SessionsLogPath, characterNameForLogs + ".Sessions.log");
             DroneStatsLogPath = Logpath;
@@ -1228,6 +1241,12 @@ namespace Questor.Modules.Lookup
                 if (SettingsLoaded != null)
                     SettingsLoaded(this, new EventArgs());
             }
+        }
+
+        public int RandomNumber(int min, int max)
+        {
+            var random = new Random();
+            return random.Next(min, max);
         }
     }
 }

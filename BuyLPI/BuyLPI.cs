@@ -9,6 +9,7 @@
 // -------------------------------------------------------------------------------
 
 using System.Globalization;
+using Questor.Modules.Caching;
 
 namespace BuyLPI
 {
@@ -92,15 +93,7 @@ namespace BuyLPI
                 return;
             }
 
-            DirectContainer hangar = _directEve.GetItemHangar();
-            if (!hangar.Window.IsReady)
-            {
-                _nextAction = DateTime.Now.AddMilliseconds(WaitMillis);
-                _directEve.ExecuteCommand(DirectCmd.OpenHangarFloor);
-
-                Logging.Log("BuyLPI", "Opening item hangar", Logging.white);
-                return;
-            }
+            if (!Cache.Instance.OpenItemsHangar("BuyLPI")) return;
 
             DirectLoyaltyPointStoreWindow lpstore = _directEve.Windows.OfType<DirectLoyaltyPointStoreWindow>().FirstOrDefault();
             if (lpstore == null)
@@ -173,7 +166,7 @@ namespace BuyLPI
             // Check items
             foreach (DirectLoyaltyPointOfferRequiredItem requiredItem in offer.RequiredItems)
             {
-                DirectItem item = hangar.Items.FirstOrDefault(i => i.TypeId == requiredItem.TypeId);
+                DirectItem item = Cache.Instance.ItemHangar.Items.FirstOrDefault(i => i.TypeId == requiredItem.TypeId);
                 if (item == null || item.Quantity < requiredItem.Quantity)
                 {
                     Logging.Log("BuyLPI", "Missing [" + requiredItem.Quantity + "] x [" +

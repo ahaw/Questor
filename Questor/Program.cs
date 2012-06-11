@@ -9,6 +9,7 @@
 //-------------------------------------------------------------------------------
 
 using System.Globalization;
+using LavishScriptAPI;
 
 namespace Questor
 {
@@ -278,7 +279,8 @@ namespace Questor
             }
 
             _startTime = DateTime.Now;
-
+            Settings.Instance.LoginUsername = _username;
+            Settings.Instance.LoginCharacter = _character;
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new QuestorfrmMain());
@@ -340,11 +342,15 @@ namespace Questor
                         bool close = false;
                         bool restart = false;
                         bool needhumanintervention = false;
+                        bool sayyes = false;
+                        bool update = false;
 
                         if (!string.IsNullOrEmpty(window.Html))
                         {
                             //errors that are repeatable and unavoidable even after a restart of eve/questor
                             needhumanintervention = window.Html.Contains("reason: Account subscription expired");
+
+                            //update |= window.Html.Contains("The update has been downloaded");
 
                             // Server going down
                             //Logging.Log("[Startup] (1) close is: " + close);
@@ -386,12 +392,26 @@ namespace Questor
                             restart |= window.Html.Contains("Local session information is corrupt");
                             restart |= window.Html.Contains("The client's local session"); // information is corrupt");
                             restart |= window.Html.Contains("restart the client prior to logging in");
-
+                            //
+                            // Modal Dialogs the need "yes" pressed
+                            //
+                            //sayyes |= window.Html.Contains("There is a new build available");
                             //Logging.Log("[Startup] (2) close is: " + close);
                             //Logging.Log("[Startup] (1) window.Html is: " + window.Html);
                             _pulsedelay = 60;
                         }
-
+                        if (update)
+                        {
+                            int secRestart = (400 * 3) + Settings.Instance.RandomNumber(3, 18) * 100 + Settings.Instance.RandomNumber(1, 9) * 10;
+                            LavishScript.ExecuteCommand("uplink exec Echo [${Time}] timedcommand " + secRestart + " OSExecute taskkill /IM launcher.exe");
+                        }
+                        if (sayyes)
+                        {
+                            Logging.Log("Startup", "Found a window that needs 'yes' chosen...", Logging.white);
+                            Logging.Log("Startup", "Content of modal window (HTML): [" + (window.Html ?? string.Empty).Replace("\n", "").Replace("\r", "") + "]", Logging.white);
+                            window.AnswerModal("Yes");
+                            continue;
+                        }
                         if (restart)
                         {
                             Logging.Log("Startup", "Restarting eve...", Logging.red);
@@ -413,9 +433,13 @@ namespace Questor
                         {
                             Logging.Log("Startup", "ERROR! - Human Intervention is required in this case: halting all login attempts - ERROR!", Logging.red);
                             Logging.Log("Startup", "window.Name is: " + window.Name, Logging.red);
-                            Logging.Log("Startup", "window.Caption is: " + window.Caption, Logging.red);
-                            Logging.Log("Startup", "window.ID is: " + window.Id, Logging.red);
                             Logging.Log("Startup", "window.Html is: " + window.Html, Logging.red);
+                            Logging.Log("Startup", "window.Caption is: " + window.Caption, Logging.red);
+                            Logging.Log("Startup", "window.Type is: " + window.Type, Logging.red);
+                            Logging.Log("Startup", "window.ID is: " + window.Id, Logging.red);
+                            Logging.Log("Startup", "window.IsDialog is: " + window.IsDialog, Logging.red);
+                            Logging.Log("Startup", "window.IsKillable is: " + window.IsKillable, Logging.red);
+                            Logging.Log("Startup", "window.Viewmode is: " + window.ViewMode, Logging.red);
                             Logging.Log("Startup", "ERROR! - Human Intervention is required in this case: halting all login attempts - ERROR!", Logging.red);
                             _humaninterventionrequired = true;
                             return;
@@ -428,9 +452,14 @@ namespace Questor
                         continue;
                     Logging.Log("Startup", "We've got an unexpected window, auto login halted.", Logging.red);
                     Logging.Log("Startup", "window.Name is: " + window.Name, Logging.red);
-                    Logging.Log("Startup", "window.Caption is: " + window.Caption, Logging.red);
-                    Logging.Log("Startup", "window.ID is: " + window.Id, Logging.red);
                     Logging.Log("Startup", "window.Html is: " + window.Html, Logging.red);
+                    Logging.Log("Startup", "window.Caption is: " + window.Caption, Logging.red);
+                    Logging.Log("Startup", "window.Type is: " + window.Type, Logging.red);
+                    Logging.Log("Startup", "window.ID is: " + window.Id, Logging.red);
+                    Logging.Log("Startup", "window.IsDialog is: " + window.IsDialog, Logging.red);
+                    Logging.Log("Startup", "window.IsKillable is: " + window.IsKillable, Logging.red);
+                    Logging.Log("Startup", "window.Viewmode is: " + window.ViewMode, Logging.red);
+                    Logging.Log("Startup", "We've got an unexpected window, auto login halted.", Logging.red);
                     _done = true;
                     return;
                 }

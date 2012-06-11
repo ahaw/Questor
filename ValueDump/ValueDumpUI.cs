@@ -40,12 +40,6 @@ namespace ValueDump
 
         private DirectEve _directEve { get; set; }
 
-        private static double Marketlookupdelay { get; set; }
-
-        private static double Marketsellorderdelay { get; set; }
-
-        private static double Marketbuyorderdelay { get; set; }
-
         public string CharacterName { get; set; }
 
         public string InvTypesPath
@@ -73,9 +67,6 @@ namespace ValueDump
 
             _directEve = new DirectEve();
             Cache.Instance.DirectEve = _directEve;
-            Marketlookupdelay = 3;
-            Marketsellorderdelay = 5;
-            Marketbuyorderdelay = 5;
             _directEve.OnFrame += OnFrame;
         }
 
@@ -129,9 +120,12 @@ namespace ValueDump
             if (State == ValueDumpState.Idle)
                 return;
 
+            XDocument invIgnore = XDocument.Load(Settings.Instance.Path + "\\InvIgnore.xml"); //items to ignore
             DirectMarketWindow marketWindow = Cache.Instance.DirectEve.Windows.OfType<DirectMarketWindow>().FirstOrDefault();
             DirectMarketActionWindow sellWindow = Cache.Instance.DirectEve.Windows.OfType<DirectMarketActionWindow>().FirstOrDefault(w => w.IsSellAction);
             DirectReprocessingWindow reprorcessingWindow = Cache.Instance.DirectEve.Windows.OfType<DirectReprocessingWindow>().FirstOrDefault();
+            //bool block;
+
             switch (State)
             {
                 case ValueDumpState.CheckMineralPrices:
@@ -143,7 +137,7 @@ namespace ValueDump
                     //_currentMineral = InvTypesById.Values.FirstOrDefault(i => i.Id == 20236 && i.LastUpdate < DateTime.Now.AddMinutes(-1));
                     if (_currentMineral == null)
                     {
-                        if (DateTime.Now.Subtract(_lastExecute).TotalSeconds > Marketlookupdelay)
+                        if (DateTime.Now.Subtract(_lastExecute).TotalSeconds > (int)Time.Marketlookupdelay_seconds)
                         {
                             State = ValueDumpState.SaveMineralPrices;
                             if (marketWindow != null)
@@ -155,7 +149,7 @@ namespace ValueDump
                         //State = ValueDumpState.GetMineralPrice;
                         if (marketWindow == null)
                         {
-                            if (DateTime.Now.Subtract(_lastExecute).TotalSeconds > Marketlookupdelay)
+                            if (DateTime.Now.Subtract(_lastExecute).TotalSeconds > (int)Time.Marketlookupdelay_seconds)
                             {
                                 Cache.Instance.DirectEve.ExecuteCommand(DirectCmd.OpenMarket);
                                 _lastExecute = DateTime.Now;
@@ -168,7 +162,7 @@ namespace ValueDump
 
                         if (marketWindow.DetailTypeId != _currentMineral.Id)
                         {
-                            if (DateTime.Now.Subtract(_lastExecute).TotalSeconds < Marketlookupdelay)
+                            if (DateTime.Now.Subtract(_lastExecute).TotalSeconds < (int)Time.Marketlookupdelay_seconds)
                                 return;
 
                             Logging.Log("ValuedumpUI", "Loading orders for " + _currentMineral.Name, Logging.white);
@@ -395,7 +389,7 @@ namespace ValueDump
                     break;
 
                 case ValueDumpState.StartQuickSell:
-                    if (DateTime.Now.Subtract(_lastExecute).TotalSeconds < 5)
+                    if (DateTime.Now.Subtract(_lastExecute).TotalSeconds < (int)Time.Marketsellorderdelay_seconds)
                         break;
                     _lastExecute = DateTime.Now;
 
@@ -434,7 +428,7 @@ namespace ValueDump
 
                 case ValueDumpState.InspectOrder:
                     // Let the order window stay open for 2 seconds
-                    if (DateTime.Now.Subtract(_lastExecute).TotalSeconds < 2)
+                    if (DateTime.Now.Subtract(_lastExecute).TotalSeconds < (int)Time.Marketbuyorderdelay_seconds)
                         break;
 
                     if (sellWindow != null && (!sellWindow.OrderId.HasValue || !sellWindow.Price.HasValue || !sellWindow.RemainingVolume.HasValue))
@@ -554,7 +548,7 @@ namespace ValueDump
                 case ValueDumpState.RefineItems:
                     if (reprorcessingWindow == null)
                     {
-                        if (DateTime.Now.Subtract(_lastExecute).TotalSeconds > Marketlookupdelay)
+                        if (DateTime.Now.Subtract(_lastExecute).TotalSeconds > (int)Time.Marketlookupdelay_seconds)
                         {
                             IEnumerable<DirectItem> refineItems = Cache.Instance.ItemHangar.Items.Where(i => ItemsToRefine.Any(r => r.Id == i.ItemId));
                             Cache.Instance.DirectEve.ReprocessStationItems(refineItems);
@@ -566,7 +560,7 @@ namespace ValueDump
 
                     if (reprorcessingWindow.NeedsQuote)
                     {
-                        if (DateTime.Now.Subtract(_lastExecute).TotalSeconds > Marketlookupdelay)
+                        if (DateTime.Now.Subtract(_lastExecute).TotalSeconds > (int)Time.Marketlookupdelay_seconds)
                         {
                             reprorcessingWindow.GetQuotes();
                             _lastExecute = DateTime.Now;
@@ -583,7 +577,7 @@ namespace ValueDump
                     }
 
                     // Wait another 5 seconds to view the quote and then reprocess the stuff
-                    if (DateTime.Now.Subtract(_lastExecute).TotalSeconds > Marketlookupdelay)
+                    if (DateTime.Now.Subtract(_lastExecute).TotalSeconds > (int)Time.Marketlookupdelay_seconds)
                     {
                         // TODO: We should wait for the items to appear in our hangar and then sell them...
                         reprorcessingWindow.Reprocess();

@@ -20,7 +20,7 @@ namespace Questor.Modules.Lookup
         RepModuleDelay_milliseconds = 2500,                      //
         ApproachDelay_seconds = 15,                              //
         TargetDelay_milliseconds = 1000,                         //
-        DelayBetweenSalvagingSessions_minutes = 20,              //
+        DelayBetweenSalvagingSessions_minutes = 10,              //
         OrbitDelay_seconds = 15,                                 // This is the delay between orbit commands, units: seconds. Default is 15
         DockingDelay_seconds = 5,                                // This is the delay between docking attempts, units: seconds. Default is 5
         WarptoDelay_seconds = 5,                                 // This is the delay between warpto commands, units: seconds. Default is 5
@@ -63,5 +63,8 @@ namespace Questor.Modules.Lookup
         NoFramesReallyRestart_seconds = 90,
         NoSessionIsReadyRestart_seconds = 60,
         NoSessionIsReadyReallyRestart_seconds = 120,
+        Marketlookupdelay_seconds = 3,
+        Marketsellorderdelay_seconds = 5,
+        Marketbuyorderdelay_seconds = 5,
     }
 }

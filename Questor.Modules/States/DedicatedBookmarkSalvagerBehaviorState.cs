@@ -16,6 +16,7 @@ namespace Questor.Modules.States
         DelayedGotoBase,
         GotoBase,
         UnloadLoot,
+        CheckBookmarkAge,
         BeginAfterMissionSalvaging,
         GotoSalvageBookmark,
         SalvageUseGate,

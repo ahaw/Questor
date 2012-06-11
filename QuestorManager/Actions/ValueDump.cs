@@ -35,7 +35,7 @@ namespace QuestorManager.Actions
         {
             get
             {
-                return Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\InvTypes.xml";
+                return Path.GetDirectoryName(Settings.Instance.Path + "\\InvTypes.xml");
             }
         }
 
@@ -46,14 +46,11 @@ namespace QuestorManager.Actions
 
         public void ProcessState()
         {
-            XDocument invIgnore = XDocument.Load(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\InvIgnore.xml"); //items to ignore
+            XDocument invIgnore = XDocument.Load(Settings.Instance.Path + "\\InvIgnore.xml"); //items to ignore
             DirectMarketWindow marketWindow = Cache.Instance.DirectEve.Windows.OfType<DirectMarketWindow>().FirstOrDefault();
-            DirectContainer hangar = Cache.Instance.DirectEve.GetItemHangar();
             DirectMarketActionWindow sellWindow = Cache.Instance.DirectEve.Windows.OfType<DirectMarketActionWindow>().FirstOrDefault(w => w.IsSellAction);
             DirectReprocessingWindow reprorcessingWindow = Cache.Instance.DirectEve.Windows.OfType<DirectReprocessingWindow>().FirstOrDefault();
             bool block;
-
-            int randomNumber = _random.Next(2, 4);
 
             switch (_States.CurrentValueDumpState)
             {
@@ -83,7 +80,7 @@ namespace QuestorManager.Actions
                     _currentMineral = _form.InvTypesById.Values.FirstOrDefault(i => i.Id != 27029 && i.GroupId == 18 && i.LastUpdate < DateTime.Now.AddHours(-4));
                     if (_currentMineral == null)
                     {
-                        if (DateTime.Now.Subtract(_lastExecute).TotalSeconds > 5)
+                        if (DateTime.Now.Subtract(_lastExecute).TotalSeconds > (int)Time.Marketlookupdelay_seconds)
                         {
                             _States.CurrentValueDumpState = ValueDumpState.SaveMineralPrices;
                             if (marketWindow != null)
@@ -98,7 +95,7 @@ namespace QuestorManager.Actions
                 case ValueDumpState.GetMineralPrice:
                     if (marketWindow == null)
                     {
-                        if (DateTime.Now.Subtract(_lastExecute).TotalSeconds > 5)
+                        if (DateTime.Now.Subtract(_lastExecute).TotalSeconds > (int)Time.Marketlookupdelay_seconds)
                         {
                             Cache.Instance.DirectEve.ExecuteCommand(DirectCmd.OpenMarket);
                             _lastExecute = DateTime.Now;
@@ -109,7 +106,7 @@ namespace QuestorManager.Actions
 
                     if (marketWindow.DetailTypeId != _currentMineral.Id)
                     {
-                        if (DateTime.Now.Subtract(_lastExecute).TotalSeconds < 5)
+                        if (DateTime.Now.Subtract(_lastExecute).TotalSeconds < (int)Time.Marketlookupdelay_seconds)
                             return;
 
                         Logging.Log("ValueDump", "Loading orders for " + _currentMineral.Name, Logging.white);
@@ -147,27 +144,14 @@ namespace QuestorManager.Actions
                     break;
 
                 case ValueDumpState.GetItems:
-                    if (hangar.Window == null)
-                    {
-                        // No, command it to open
-                        if (DateTime.Now.Subtract(_lastExecute).TotalSeconds > 5)
-                        {
-                            Logging.Log("ValueDump", "Opening hangar", Logging.white);
-                            Cache.Instance.DirectEve.ExecuteCommand(DirectCmd.OpenHangarFloor);
-                            _lastExecute = DateTime.Now;
-                        }
 
-                        return;
-                    }
-
-                    if (!hangar.Window.IsReady)
-                        return;
+                    if (!Cache.Instance.OpenItemsHangar("Valuedump")) return;
 
                     Logging.Log("ValueDump", "Loading hangar items", Logging.white);
 
                     // Clear out the old
                     _form.Items.Clear();
-                    List<DirectItem> hangarItems = hangar.Items;
+                    List<DirectItem> hangarItems = Cache.Instance.ItemHangar.Items;
                     if (hangarItems != null)
                         _form.Items.AddRange(hangarItems.Where(i => i.ItemId > 0 && i.MarketGroupId > 0 && i.Quantity > 0).Select(i => new ItemCache(i, _form.RefineCheckBox.Checked)));
 
@@ -241,11 +225,11 @@ namespace QuestorManager.Actions
                     break;
 
                 case ValueDumpState.StartQuickSell:
-                    if ((DateTime.Now.Subtract(_lastExecute).TotalSeconds < randomNumber) && _form.cbxSell.Checked)
+                    if ((DateTime.Now.Subtract(_lastExecute).TotalSeconds < Cache.Instance.RandomNumber(1,3)) && _form.cbxSell.Checked)
                         break;
                     _lastExecute = DateTime.Now;
 
-                    DirectItem directItem = hangar.Items.FirstOrDefault(i => i.ItemId == _currentItem.Id);
+                    DirectItem directItem = Cache.Instance.ItemHangar.Items.FirstOrDefault(i => i.ItemId == _currentItem.Id);
                     if (directItem == null)
                     {
                         Logging.Log("ValueDump", "Item " + _currentItem.Name + " no longer exists in the hanger", Logging.white);
@@ -287,7 +271,7 @@ namespace QuestorManager.Actions
 
                 case ValueDumpState.InspectOrder:
                     // Let the order window stay open for random number
-                    if (DateTime.Now.Subtract(_lastExecute).TotalSeconds < randomNumber)
+                    if (DateTime.Now.Subtract(_lastExecute).TotalSeconds < Cache.Instance.RandomNumber(1, 3))
                         break;
 
                     if (sellWindow != null && (!sellWindow.OrderId.HasValue || !sellWindow.Price.HasValue || !sellWindow.RemainingVolume.HasValue))
@@ -389,9 +373,9 @@ namespace QuestorManager.Actions
 
                     if (reprorcessingWindow == null)
                     {
-                        if (DateTime.Now.Subtract(_lastExecute).TotalSeconds > randomNumber)
+                        if (DateTime.Now.Subtract(_lastExecute).TotalSeconds > Cache.Instance.RandomNumber(1, 3))
                         {
-                            IEnumerable<DirectItem> refineItems = hangar.Items.Where(i => _form.ItemsToRefine.Any(r => r.Id == i.ItemId));
+                            IEnumerable<DirectItem> refineItems = Cache.Instance.ItemHangar.Items.Where(i => _form.ItemsToRefine.Any(r => r.Id == i.ItemId));
                             Cache.Instance.DirectEve.ReprocessStationItems(refineItems);
 
                             _lastExecute = DateTime.Now;
@@ -401,7 +385,7 @@ namespace QuestorManager.Actions
 
                     if (reprorcessingWindow.NeedsQuote)
                     {
-                        if (DateTime.Now.Subtract(_lastExecute).TotalSeconds > randomNumber)
+                        if (DateTime.Now.Subtract(_lastExecute).TotalSeconds > Cache.Instance.RandomNumber(1, 3))
                         {
                             reprorcessingWindow.GetQuotes();
                             _lastExecute = DateTime.Now;

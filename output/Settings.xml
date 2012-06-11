@@ -17,6 +17,7 @@
   <debugGotobase>false</debugGotobase>
   <debugIdle>false</debugIdle>
   <debugAutoStart>false</debugAutoStart>
+  <debugSalvage>false</debugSalvage>
   <useInnerspace>true</useInnerspace>
   
   
@@ -39,8 +40,11 @@
   <!--   CONSOLE LOG SETTINGS   -->
   <!--                                                -->
   
-  <!-- Enable or Disable the SessionsLog that tracks Logins / Logoffs and overall session stats for questor -->
+  <!-- Save Console Log: the logs will save to: ./.Net Programs/Logs/<CharacterName>/consolelogs/<DailyLog> -->
   <saveLog>true</saveLog><!-- default is true -->
+  <!-- Save Console Log Redacted of at least some of the sensitive info: the logs will save to: ./.Net Programs/Logs/<CharacterName>/consolelogs/<DailyLog-redacted> -->
+  <saveLogRedacted>true</saveLogRedacted><!-- default is true -->
+  
   <!-- Maximum number of lines in the external console -->
   <maxLineConsole>1000</maxLineConsole><!-- default is 1000 -->
   
@@ -74,7 +78,7 @@
   <!-- By Default ClearPocket ignores sentries. If you would like them cleared as part of clearpocket you need this set to true --> 
   <killSentries>false</killSentries>
   <!-- Require a mission XML for Every Mission, default is false: if enabled questor will error while docked if it comes across a mission you do not have an XML for -->
-  <requireMissionXML>false<requireMissionXML>
+  <requireMissionXML>false</requireMissionXML>
   <!-- agentsList is used when WaitDecine is true and your standings have gone below MinStandings, it will switch to a lower priority agent, need to be filled out for at least one agent -->
   <agentsList>
     <agentList name="" priority="0" /><!-- needs to be customized -->
@@ -211,7 +215,7 @@
   <!--                                                                                                                                                   -->
   <!--      Logging Options: All logs are in ./.Net Programs/Logs/<CharacterName>/<optionalsubdirectory> -->
   <!--                                                                                                                                                   -->
-  <!-- Save Log Console: the logs will save to: ./.Net Programs/Logs/<CharacterName>/consolelogs/<DailyLog> -->
+  <!-- Enable or Disable the SessionsLog that tracks Logins / Logoffs and overall session stats for questor -->
   <SessionsLog>true</SessionsLog><!-- default is: true -->
   <!-- Enable or Disable the DroneStatsLog that tracks drone losses -->
   <DroneStatsLog>true</DroneStatsLog><!-- default is: true -->

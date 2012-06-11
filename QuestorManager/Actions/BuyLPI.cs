@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using DirectEve;
 using Questor.Modules.Caching;
@@ -21,6 +22,7 @@ namespace QuestorManager.Actions
         private static long _lastLoyaltyPoints;
         private int _requiredUnit;
         private int _requiredItemId;
+        private static DirectLoyaltyPointOffer _offer = null;
 
         public BuyLPI(QuestorManagerUI form1)
         {
@@ -29,14 +31,13 @@ namespace QuestorManager.Actions
 
         public void ProcessState()
         {
-            DirectLoyaltyPointStoreWindow lpstore =
-                Cache.Instance.DirectEve.Windows.OfType<DirectLoyaltyPointStoreWindow>().FirstOrDefault();
-            DirectMarketWindow marketWindow =
-                Cache.Instance.DirectEve.Windows.OfType<DirectMarketWindow>().FirstOrDefault();
 
             if (DateTime.Now.Subtract(_lastAction).TotalSeconds < 1)
                 return;
             _lastAction = DateTime.Now;
+
+            if (!Cache.Instance.OpenItemsHangar("BuyLPI")) return;
+            DirectMarketWindow marketWindow = Cache.Instance.DirectEve.Windows.OfType<DirectMarketWindow>().FirstOrDefault();
 
             switch (_States.CurrentBuyLPIState)
             {
@@ -66,60 +67,52 @@ namespace QuestorManager.Actions
 
                 case BuyLPIState.OpenLpStore:
 
-                    if (lpstore == null)
-                    {
-                        Cache.Instance.DirectEve.ExecuteCommand(DirectCmd.OpenLpstore);
-                        Logging.Log("BuyLPI", "Opening loyalty point store", Logging.white);
-                    }
+                    if (!Cache.Instance.OpenLPStore("BuyLPI")) return;
                     _States.CurrentBuyLPIState = BuyLPIState.FindOffer;
                     break;
 
                 case BuyLPIState.FindOffer:
 
-                    if (lpstore != null)
+                    if (Cache.Instance.LPStore != null)
                     {
-                        DirectLoyaltyPointOffer offer = lpstore.Offers.FirstOrDefault(o => o.TypeId == Item);
+                        BuyLPI._offer = Cache.Instance.LPStore.Offers.FirstOrDefault(o => o.TypeId == Item);
 
                         // Wait for the amount of LP to change
-                        if (_lastLoyaltyPoints == lpstore.LoyaltyPoints)
+                        if (_lastLoyaltyPoints == Cache.Instance.LPStore.LoyaltyPoints)
                             break;
 
                         // Do not expect it to be 0 (probably means its reloading)
-                        if (lpstore.LoyaltyPoints == 0)
+                        if (Cache.Instance.LPStore.LoyaltyPoints == 0)
                         {
                             if (_loyaltyPointTimeout < DateTime.Now)
                             {
                                 Logging.Log("BuyLPI", "It seems we have no loyalty points left", Logging.white);
-
                                 _States.CurrentBuyLPIState = BuyLPIState.Done;
+                                break;
                             }
                             break;
                         }
 
-                        _lastLoyaltyPoints = lpstore.LoyaltyPoints;
+                        _lastLoyaltyPoints = Cache.Instance.LPStore.LoyaltyPoints;
 
                         // Find the offer
-                        if (offer == null)
+                        if (_offer == null)
                         {
                             Logging.Log("BuyLPI", "Can't find offer with type name/id: " + Item + "!", Logging.white);
-
                             _States.CurrentBuyLPIState = BuyLPIState.Done;
                             break;
                         }
-                    }
-
                     _States.CurrentBuyLPIState = BuyLPIState.CheckPetition;
-
+                    }
+                    _States.CurrentBuyLPIState = BuyLPIState.OpenLpStore;
                     break;
 
                 case BuyLPIState.CheckPetition:
 
-                    if (lpstore != null)
+                    if (Cache.Instance.LPStore != null)
                     {
-                        DirectLoyaltyPointOffer offer1 = lpstore.Offers.FirstOrDefault(o => o.TypeId == Item);
-
                         // Check LP
-                        if (offer1 != null && _lastLoyaltyPoints < offer1.LoyaltyPointCost)
+                        if (_lastLoyaltyPoints < _offer.LoyaltyPointCost)
                         {
                             Logging.Log("BuyLPI", "Not enough loyalty points left", Logging.white);
 
@@ -128,7 +121,7 @@ namespace QuestorManager.Actions
                         }
 
                         // Check ISK
-                        if (offer1 != null && Cache.Instance.DirectEve.Me.Wealth < offer1.IskCost)
+                        if (Cache.Instance.DirectEve.Me.Wealth < _offer.IskCost)
                         {
                             Logging.Log("BuyLPI", "Not enough ISK left", Logging.white);
 
@@ -137,11 +130,12 @@ namespace QuestorManager.Actions
                         }
 
                         // Check items
-                        if (offer1 != null)
-                            foreach (DirectLoyaltyPointOfferRequiredItem requiredItem in offer1.RequiredItems)
+                        foreach (DirectLoyaltyPointOfferRequiredItem requiredItem in _offer.RequiredItems)
                             {
-                                DirectItem ship = Cache.Instance.ShipHangar.Items.FirstOrDefault(i => i.TypeId == requiredItem.TypeId);
-                                DirectItem item = Cache.Instance.ItemHangar.Items.FirstOrDefault(i => i.TypeId == requiredItem.TypeId);
+                            DirectItem ship =
+                                Cache.Instance.ShipHangar.Items.FirstOrDefault(i => i.TypeId == requiredItem.TypeId);
+                            DirectItem item =
+                                Cache.Instance.ItemHangar.Items.FirstOrDefault(i => i.TypeId == requiredItem.TypeId);
                                 if (item == null || item.Quantity < requiredItem.Quantity)
                                 {
                                     if (ship == null || ship.Quantity < requiredItem.Quantity)
@@ -156,18 +150,18 @@ namespace QuestorManager.Actions
                                         //    break;
                                         //}
 
-                                        Logging.Log("BuyLPI", "Are buying the item [" + requiredItem.TypeName + "]", Logging.white);
+                                        Logging.Log("BuyLPI", "Are buying the item [" + requiredItem.TypeName + "]",
+                                                Logging.white);
                                         _requiredUnit = Convert.ToInt32(requiredItem.Quantity);
                                         _requiredItemId = requiredItem.TypeId;
                                         _States.CurrentBuyLPIState = BuyLPIState.OpenMarket;
                                         return;
                                     }
                                 }
+                                _States.CurrentBuyLPIState = BuyLPIState.AcceptOffer;
                             }
+                            _States.CurrentBuyLPIState = BuyLPIState.OpenLpStore;
                     }
-
-                    _States.CurrentBuyLPIState = BuyLPIState.AcceptOffer;
-
                     break;
 
                 case BuyLPIState.OpenMarket:
@@ -182,7 +176,6 @@ namespace QuestorManager.Actions
                         break;
 
                     _States.CurrentBuyLPIState = BuyLPIState.BuyItems;
-
                     break;
 
                 case BuyLPIState.BuyItems:
@@ -220,9 +213,9 @@ namespace QuestorManager.Actions
 
                 case BuyLPIState.AcceptOffer:
 
-                    if (lpstore != null)
+                    if (Cache.Instance.LPStore != null)
                     {
-                        DirectLoyaltyPointOffer offer2 = lpstore.Offers.FirstOrDefault(o => o.TypeId == Item);
+                        DirectLoyaltyPointOffer offer2 = Cache.Instance.LPStore.Offers.FirstOrDefault(o => o.TypeId == Item);
 
                         if (offer2 != null)
                         {
@@ -231,7 +224,6 @@ namespace QuestorManager.Actions
                         }
                     }
                     _States.CurrentBuyLPIState = BuyLPIState.Quantity;
-
                     break;
 
                 case BuyLPIState.Quantity:

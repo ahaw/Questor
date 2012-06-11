@@ -445,13 +445,12 @@ namespace Questor.Behaviors
                     if (!Cache.Instance.InSpace)
                         return;
                     
-                    DirectContainer salvageCargo = Cache.Instance.DirectEve.GetShipsCargo();
+                    if (!Cache.Instance.OpenCargoHold("CombatMissionsBehavior: Salvage")) break;    
                     Cache.Instance.SalvageAll = true;
                     Cache.Instance.OpenWrecks = true;
                     
-                    if (!Cache.Instance.OpenCargoHold("CombatMissionsBehavior: Salvage")) break;
 
-                    if (Settings.Instance.UnloadLootAtStation && salvageCargo.Window.IsReady && (salvageCargo.Capacity - salvageCargo.UsedCapacity) < 100)
+                    if (Settings.Instance.UnloadLootAtStation && Cache.Instance.CargoHold.Window.IsReady && (Cache.Instance.CargoHold.Capacity - Cache.Instance.CargoHold.UsedCapacity) < 100)
                     {
                         Logging.Log("CombatMissionsBehavior.Salvage", "We are full, go to base to unload", Logging.white);
                         if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.Salvage)

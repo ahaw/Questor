@@ -1119,6 +1119,7 @@
             this.MaximizeBox = false;
             this.Name = "QuestorManagerUI";
             this.Text = "Questor Manager";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FrmMainFormClosed);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();

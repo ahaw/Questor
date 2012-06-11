@@ -27,7 +27,6 @@ namespace Questor.Modules.Actions
     {
         private bool _missionItemMoved;
         private bool _optionalMissionItemMoved;
-        private bool _inventoryWindowsCleanedUp = false;
 
         public Arm()
         {
@@ -64,7 +63,6 @@ namespace Questor.Modules.Actions
             switch (_States.CurrentArmState)
             {
                 case ArmState.Idle:
-                    _inventoryWindowsCleanedUp = false;
                     break;
 
                 case ArmState.Cleanup:

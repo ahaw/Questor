@@ -71,8 +71,9 @@ namespace QuestorManager
         private readonly ValueDump _valuedump;
         private readonly BuyLPI _buylpi;
         private readonly Defense _defense;
+        private readonly Cleanup _cleanup;
         private readonly ListItems _item;
-
+        
         private DateTime _lastAction;
 
         public string CharacterName { get; set; }
@@ -93,6 +94,7 @@ namespace QuestorManager
             _buylpi = new BuyLPI(this);
             //_buylpi = new BuyLPI();
             _defense = new Defense();
+            _cleanup = new Cleanup();
             List = new List<ListItems>();
             Items = new List<ItemCache>();
             ItemsToSell = new List<ItemCache>();
@@ -194,6 +196,49 @@ namespace QuestorManager
                     (int)DateTime.Now.Subtract(Cache.Instance.QuestorStarted_DateTime).TotalMinutes;
                 Cache.Instance.LastupdateofSessionRunningTime = DateTime.Now;
             }
+
+            // We always check our defense state if we're in space, regardless of questor state
+            // We also always check panic
+            if (Cache.Instance.InSpace)
+            {
+                if (!Cache.Instance.DoNotBreakInvul)
+                {
+                    _defense.ProcessState();
+                }
+            }
+
+            if (Cache.Instance.Paused)
+            {
+                Cache.Instance.LastKnownGoodConnectedTime = DateTime.Now;
+                Cache.Instance.MyWalletBalance = Cache.Instance.DirectEve.Me.Wealth;
+                Cache.Instance.GotoBaseNow = false;
+                Cache.Instance.SessionState = string.Empty;
+                return;
+            }
+
+            //if (Cache.Instance.SessionState == "Quitting")
+            //{
+            //    if (_States.CurrentQuestorState != QuestorState.CloseQuestor)
+            //    {
+            //        BeginClosingQuestor();
+            //    }
+            //}
+
+            // Start _cleanup.ProcessState
+            // Description: Closes Windows, and eventually other things considered 'cleanup' useful to more than just Questor(Missions) but also Anomalies, Mining, etc
+            //
+            _cleanup.ProcessState();
+            
+            if (Settings.Instance.DebugStates)
+                Logging.Log("Cleanup.State is", _States.CurrentCleanupState.ToString(), Logging.white);
+
+            // Done
+            // Cleanup State: ProcessState
+
+            // When in warp there's nothing we can do, so ignore everything
+            if (Cache.Instance.InWarp)
+                return;
+
 
             InitializeTraveler();
 
@@ -521,8 +566,7 @@ namespace QuestorManager
                         _traveler.Destination = travelerDestination;
 
                     _traveler.ProcessState();
-                    _defense.ProcessState();
-
+                    
                     // Record number of jumps
                     _jumps = Cache.Instance.DirectEve.Navigation.GetDestinationPath().Count;
 
