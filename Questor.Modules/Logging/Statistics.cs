@@ -18,10 +18,10 @@ namespace Questor.Modules.Logging
         //private DateTime _lastStatisticsAction;
         public DateTime MissionLoggingStartedTimestamp { get; set; }
 
-        public DateTime StartedMission = DateTime.Now;
-        public DateTime FinishedMission = DateTime.Now;
-        public DateTime StartedSalvaging = DateTime.Now;
-        public DateTime FinishedSalvaging = DateTime.Now;
+        public DateTime StartedMission = DateTime.MinValue;
+        public DateTime FinishedMission = DateTime.MinValue;
+        public DateTime StartedSalvaging = DateTime.MinValue;
+        public DateTime FinishedSalvaging = DateTime.MinValue;
 
         public DateTime StartedPocket = DateTime.Now;
 

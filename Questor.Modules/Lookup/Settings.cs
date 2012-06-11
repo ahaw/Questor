@@ -134,6 +134,7 @@ namespace Questor.Modules.Lookup
         // KillSentries Setting
         //
         private bool _killSentries;
+        public int NumberOfModulesToActivateInCycle = 1;
         public bool KillSentries
         {
             get

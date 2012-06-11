@@ -68,6 +68,9 @@ namespace Questor.Storylines
                                {"Pirate Radio", new GenericCombatStoryline()},
                                {"Operation Doorstop", new GenericCourier()},
                                {"Black Ops Crisis", new GenericCourier()},
+                               {"On the Run", new GenericCourier()},
+                               {"A Fathers Love", new GenericCourier()},
+                               {"Fire and Ice", new GenericCourier()},
                                //{"Matriarch", new GenericCombatStoryline()},
                                //{"Diplomatic Incident", new GenericCombatStoryline()},
                                //these work but are against other factions that I generally like to avoid
@@ -97,8 +100,10 @@ namespace Questor.Storylines
 
                 missionsinjournal = missionsinjournal.Where(m => !Cache.Instance.AgentBlacklist.Contains(m.AgentId));
                 missionsinjournal = missionsinjournal.Where(m => m.Important);
+                Logging.Log("Storyline", "Currently have  [" + missionsinjournal.Count() + "] availible storyline missions", Logging.yellow);
                 missionsinjournal = missionsinjournal.Where(m => _storylines.ContainsKey(Cache.Instance.FilterPath(m.Name)));
                 missionsinjournal = missionsinjournal.Where(m => !Settings.Instance.MissionBlacklist.Any(b => b.ToLower() == Cache.Instance.FilterPath(m.Name).ToLower()));
+                Logging.Log("Storyline", "Currently have  [" + missionsinjournal.Count() + "] to do storyline missions", Logging.yellow);
                 //missions = missions.Where(m => !Settings.Instance.MissionGreylist.Any(b => b.ToLower() == Cache.Instance.FilterPath(m.Name).ToLower()));
                 return missionsinjournal.FirstOrDefault();
             }

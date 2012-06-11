@@ -129,24 +129,25 @@ namespace Questor.Storylines
             if (!Cache.Instance.OpenCargoHold("GenericCourierStoryline: MoveItem")) return false;
 
             // 314 == Giant Sealed Cargo Containers
-            const int groupId = 314;
+            const int containersGroupId = 314;
+            const int marinesGroupId = 283;
             DirectContainer from = pickup ? Cache.Instance.ItemHangar : Cache.Instance.CargoHold;
             DirectContainer to = pickup ? Cache.Instance.CargoHold : Cache.Instance.ItemHangar;
 
             // We moved the item
-            if (to.Items.Any(i => i.GroupId == groupId))
-                return true;
 
+            if (to.Items.Any(i => i.GroupId == containersGroupId || i.GroupId==marinesGroupId))
+                return true;
+            
             if (directEve.GetLockedItems().Count != 0)
                 return false;
 
             // Move items
-            foreach (var item in from.Items.Where(i => i.GroupId == groupId))
+            foreach (var item in from.Items.Where(i => i.GroupId == containersGroupId || i.GroupId == marinesGroupId))
             {
                 Logging.Log("GenericCourier", "Moving [" + item.TypeName + "][" + item.ItemId + "] to " + (pickup ? "cargo" : "hangar"), Logging.white);
                 to.Add(item, item.Stacksize);
             }
-
             _nextAction = DateTime.Now.AddSeconds(10);
             return false;
         }

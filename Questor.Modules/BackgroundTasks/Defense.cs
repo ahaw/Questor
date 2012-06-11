@@ -69,7 +69,7 @@ namespace Questor.Modules.BackgroundTasks
                 module.Click();
                 Cache.Instance.NextActivateSupportModules = DateTime.Now.AddMilliseconds((int)Time.DefenceDelay_milliseconds);
                 Logging.Log("Defense", "Defensive module activated: [" + module.ItemId + "] waiting [" + Math.Round(Cache.Instance.NextActivateSupportModules.Subtract(DateTime.Now).TotalSeconds, 0) + " sec]", Logging.white);
-                continue;
+                return;
             }
         }
 
@@ -143,7 +143,6 @@ namespace Questor.Modules.BackgroundTasks
                     //Logging.Log("LowestShieldPercentage(mission) [ " + Cache.Instance.lowest_shield_percentage_this_mission + " ] ");
                     //Logging.Log("LowestArmorPercentage(mission) [ " + Cache.Instance.lowest_armor_percentage_this_mission + " ] ");
                     //Logging.Log("LowestCapacitorPercentage(mission) [ " + Cache.Instance.lowest_capacitor_percentage_this_mission + " ] ");
-                    continue;
                 }
                 else if (module.IsActive && perc >= Settings.Instance.DeactivateRepairModules)
                 {
@@ -164,8 +163,9 @@ namespace Questor.Modules.BackgroundTasks
                     }
                     //Cache.Instance.repair_cycle_time_this_pocket = Cache.Instance.repair_cycle_time_this_pocket + ((int)watch.Elapsed);
                     //Cache.Instance.repair_cycle_time_this_mission = Cache.Instance.repair_cycle_time_this_mission + watch.Elapsed.TotalMinutes;
-                    continue;
+                    
                 }
+                return;
             }
         }
 
@@ -209,14 +209,13 @@ namespace Questor.Modules.BackgroundTasks
                 {
                     module.Click();
                     Cache.Instance.NextAfterburnerAction = DateTime.Now.AddMilliseconds((int)Time.AfterburnerDelay_milliseconds);
-                    return;
                 }
                 else if (deactivate && module.IsActive)
                 {
                     module.Click();
                     Cache.Instance.NextAfterburnerAction = DateTime.Now.AddMilliseconds((int)Time.AfterburnerDelay_milliseconds);
-                    return;
                 }
+                return;
             }
         }
 

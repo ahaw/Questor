@@ -441,7 +441,8 @@ namespace Questor.Behaviors
                         break;
 
                     _storyline.Reset();
-                    if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.DelayedStart) _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.Cleanup;
+                    if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.DelayedStart)
+                        _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.Cleanup;
                     break;
 
                 case CombatMissionsBehaviorState.DelayedGotoBase:
@@ -449,7 +450,8 @@ namespace Questor.Behaviors
                         break;
 
                     Logging.Log("CombatMissionsBehavior", "Heading back to base", Logging.white);
-                    if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.DelayedGotoBase) _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.GotoBase;
+                    if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.DelayedGotoBase) 
+                        _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.GotoBase;
                     break;
 
                 case CombatMissionsBehaviorState.Cleanup:
@@ -461,13 +463,15 @@ namespace Questor.Behaviors
                     //
                     if (Cache.Instance.LootAlreadyUnloaded == false)
                     {
-                        if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.Cleanup) _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.GotoBase;
+                        if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.Cleanup) 
+                            _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.GotoBase;
                         break;
                     }
                     else
                     {
                         Questor.CheckEVEStatus();
-                        if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.Cleanup) _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.Start;
+                        if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.Cleanup) 
+                            _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.Start;
                         break;
                     }
 
@@ -475,7 +479,8 @@ namespace Questor.Behaviors
                     if (_firstStart && Settings.Instance.MultiAgentSupport)
                     {
                         //if you are in wrong station and is not first agent
-                        if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.Start) _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.Switch;
+                        if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.Start) 
+                            _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.Switch;
                         _firstStart = false;
                         break;
                     }
@@ -489,7 +494,8 @@ namespace Questor.Behaviors
                         {
                             Logging.Log("CombatMissionsBehavior", "Storyline detected, doing storyline.", Logging.white);
                             _storyline.Reset();
-                            if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.Start) _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.Storyline;
+                            if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.Start) 
+                                _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.Storyline;
                             break;
                         }
                         Logging.Log("AgentInteraction", "Start conversation [Start Mission]", Logging.white);

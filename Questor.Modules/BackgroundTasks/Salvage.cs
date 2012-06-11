@@ -105,7 +105,7 @@ namespace Questor.Modules.BackgroundTasks
                     tractorBeam.Click();
                     tractorsProcessedThisTick++;
                     Cache.Instance.NextSalvageAction = DateTime.Now.AddMilliseconds((int)Time.SalvageDelayBetweenActions_milliseconds);
-                    if (tractorsProcessedThisTick < 2)
+                    if (tractorsProcessedThisTick < Settings.Instance.NumberOfModulesToActivateInCycle)
                         continue;
                     else
                     {
@@ -173,7 +173,7 @@ namespace Questor.Modules.BackgroundTasks
                 salvager.Activate(wreck.Id);
                 salvagersProcessedThisTick++;
                 Cache.Instance.NextSalvageAction = DateTime.Now.AddMilliseconds((int)Time.SalvageDelayBetweenActions_milliseconds);
-                if (salvagersProcessedThisTick < 2)
+                if (salvagersProcessedThisTick < Settings.Instance.NumberOfModulesToActivateInCycle)
                     continue;
                 else
                 {
@@ -309,6 +309,7 @@ namespace Questor.Modules.BackgroundTasks
                 else
                     if (wreckTargets.Count >= MaximumWreckTargets)
                         return;
+                return;
                 //return;
             }
         }

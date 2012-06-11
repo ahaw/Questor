@@ -404,7 +404,7 @@ namespace Questor.Modules.Combat
                             {
                                 //if we are already shooting at it, stop
                                 weapon.Click();
-                                continue;
+                                return;
                             }
                             else
                             {
@@ -416,25 +416,29 @@ namespace Questor.Modules.Combat
                 }
                 if (!weapon.IsActive)
                 {
-                    if (Settings.Instance.DebugActivateWeapons) Logging.Log("Combat", "ActivateWeapons: deactivate: weapon [" + weapon.ItemId + "] is not active: no need to do anything", Logging.teal);
+                    if (Settings.Instance.DebugActivateWeapons) 
+                        Logging.Log("Combat", "ActivateWeapons: deactivate: weapon [" + weapon.ItemId + "] is not active: no need to do anything", Logging.teal);
                     continue;
                 }
                 if (weapon.IsReloadingAmmo || weapon.IsDeactivating || weapon.IsChangingAmmo)
                 {
-                    if (Settings.Instance.DebugActivateWeapons) Logging.Log("Combat", "ActivateWeapons: deactivate: weapon [" + weapon.ItemId + "] is reloading, deactivating or changing ammo: no need to do anything", Logging.teal);
+                    if (Settings.Instance.DebugActivateWeapons) 
+                        Logging.Log("Combat", "ActivateWeapons: deactivate: weapon [" + weapon.ItemId + "] is reloading, deactivating or changing ammo: no need to do anything", Logging.teal);
                     continue;
                 }
 
                 if (DateTime.Now < Cache.Instance.NextReload) //if we should not yet reload we are likely in the middle of a reload and should wait!
                 {
-                    if (Settings.Instance.DebugActivateWeapons) Logging.Log("Combat", "ActivateWeapons: deactivate: NextReload is still in the future: wait before doing anything with the weapon", Logging.teal);
+                    if (Settings.Instance.DebugActivateWeapons) 
+                        Logging.Log("Combat", "ActivateWeapons: deactivate: NextReload is still in the future: wait before doing anything with the weapon", Logging.teal);
                     return;
                 }
 
                 // No ammo loaded
                 if (weapon.Charge == null)
                 {
-                    if (Settings.Instance.DebugActivateWeapons) Logging.Log("Combat", "ActivateWeapons: deactivate: no ammo loaded? [" + weapon.ItemId + "] reload will happen elsewhere", Logging.teal);
+                    if (Settings.Instance.DebugActivateWeapons) 
+                        Logging.Log("Combat", "ActivateWeapons: deactivate: no ammo loaded? [" + weapon.ItemId + "] reload will happen elsewhere", Logging.teal);
                     continue;
                 }
 
@@ -468,6 +472,7 @@ namespace Questor.Modules.Combat
                 // Target is out of range, stop firing
                 if (Settings.Instance.DebugActivateWeapons) Logging.Log("Combat", "ActivateWeapons: deactivate: target is out of range, stop firing", Logging.teal);
                 weapon.Click();
+                return;
             }
 
                 // Hack for max charges returning incorrect value
@@ -498,6 +503,7 @@ namespace Questor.Modules.Combat
                     {
                         if (Settings.Instance.DebugActivateWeapons) Logging.Log("Combat", "ActivateWeapons: Activate: weapon [" + weapon.ItemId + "] is shooting at the wrong target: deactivating", Logging.teal);
                         weapon.Click();
+                        return;
                     }
                     continue;
                 }
@@ -539,7 +545,11 @@ namespace Questor.Modules.Combat
                 if (painter.IsActive)
                 {
                     if (painter.TargetId != target.Id)
+                    {
                         painter.Click();
+                        return;
+                    }
+
 
                     continue;
                 }
@@ -575,7 +585,10 @@ namespace Questor.Modules.Combat
                 if (nos.IsActive)
                 {
                     if (nos.TargetId != target.Id)
+                    { 
                         nos.Click();
+                        return;
+                    }
 
                     continue;
                 }
@@ -619,7 +632,10 @@ namespace Questor.Modules.Combat
                 if (web.IsActive)
                 {
                     if (web.TargetId != target.Id)
+                    {
                         web.Click();
+                        return;
+                    }
 
                     continue;
                 }
