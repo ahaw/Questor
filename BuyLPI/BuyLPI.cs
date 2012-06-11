@@ -8,16 +8,17 @@
 //   </copyright>
 // -------------------------------------------------------------------------------
 
-using System.Globalization;
-using Questor.Modules.Caching;
-
 namespace BuyLPI
 {
     using System;
     using System.Linq;
     using System.Threading;
     using DirectEve;
+    using System.Globalization;
     using Questor.Modules.Logging;
+    using Questor.Modules.Caching;
+    using Questor.Modules.BackgroundTasks;
+    using Questor.Modules.Lookup;
 
     internal class BuyLPI
     {
@@ -28,8 +29,11 @@ namespace BuyLPI
         private static string _type;
         private static int? _quantity;
         private static int? _totalquantityoforders;
-        private static bool _done;
+        private static DateTime _done = DateTime.Now.AddYears(10);
         private static DirectEve _directEve;
+        private static DateTime _lastPulse;
+        private static Cleanup _cleanup;
+        
 
         private static void Main(string[] args)
         {
@@ -71,11 +75,13 @@ namespace BuyLPI
             }
 
             Logging.Log("BuyLPI", "Starting BuyLPI...", Logging.white);
+            _cleanup = new Cleanup();
             _directEve = new DirectEve();
+            Cache.Instance.DirectEve = _directEve;
             _directEve.OnFrame += OnFrame;
 
             // Sleep until we're done
-            while (!_done)
+            while (_done.AddSeconds(5) > DateTime.Now)
                 Thread.Sleep(50);
 
             _directEve.Dispose();
@@ -84,7 +90,43 @@ namespace BuyLPI
 
         private static void OnFrame(object sender, EventArgs eventArgs)
         {
-            if (_done)
+            // New frame, invalidate old cache
+            Cache.Instance.InvalidateCache();
+
+            Cache.Instance.LastFrame = DateTime.Now;
+
+            // Only pulse state changes every 1.5s
+            if (DateTime.Now.Subtract(_lastPulse).TotalMilliseconds < 300)
+                return;
+            _lastPulse = DateTime.Now;
+
+            // Session is not ready yet, do not continue
+            if (!Cache.Instance.DirectEve.Session.IsReady)
+                return;
+
+            if (Cache.Instance.DirectEve.Session.IsReady)
+                Cache.Instance.LastSessionIsReady = DateTime.Now;
+
+            // We are not in space or station, don't do shit yet!
+            if (!Cache.Instance.InSpace && !Cache.Instance.InStation)
+            {
+                Cache.Instance.NextInSpaceorInStation = DateTime.Now.AddSeconds(12);
+                Cache.Instance.LastSessionChange = DateTime.Now;
+                return;
+            }
+
+            if (DateTime.Now < Cache.Instance.NextInSpaceorInStation)
+                return;
+            
+            // Start _cleanup.ProcessState
+            // Description: Closes Windows, and eventually other things considered 'cleanup' useful to more than just Questor(Missions) but also Anomalies, Mining, etc
+            //
+            _cleanup.ProcessState();
+            
+            // Done
+            // Cleanup State: ProcessState
+ 
+            if (DateTime.Now > _done)
                 return;
 
             // Wait for the next action
@@ -93,7 +135,7 @@ namespace BuyLPI
                 return;
             }
 
-            if (!Cache.Instance.OpenItemsHangar("BuyLPI")) return;
+            if (!Cache.Instance.OpenItemsHangarAsLootHangar("BuyLPI")) return;
 
             DirectLoyaltyPointStoreWindow lpstore = _directEve.Windows.OfType<DirectLoyaltyPointStoreWindow>().FirstOrDefault();
             if (lpstore == null)
@@ -104,17 +146,6 @@ namespace BuyLPI
                 Logging.Log("BuyLPI", "Opening loyalty point store", Logging.white);
                 return;
             }
-            foreach (var window in _directEve.Windows)
-            {
-                if (window.Name == "modal")
-                {
-                    _nextAction = DateTime.Now.AddMilliseconds(WaitMillis);
-                    window.AnswerModal("Ok");
-                    Logging.Log("BuyLPI", "BuyLPI: Saying OK to modal window for lpstore offer.", Logging.white);                    
-                    return;
-                }
-            }
-
 
             // Wait for the amount of LP to change
             if (_lastLoyaltyPoints == lpstore.LoyaltyPoints)
@@ -127,7 +158,7 @@ namespace BuyLPI
                 {
                     Logging.Log("BuyLPI", "It seems we have no loyalty points left", Logging.white);
 
-                    _done = true;
+                    _done = DateTime.Now;
                     return;
                 }
                 return;
@@ -139,39 +170,39 @@ namespace BuyLPI
             DirectLoyaltyPointOffer offer = lpstore.Offers.FirstOrDefault(o => o.TypeId.ToString(CultureInfo.InvariantCulture) == _type || String.Compare(o.TypeName, _type, StringComparison.OrdinalIgnoreCase) == 0);
             if (offer == null)
             {
-                Logging.Log("BuyLPI", "Can't find offer with type name/id: {0}!", _type);
+                Logging.Log("BuyLPI"," Can't find offer with type name/id: [" + _type + "]",Logging.white);
 
-                _done = true;
+                _done = DateTime.Now;
                 return;
             }
 
             // Check LP
             if (_lastLoyaltyPoints < offer.LoyaltyPointCost)
             {
-                Logging.Log("BuyLPI", "Not enough loyalty points left", Logging.white);
+                Logging.Log("BuyLPI", "Not enough loyalty points left: you have [" + _lastLoyaltyPoints + "] and you need [" + offer.LoyaltyPointCost + "]", Logging.white);
 
-                _done = true;
+                _done = DateTime.Now;
                 return;
             }
 
             // Check ISK
             if (_directEve.Me.Wealth < offer.IskCost)
             {
-                Logging.Log("BuyLPI", "Not enough ISK left", Logging.white);
+                Logging.Log("BuyLPI", "Not enough ISK left: you have [" + Math.Round(_directEve.Me.Wealth, 0) + "] and you need  [" + offer.IskCost + "]", Logging.white);
 
-                _done = true;
+                _done = DateTime.Now;
                 return;
             }
 
             // Check items
             foreach (DirectLoyaltyPointOfferRequiredItem requiredItem in offer.RequiredItems)
             {
-                DirectItem item = Cache.Instance.ItemHangar.Items.FirstOrDefault(i => i.TypeId == requiredItem.TypeId);
+                DirectItem item = Cache.Instance.LootHangar.Items.FirstOrDefault(i => i.TypeId == requiredItem.TypeId);
                 if (item == null || item.Quantity < requiredItem.Quantity)
                 {
                     Logging.Log("BuyLPI", "Missing [" + requiredItem.Quantity + "] x [" +
                                                     requiredItem.TypeName + "]", Logging.white);
-                    _done = true;
+                    _done = DateTime.Now;
                     return;
                 }
             }
@@ -193,7 +224,7 @@ namespace BuyLPI
                 {
                     Logging.Log("BuyLPI", "Quantity limit reached", Logging.white);
 
-                    _done = true;
+                    _done = DateTime.Now;
                     return;
                 }
             }

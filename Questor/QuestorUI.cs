@@ -442,6 +442,20 @@ namespace Questor
             if (Text != text)
                 Text = text;
 
+            lastSessionisreadyData.Text = "[" + Math.Round(DateTime.Now.Subtract(Cache.Instance.LastSessionIsReady).TotalSeconds,0) + "] sec ago";
+            LastFrameData.Text = "[" + Math.Round(DateTime.Now.Subtract(Cache.Instance.LastFrame).TotalSeconds,0) + "] sec ago";
+            lastInSpaceData.Text = "[" + Math.Round(DateTime.Now.Subtract(Cache.Instance.LastInSpace).TotalSeconds,0) + "] sec ago";
+            lastInStationData.Text = "[" + Math.Round(DateTime.Now.Subtract(Cache.Instance.LastInStation).TotalSeconds,0) + "] sec ago";
+            lastKnownGoodConnectedTimeData.Text = "[" + Math.Round(DateTime.Now.Subtract(Cache.Instance.LastKnownGoodConnectedTime).TotalSeconds,0) + "] min ago";
+            
+            if (Cache.Instance.SessionState == "Quitting")
+            {
+                if (Cache.Instance.ReasonToStopQuestor == "A message from ccp indicated we were disconnected")
+                {
+                    CloseQuestor();
+                }
+            }
+
             //
             // Left Group
             //
@@ -702,13 +716,12 @@ namespace Questor
             }
             if (DateTime.Now.Subtract(Cache.Instance.LastFrame).TotalSeconds > ((int)Time.NoFramesRestart_seconds + extraWaitSeconds) && DateTime.Now.Subtract(Program.AppStarted).TotalSeconds > 300)
             {
+                if (DateTime.Now.Subtract(Cache.Instance.LastLogMessage).TotalSeconds > 30)
                 {
-                    if (DateTime.Now.Subtract(Cache.Instance.LastLogMessage).TotalSeconds > 30)
-                    {
-                        Logging.Log("QuestorUI",
-                                    "The Last UI Frame Drawn by EVE was [" +
-                                    Math.Round(DateTime.Now.Subtract(Cache.Instance.LastFrame).TotalSeconds, 0) +
-                                    "] seconds ago! This is bad. - Exiting EVE", Logging.red);
+                    Logging.Log("QuestorUI",
+                                "The Last UI Frame Drawn by EVE was [" +
+                                Math.Round(DateTime.Now.Subtract(Cache.Instance.LastFrame).TotalSeconds, 0) +
+                                "] seconds ago! This is bad. - Exiting EVE", Logging.red);
                     //
                     // closing eve would be a very good idea here
                     //
@@ -716,21 +729,21 @@ namespace Questor
                     //Application.Exit();
                 }
             }
-                if (DateTime.Now.Subtract(Cache.Instance.LastSessionIsReady).TotalSeconds > ((int)Time.NoSessionIsReadyRestart_seconds + extraWaitSeconds) &&
+
+            if (DateTime.Now.Subtract(Cache.Instance.LastSessionIsReady).TotalSeconds > ((int)Time.NoSessionIsReadyRestart_seconds + extraWaitSeconds) &&
                     DateTime.Now.Subtract(Program.AppStarted).TotalSeconds > 300)
             {
                 if (DateTime.Now.Subtract(Cache.Instance.LastLogMessage).TotalSeconds > 60)
                 {
-                        Logging.Log("QuestorUI",
-                                    "The Last Session.IsReady = true was [" +
-                                    Math.Round(DateTime.Now.Subtract(Cache.Instance.LastSessionIsReady).TotalSeconds, 0) +
-                                    "] seconds ago! This is bad. - Exiting EVE", Logging.red);
-                        CloseQuestor();
-                        //Application.Exit();
-                    
-                    }
+                    Logging.Log("QuestorUI",
+                                "The Last Session.IsReady = true was [" +
+                                Math.Round(DateTime.Now.Subtract(Cache.Instance.LastSessionIsReady).TotalSeconds, 0) +
+                                "] seconds ago! This is bad. - Exiting EVE", Logging.red);
+                    CloseQuestor();
+                    //Application.Exit();
                 }
             }
+
             //
             // Targets Tab
             //

@@ -66,9 +66,9 @@ popd
 
 :CopyQuestor
 @Echo.
-@Echo Starting to copy EXE files from [.\output\*.exe] to [%innerspacedotnetdirectory%]
+@Echo Starting to copy debug files from [.\output\*.pdb] to [%innerspacedotnetdirectory%]
 @Echo on
-copy /y ".\output\*.exe" "%innerspacedotnetdirectory%"
+copy /y ".\output\*.pdb" "%innerspacedotnetdirectory%"
 @Echo off
 @Echo.
 @Echo Starting to copy DLL files from [.\output\*.dll] to [%innerspacedotnetdirectory%]
@@ -76,12 +76,11 @@ copy /y ".\output\*.exe" "%innerspacedotnetdirectory%"
 copy /y ".\output\*.dll" "%innerspacedotnetdirectory%"
 @Echo off
 @Echo.
-@Echo.
-@Echo Starting to copy debug files from [.\output\*.pdb] to [%innerspacedotnetdirectory%]
+@Echo Starting to copy EXE files from [.\output\*.exe] to [%innerspacedotnetdirectory%]
 @Echo on
-copy /y ".\output\*.pdb" "%innerspacedotnetdirectory%"
-@Echo off
+copy /y ".\output\*.exe" "%innerspacedotnetdirectory%"
 @Echo.
+@Echo off
 
 if "%debug%"=="true" pause && echo ------------------------------------------ && echo ------------------------------------------
 ::

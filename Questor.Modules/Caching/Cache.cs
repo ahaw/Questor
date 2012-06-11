@@ -2020,10 +2020,15 @@ namespace Questor.Modules.Caching
                 return false;
             if (Cache.Instance.InStation)
             {
+                if (Settings.Instance.DebugHangars) Logging.Log("OpenItemsHangar", "We are in Station", Logging.teal);
                 Cache.Instance.ItemHangar = Cache.Instance.DirectEve.GetItemHangar();
 
                 if (Cache.Instance.ItemHangar == null)
+                {
+                    if (Settings.Instance.DebugHangars) Logging.Log("OpenItemsHangar", "ItemsHangar was null", Logging.teal);
                     return false;
+                }
+                if (Settings.Instance.DebugHangars) Logging.Log("OpenItemsHangar", "ItemsHangar exists", Logging.teal);
 
                 // Is the items hangar open?
                 if (Cache.Instance.ItemHangar.Window == null)
@@ -2038,11 +2043,16 @@ namespace Questor.Modules.Caching
                 }
 
                 if (!Cache.Instance.ItemHangar.Window.IsReady)
+                {
+                    if (Settings.Instance.DebugHangars) Logging.Log("OpenItemsHangar", "ItemsHangar.window is not yet ready", Logging.teal);
                     return false;
+                }
                 if (Cache.Instance.ItemHangar.Window.IsReady)
                 {
+                    if (Settings.Instance.DebugHangars) Logging.Log("OpenItemsHangar", "ItemsHangar.window ready", Logging.teal);
                     if (Cache.Instance.ItemHangar.Window.IsPrimary())
                     {
+                        if (Settings.Instance.DebugHangars) Logging.Log("OpenItemsHangar", "ItemsHangar.window is primary, opening as secondary", Logging.teal);
                         Cache.Instance.ItemHangar.Window.OpenAsSecondary();
                     return false;
                     }
@@ -2066,10 +2076,10 @@ namespace Questor.Modules.Caching
 
                 if (Cache.Instance.LootHangar == null)
                 {
-                    if (Settings.Instance.DebugHangars) Logging.Log("OpenItemsHangarAsLootHangar", "AmmoHangar was null", Logging.teal);
+                    if (Settings.Instance.DebugHangars) Logging.Log("OpenItemsHangarAsLootHangar", "LootHangar was null", Logging.teal);
                     return false;
                 }
-                if (Settings.Instance.DebugHangars) Logging.Log("OpenItemsHangarAsLootHangar", "AmmoHangar exists", Logging.teal);
+                if (Settings.Instance.DebugHangars) Logging.Log("OpenItemsHangarAsLootHangar", "LootHangar exists", Logging.teal);
 
                 // Is the items hangar open?
                 if (Cache.Instance.LootHangar.Window == null)
@@ -2084,15 +2094,15 @@ namespace Questor.Modules.Caching
                 }
                 if (!Cache.Instance.LootHangar.Window.IsReady)
                 {
-                    if (Settings.Instance.DebugHangars) Logging.Log("OpenItemsHangarAsLootHangar", "AmmoHangar.window is not yet ready", Logging.teal);
+                    if (Settings.Instance.DebugHangars) Logging.Log("OpenItemsHangarAsLootHangar", "LootHangar.window is not yet ready", Logging.teal);
                     return false;
                 }
                 if (Cache.Instance.LootHangar.Window.IsReady)
                 {
-                    if (Settings.Instance.DebugHangars) Logging.Log("OpenItemsHangarAsLootHangar", "AmmoHangar.window ready", Logging.teal);
+                    if (Settings.Instance.DebugHangars) Logging.Log("OpenItemsHangarAsLootHangar", "LootHangar.window ready", Logging.teal);
                     if (Cache.Instance.LootHangar.Window.IsPrimary())
                     {
-                        if (Settings.Instance.DebugHangars) Logging.Log("OpenItemsHangarAsLootHangar", "AmmoHangar.window is primary, opening as secondary", Logging.teal);
+                        if (Settings.Instance.DebugHangars) Logging.Log("OpenItemsHangarAsLootHangar", "LootHangar.window is primary, opening as secondary", Logging.teal);
                         Cache.Instance.LootHangar.Window.OpenAsSecondary();
                         return false;
                     }

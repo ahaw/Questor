@@ -187,6 +187,7 @@ namespace Questor.Modules.BackgroundTasks
                             bool restart = false;
                             bool gotobasenow = false;
                             bool sayyes = false;
+                            bool sayok = false;
                             bool needhumanintervention = false;
 
                             //bool sayno = false;
@@ -240,6 +241,11 @@ namespace Questor.Modules.BackgroundTasks
                                 sayyes |= window.Html.Contains("objectives requiring a total capacity");
                                 sayyes |= window.Html.Contains("your ship only has space for");
                                 sayyes |= window.Html.Contains("Are you sure you want to remove location");
+
+                                //
+                                // LP Store "Accept offer" dialog
+                                //
+                                sayok |= window.Html.Contains("Are you sure you want to accept this offer?");
                                 //
                                 // Modal Dialogs the need "no" pressed
                                 //
@@ -252,6 +258,13 @@ namespace Questor.Modules.BackgroundTasks
                                 window.AnswerModal("Yes");
                                 continue;
                             }
+                            if (sayok)
+                            {
+                                Logging.Log("Cleanup", "Saying OK to modal window for lpstore offer.", Logging.white); 
+                                window.AnswerModal("OK");
+                                continue;
+                            }
+
                             if (close)
                             {
                                 Logging.Log("Cleanup", "Closing modal window...", Logging.white);

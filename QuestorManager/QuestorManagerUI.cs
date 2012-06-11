@@ -100,7 +100,6 @@ namespace QuestorManager
             ItemsToSell = new List<ItemCache>();
             ItemsToSellUnsorted = new List<ItemCache>();
             ItemsToRefine = new List<ItemCache>();
-            //Cache.Instance.DirectEve = _directEve;
             _directEve = new DirectEve();
             Cache.Instance.DirectEve = _directEve;
             XDocument invTypes = XDocument.Load(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\InvTypes.xml");
