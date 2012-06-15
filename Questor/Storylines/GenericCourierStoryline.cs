@@ -67,7 +67,7 @@ namespace Questor.Storylines
                 {
                     Logging.Log("Arm", "Making [" + ship.GivenName + "] active", Logging.white);
                     ship.ActivateShip();
-                    Cache.Instance.NextArmAction = DateTime.Now.AddSeconds((int)Modules.Lookup.Time.SwitchShipsDelay_seconds);
+                    Cache.Instance.NextArmAction = DateTime.Now.AddSeconds(Modules.Lookup.Time.Instance. SwitchShipsDelay_seconds);
                 }
                 return StorylineState.Arm;
             }

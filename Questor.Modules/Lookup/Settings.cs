@@ -232,7 +232,7 @@ namespace Questor.Modules.Lookup
 
         public int MaximumWreckTargets { get; set; }
         public int AgeofBookmarksForSalvageBehavior { get; set; } //in minutes
-
+        public bool DeleteBookmarksWithNPC { get; set; }
         //
         // undocking settings
         //
@@ -662,8 +662,8 @@ namespace Questor.Modules.Lookup
                 MaximumWreckTargets = 0;
                 WreckBlackListSmallWrecks = false;
                 WreckBlackListMediumWrecks = false;
-                AgeofBookmarksForSalvageBehavior = 45;
-
+                AgeofBookmarksForSalvageBehavior = 60;
+                DeleteBookmarksWithNPC = false;
                 //
                 // Enable / Disable the different types of logging that are available
                 //

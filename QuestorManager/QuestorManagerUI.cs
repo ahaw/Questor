@@ -151,7 +151,7 @@ namespace QuestorManager
             Cache.Instance.LastFrame = DateTime.Now;
 
             // Only pulse state changes every 1.5s
-            if (DateTime.Now.Subtract(_lastPulse).TotalMilliseconds < (int)Time.QuestorPulse_milliseconds) //default: 1500ms
+            if (DateTime.Now.Subtract(_lastPulse).TotalMilliseconds < (int)Time.Instance.QuestorPulse_milliseconds) //default: 1500ms
                 return;
             _lastPulse = DateTime.Now;
 
@@ -189,7 +189,7 @@ namespace QuestorManager
                 Cache.Instance.DirectEve.Rendering3D = !Settings.Instance.Disable3D;
 
             if (DateTime.Now.Subtract(Cache.Instance.LastupdateofSessionRunningTime).TotalSeconds <
-                (int)Time.SessionRunningTimeUpdate_seconds)
+                (int)Time.Instance.SessionRunningTimeUpdate_seconds)
             {
                 Cache.Instance.SessionRunningTime =
                     (int)DateTime.Now.Subtract(Cache.Instance.QuestorStarted_DateTime).TotalMinutes;

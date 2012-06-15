@@ -217,7 +217,7 @@ namespace Questor.Behaviors
                         Logging.Log("CombatHelperBehavior", _States.CurrentCombatHelperBehaviorState +
                                     ": initiating Orbit of [" + thisBigObject.Name +
                                     "] orbiting at [" + Distance.SafeDistancefromStructure + "]", Logging.white);
-                        Cache.Instance.NextOrbit = DateTime.Now.AddSeconds((int) Time.OrbitDelay_seconds);
+                        Cache.Instance.NextOrbit = DateTime.Now.AddSeconds(Time.Instance.OrbitDelay_seconds);
                     }
                     return;
                     //we are still too close, do not continue through the rest until we are not "too close" anymore
@@ -231,7 +231,7 @@ namespace Questor.Behaviors
             // Invalid settings, quit while we're ahead
             if (!ValidSettings)
             {
-                if (DateTime.Now.Subtract(LastAction).TotalSeconds < (int)Time.ValidateSettings_seconds) //default is a 15 second interval
+                if (DateTime.Now.Subtract(LastAction).TotalSeconds < Time.Instance.ValidateSettings_seconds) //default is a 15 second interval
                 {
                     ValidateCombatMissionSettings();
                     LastAction = DateTime.Now;
@@ -346,7 +346,7 @@ namespace Questor.Behaviors
                     break;
 
                 case CombatHelperBehaviorState.DelayedGotoBase:
-                    if (DateTime.Now.Subtract(LastAction).TotalSeconds < (int)Time.DelayedGotoBase_seconds)
+                    if (DateTime.Now.Subtract(LastAction).TotalSeconds < Time.Instance.DelayedGotoBase_seconds)
                         break;
 
                     Logging.Log("CombatHelperBehavior", "Heading back to base", Logging.white);
@@ -603,7 +603,7 @@ namespace Questor.Behaviors
                         {
                             Logging.Log("CombatHelperBehavior.GotoNearestStation", "[" + station.Name + "] which is [" + Math.Round(station.Distance / 1000, 0) + "k away]", Logging.white);
                             station.WarpToAndDock();
-                            Cache.Instance.NextWarpTo = DateTime.Now.AddSeconds((int)Time.WarptoDelay_seconds);
+                            Cache.Instance.NextWarpTo = DateTime.Now.AddSeconds(Time.Instance.WarptoDelay_seconds);
                             if (_States.CurrentCombatHelperBehaviorState == CombatHelperBehaviorState.GotoNearestStation) _States.CurrentCombatHelperBehaviorState = CombatHelperBehaviorState.Idle;
                             break;
                         }
@@ -615,14 +615,14 @@ namespace Questor.Behaviors
                                 {
                                     Logging.Log("CombatHelperBehavior.GotoNearestStation", "[" + station.Name + "] which is [" + Math.Round(station.Distance / 1000, 0) + "k away]", Logging.white);
                                     station.Dock();
-                                    Cache.Instance.NextDockAction = DateTime.Now.AddSeconds((int)Time.DockingDelay_seconds);
+                                    Cache.Instance.NextDockAction = DateTime.Now.AddSeconds(Time.Instance.DockingDelay_seconds);
                                 }
                             }
                             else
                             {
                                 if (Cache.Instance.NextApproachAction < DateTime.Now && (Cache.Instance.Approaching == null || Cache.Instance.Approaching.Id != station.Id))
                                 {
-                                    Cache.Instance.NextApproachAction = DateTime.Now.AddSeconds((int)Time.ApproachDelay_seconds);
+                                    Cache.Instance.NextApproachAction = DateTime.Now.AddSeconds(Time.Instance.ApproachDelay_seconds);
                                     Logging.Log("CombatHelperBehavior.GotoNearestStation", "Approaching [" + station.Name + "] which is [" + Math.Round(station.Distance / 1000, 0) + "k away]", Logging.white);
                                     station.Approach();
                                 }

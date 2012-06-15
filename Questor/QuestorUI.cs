@@ -714,7 +714,7 @@ namespace Questor
             {
                 extraWaitSeconds = 60;
             }
-            if (DateTime.Now.Subtract(Cache.Instance.LastFrame).TotalSeconds > ((int)Time.NoFramesRestart_seconds + extraWaitSeconds) && DateTime.Now.Subtract(Program.AppStarted).TotalSeconds > 300)
+            if (DateTime.Now.Subtract(Cache.Instance.LastFrame).TotalSeconds > (Time.Instance.NoFramesRestart_seconds + extraWaitSeconds) && DateTime.Now.Subtract(Program.AppStarted).TotalSeconds > 300)
             {
                 if (DateTime.Now.Subtract(Cache.Instance.LastLogMessage).TotalSeconds > 30)
                 {
@@ -730,7 +730,7 @@ namespace Questor
                 }
             }
 
-            if (DateTime.Now.Subtract(Cache.Instance.LastSessionIsReady).TotalSeconds > ((int)Time.NoSessionIsReadyRestart_seconds + extraWaitSeconds) &&
+            if (DateTime.Now.Subtract(Cache.Instance.LastSessionIsReady).TotalSeconds > (Time.Instance.NoSessionIsReadyRestart_seconds + extraWaitSeconds) &&
                     DateTime.Now.Subtract(Program.AppStarted).TotalSeconds > 300)
             {
                 if (DateTime.Now.Subtract(Cache.Instance.LastLogMessage).TotalSeconds > 60)

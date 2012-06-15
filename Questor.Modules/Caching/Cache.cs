@@ -3168,7 +3168,7 @@ namespace Questor.Modules.Caching
                     Logging.Log(module, "Opening container [" + containerToOpen.Name + "][ID: " + containerToOpen.Id + "]["+ Math.Round(containerToOpen.Distance/1000,0) +"k]", Logging.white);
                     containerToOpen.OpenCargo();
                     Salvage.OpenedContainers[containerToOpen.Id] = DateTime.Now;
-                    //Cache.Instance.NextLootAction = DateTime.Now.AddMilliseconds((int)Time.LootingDelay_milliseconds);
+                    //Cache.Instance.NextLootAction = DateTime.Now.AddMilliseconds(Time.Instance.LootingDelay_milliseconds);
                     return false;
                 }
                 if (!Cache.Instance.ContainerInSpace.Window.IsReady)
@@ -3190,6 +3190,20 @@ namespace Questor.Modules.Caching
                 Logging.Log(module, "OpenContainerInSpace: how did we get this far?",Logging.white);
             }
             return false;
+        }
+        public DirectBookmark GetSalvagingBookmark()
+        {
+            if (Settings.Instance.FirstSalvageBookmarksInSystem)
+            {
+                Logging.Log("CombatMissionsBehavior.BeginAftermissionSalvaging", "Salvaging at first bookmark from system", Logging.white);
+                return  Cache.Instance.BookmarksByLabel(Settings.Instance.BookmarkPrefix + " ").OrderBy(b => b.CreatedOn).FirstOrDefault(c => c.LocationId == Cache.Instance.DirectEve.Session.SolarSystemId);
+            }
+            else
+            {
+                Logging.Log("CombatMissionsBehavior.BeginAftermissionSalvaging", "Salvaging at first oldest bookmarks", Logging.white);
+                return  Cache.Instance.BookmarksByLabel(Settings.Instance.BookmarkPrefix + " ").OrderBy(b => b.CreatedOn).FirstOrDefault();
+
+            }
         }
     }
 }

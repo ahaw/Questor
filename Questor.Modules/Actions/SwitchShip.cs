@@ -54,7 +54,7 @@ namespace Questor.Modules.Actions
 
                     if ((!string.IsNullOrEmpty(shipName) && Cache.Instance.DirectEve.ActiveShip.GivenName.ToLower() != shipName))
                     {
-                        if (DateTime.Now.Subtract(_lastSwitchShipAction).TotalSeconds > (int)Time.SwitchShipsDelay_seconds)
+                        if (DateTime.Now.Subtract(_lastSwitchShipAction).TotalSeconds > Time.Instance.SwitchShipsDelay_seconds)
                         {
                             if (!Cache.Instance.OpenShipsHangar("Arm")) break; 
                             
@@ -134,7 +134,7 @@ namespace Questor.Modules.Actions
 
                 case SwitchShipState.WaitForFitting:
                     //let's wait 10 seconds
-                    if (DateTime.Now.Subtract(_lastSwitchShipAction).TotalMilliseconds > (int)Time.FittingWindowLoadFittingDelay_seconds &&
+                    if (DateTime.Now.Subtract(_lastSwitchShipAction).TotalMilliseconds > Time.Instance.FittingWindowLoadFittingDelay_seconds &&
                         Cache.Instance.DirectEve.GetLockedItems().Count == 0)
                     {
                         //we should be done fitting, proceed to the next state

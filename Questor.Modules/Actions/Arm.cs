@@ -140,7 +140,7 @@ namespace Questor.Modules.Actions
                         {
                             Logging.Log("Arm", "Making [" + ship.GivenName + "] active", Logging.white);
                             ship.ActivateShip();
-                            Cache.Instance.NextArmAction = DateTime.Now.AddSeconds((int)Time.SwitchShipsDelay_seconds);
+                            Cache.Instance.NextArmAction = DateTime.Now.AddSeconds(Time.Instance.SwitchShipsDelay_seconds);
                         }
                         return;
                     }
@@ -178,7 +178,7 @@ namespace Questor.Modules.Actions
                                 {
                                     Logging.Log("Arm", "Making [" + ship.GivenName + "] active", Logging.white);
                                     ship.ActivateShip();
-                                    Cache.Instance.NextArmAction = DateTime.Now.AddSeconds((int)Time.SwitchShipsDelay_seconds);
+                                    Cache.Instance.NextArmAction = DateTime.Now.AddSeconds(Time.Instance.SwitchShipsDelay_seconds);
                                 }
                                 return;
                             }
@@ -234,7 +234,7 @@ namespace Questor.Modules.Actions
                                 {
                                     Logging.Log("Arm", "Making [" + ship.GivenName + "] active", Logging.white);
                                     ship.ActivateShip();
-                                    Cache.Instance.NextArmAction = DateTime.Now.AddSeconds((int)Time.SwitchShipsDelay_seconds);
+                                    Cache.Instance.NextArmAction = DateTime.Now.AddSeconds(Time.Instance.SwitchShipsDelay_seconds);
                                     if (TryMissionShip)
                                         UseMissionShip = true;
 
@@ -396,7 +396,7 @@ namespace Questor.Modules.Actions
                                 DirectActiveShip ship = Cache.Instance.DirectEve.ActiveShip;
                                 if (Cache.Instance.Fitting.ToLower().Equals(fitting.Name.ToLower()) && fitting.ShipTypeId == ship.TypeId)
                                 {
-                                    Cache.Instance.NextArmAction = DateTime.Now.AddSeconds((int)Time.SwitchShipsDelay_seconds);
+                                    Cache.Instance.NextArmAction = DateTime.Now.AddSeconds(Time.Instance.SwitchShipsDelay_seconds);
                                     Logging.Log("Arm", "Found fitting [ " + fitting.Name + " ][" + Math.Round(Cache.Instance.NextArmAction.Subtract(DateTime.Now).TotalSeconds, 0) + "sec]", Logging.white);
                                     //switch to the requested fitting for the current mission
                                     fitting.Fit();
@@ -442,7 +442,7 @@ namespace Questor.Modules.Actions
                         _States.CurrentArmState = ArmState.MoveItems;
                         fittingMgr = Cache.Instance.DirectEve.Windows.OfType<DirectFittingManagerWindow>().FirstOrDefault();
                         if (fittingMgr != null) fittingMgr.Close();
-                        Cache.Instance.NextArmAction = DateTime.Now.AddSeconds((int)Time.FittingWindowLoadFittingDelay_seconds);
+                        Cache.Instance.NextArmAction = DateTime.Now.AddSeconds(Time.Instance.FittingWindowLoadFittingDelay_seconds);
                         Logging.Log("Arm", "Done fitting", Logging.white);
                     }
                     else Logging.Log("Arm", "Waiting for fitting. locked items = " + Cache.Instance.DirectEve.GetLockedItems().Count, Logging.white);
@@ -588,7 +588,7 @@ namespace Questor.Modules.Actions
 
                     if (AmmoToLoad.Count == 0 && _missionItemMoved)
                     {
-                        Cache.Instance.NextArmAction = DateTime.Now.AddSeconds((int)Time.WaitforItemstoMove_seconds);
+                        Cache.Instance.NextArmAction = DateTime.Now.AddSeconds(Time.Instance.WaitforItemstoMove_seconds);
 
                         Logging.Log("Arm", "Waiting for items", Logging.white);
                         _States.CurrentArmState = ArmState.WaitForItems;

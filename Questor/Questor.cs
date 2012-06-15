@@ -310,7 +310,7 @@ namespace Questor
             Cache.Instance.LastFrame = DateTime.Now;
 
             // Only pulse state changes every 1.5s
-            if (DateTime.Now.Subtract(_lastPulse).TotalMilliseconds < (int)Time.QuestorPulse_milliseconds) //default: 1500ms
+            if (DateTime.Now.Subtract(_lastPulse).TotalMilliseconds < Time.Instance.QuestorPulse_milliseconds) //default: 1500ms
                 return;
             _lastPulse = DateTime.Now;
 
@@ -353,7 +353,7 @@ namespace Questor
                 Cache.Instance.DirectEve.Rendering3D = !Settings.Instance.Disable3D;
 
             if (DateTime.Now.Subtract(Cache.Instance.LastupdateofSessionRunningTime).TotalSeconds <
-                (int)Time.SessionRunningTimeUpdate_seconds)
+                Time.Instance.SessionRunningTimeUpdate_seconds)
             {
                 Cache.Instance.SessionRunningTime =
                     (int)DateTime.Now.Subtract(Cache.Instance.QuestorStarted_DateTime).TotalMinutes;
@@ -362,7 +362,7 @@ namespace Questor
 
             if (!Cache.Instance.Paused)
             {
-                if (DateTime.Now.Subtract(Cache.Instance.LastWalletCheck).TotalMinutes > (int)Time.WalletCheck_minutes && !Settings.Instance.Defaultsettingsloaded)
+                if (DateTime.Now.Subtract(Cache.Instance.LastWalletCheck).TotalMinutes > Time.Instance.WalletCheck_minutes && !Settings.Instance.Defaultsettingsloaded)
                 {
                     WalletCheck();
                 }
@@ -556,7 +556,7 @@ namespace Questor
                                 Logging.Log("Questor", "Logging Off eve in 15 seconds.", Logging.white);
                                 CloseQuestorflag = false;
                                 CloseQuestorDelay =
-                                    DateTime.Now.AddSeconds((int)Time.CloseQuestorDelayBeforeExit_seconds);
+                                    DateTime.Now.AddSeconds(Time.Instance.CloseQuestorDelayBeforeExit_seconds);
                             }
                             if (CloseQuestorDelay.AddSeconds(-10) < DateTime.Now)
                             {
@@ -614,7 +614,7 @@ namespace Questor
                                                 _closeQuestorCMDUplink = false;
                                                 CloseQuestorDelay =
                                                 DateTime.Now.AddSeconds(
-                                                    (int)Time.CloseQuestorDelayBeforeExit_seconds);
+                                                    Time.Instance.CloseQuestorDelayBeforeExit_seconds);
                                             }
                                             if ((CloseQuestorDelay.AddSeconds(-10) == DateTime.Now) &&
                                                 (!_closeQuestor10SecWarningDone))
@@ -653,7 +653,7 @@ namespace Questor
                                                 _closeQuestorCMDUplink = false;
                                                 CloseQuestorDelay =
                                                 DateTime.Now.AddSeconds(
-                                                (int)Time.CloseQuestorDelayBeforeExit_seconds);
+                                                Time.Instance.CloseQuestorDelayBeforeExit_seconds);
                                             }
                                             if ((CloseQuestorDelay.AddSeconds(-10) == DateTime.Now) &&
                                                 (!_closeQuestor10SecWarningDone))
@@ -692,7 +692,7 @@ namespace Questor
                                                 _closeQuestorCMDUplink = false;
                                                 CloseQuestorDelay =
                                                     DateTime.Now.AddSeconds(
-                                                        (int)Time.CloseQuestorDelayBeforeExit_seconds);
+                                                        Time.Instance.CloseQuestorDelayBeforeExit_seconds);
                                             }
                                             if ((CloseQuestorDelay.AddSeconds(-10) == DateTime.Now) &&
                                                 (!_closeQuestor10SecWarningDone))
@@ -720,7 +720,7 @@ namespace Questor
                                                 _closeQuestorCMDUplink = false;
                                                 CloseQuestorDelay =
                                                     DateTime.Now.AddSeconds(
-                                                        (int)Time.CloseQuestorDelayBeforeExit_seconds);
+                                                        Time.Instance.CloseQuestorDelayBeforeExit_seconds);
                                             }
                                             if ((CloseQuestorDelay.AddSeconds(-10) == DateTime.Now) &&
                                                 (!_closeQuestor10SecWarningDone))

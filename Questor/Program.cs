@@ -33,7 +33,7 @@ namespace Questor
 
         public static List<CharSchedule> CharSchedules { get; private set; }
 
-        private static int _pulsedelay = (int)Time.QuestorBeforeLoginPulseDelay_seconds;
+        private static int _pulsedelay = Time.Instance.QuestorBeforeLoginPulseDelay_seconds;
 
         public static DateTime AppStarted = DateTime.Now;
         private static string _username;
@@ -504,7 +504,7 @@ namespace Questor
                     Logging.Log("Startup", "Login account [" + _username + "]", Logging.white);
                     _directEve.Login.Login(_username, _password);
                     Logging.Log("Startup", "Waiting for Character Selection Screen", Logging.white);
-                    _pulsedelay = (int)Time.QuestorBeforeLoginPulseDelay_seconds;
+                    _pulsedelay = Time.Instance.QuestorBeforeLoginPulseDelay_seconds;
                     return;
                 }
             }

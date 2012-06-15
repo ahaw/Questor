@@ -99,7 +99,7 @@ namespace Questor.Modules.Activities
                     if (Cache.Instance.InStation)
                     {
                         Cache.Instance.DirectEve.ExecuteCommand(DirectCmd.CmdExitStation);
-                        _nextTravelerAction = DateTime.Now.AddSeconds((int)Time.TravelerExitStationAmIInSpaceYet_seconds);
+                        _nextTravelerAction = DateTime.Now.AddSeconds(Time.Instance.TravelerExitStationAmIInSpaceYet_seconds);
                     }
                     Cache.Instance.NextActivateSupportModules = DateTime.Now.AddSeconds(Cache.Instance.RandomNumber(1, 2));
                     // We are not yet in space, wait for it
@@ -122,7 +122,7 @@ namespace Questor.Modules.Activities
                 {
                     // not found, that cant be true?!?!?!?!
                     Logging.Log("Traveler", "Error [" + Logging.yellow + locationName + Logging.green + "] not found, most likely lag waiting 15 seconds.", Logging.red);
-                    _nextTravelerAction = DateTime.Now.AddSeconds((int)Time.TravelerNoStargatesFoundRetryDelay_seconds);
+                    _nextTravelerAction = DateTime.Now.AddSeconds(Time.Instance.TravelerNoStargatesFoundRetryDelay_seconds);
                     return;
                 }
 
@@ -133,15 +133,15 @@ namespace Questor.Modules.Activities
                     Logging.Log("Traveler", "Jumping to [" + Logging.yellow + locationName + Logging.green + "]", Logging.green);
                     stargate.Jump();
                     Cache.Instance.NextInSpaceorInStation = DateTime.Now;
-                    _nextTravelerAction = DateTime.Now.AddSeconds((int)Time.TravelerJumpedGateNextCommandDelay_seconds);
-                    Cache.Instance.NextActivateSupportModules = DateTime.Now.AddSeconds((int)Time.TravelerJumpedGateNextCommandDelay_seconds);
+                    _nextTravelerAction = DateTime.Now.AddSeconds(Time.Instance.TravelerJumpedGateNextCommandDelay_seconds);
+                    Cache.Instance.NextActivateSupportModules = DateTime.Now.AddSeconds(Time.Instance.TravelerJumpedGateNextCommandDelay_seconds);
                 }
                 else if (stargate.Distance < (int)Distance.WarptoDistance)
                 {
                     if (DateTime.Now > Cache.Instance.NextApproachAction && !Cache.Instance.IsApproaching)
                     {
                         stargate.Approach(); //you could use a negative approach distance here but ultimately that is a bad idea.. Id like to go toward the entity without approaching it so we would end up inside the docking ring (eventually)
-                        Cache.Instance.NextApproachAction = DateTime.Now.AddSeconds((int)Time.ApproachDelay_seconds);
+                        Cache.Instance.NextApproachAction = DateTime.Now.AddSeconds(Time.Instance.ApproachDelay_seconds);
                     }
                 }
                 else
@@ -155,7 +155,7 @@ namespace Questor.Modules.Activities
                                         Math.Round((stargate.Distance/1000)/149598000, 2) + " AU away]", Logging.green);
                             stargate.WarpTo();
                             Combat.ReloadAll();
-                            Cache.Instance.NextWarpTo = DateTime.Now.AddSeconds((int)Time.WarptoDelay_seconds);
+                            Cache.Instance.NextWarpTo = DateTime.Now.AddSeconds(Time.Instance.WarptoDelay_seconds);
                         }
                     }
                 }

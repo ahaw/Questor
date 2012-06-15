@@ -17,7 +17,7 @@ namespace Questor.Modules.BackgroundTasks
             {
                 case LocalWatchState.Idle:
                     //checking local every 5 second
-                    if (DateTime.Now.Subtract(_lastAction).TotalSeconds < (int)Time.CheckLocalDelay_seconds)
+                    if (DateTime.Now.Subtract(_lastAction).TotalSeconds < Time.Instance.CheckLocalDelay_seconds)
                         break;
 
                     _States.CurrentLocalWatchState = LocalWatchState.CheckLocal;
