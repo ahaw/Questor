@@ -15,6 +15,7 @@ namespace Questor.Modules.Activities
     using System.Linq;
     using DirectEve;
     using System.Globalization;
+    using Questor.Modules.BackgroundTasks;
     using global::Questor.Modules.Lookup;
     using global::Questor.Modules.Logging;
     using global::Questor.Modules.States;
@@ -61,38 +62,16 @@ namespace Questor.Modules.Activities
             _currentAction++;
         }
 
-        public static void NavigateIntoRange(EntityCache target)
-        {
-            if (Cache.Instance.InWarp || Cache.Instance.InStation)
-                return;
-
-            if (Settings.Instance.SpeedTank)
-            {   //this should be only executed when no specific actions
-                if (DateTime.Now > Cache.Instance.NextOrbit)
-                {
-                    if (target.Distance + (int)Cache.Instance.OrbitDistance < Cache.Instance.MaxRange)
-                    {
-                        //Logging.Log("CombatMissionCtrl." + _pocketActions[_currentAction] ,"StartOrbiting: Target in range");
-                        if (!Cache.Instance.IsApproachingOrOrbiting)
-                        {
-                            Logging.Log("CombatMissionCtrl.NavigateIntoRange", "We are not approaching nor orbiting", Logging.teal);                            
-                            if (Settings.Instance.OrbitStructure)
                             {
                                 Logging.Log("CombatMissionCtrl.NavigateIntoRange", "OrbitStructure enabled", Logging.teal);
-                                EntityCache structure = Cache.Instance.Entities.Where(i => i.Name.Contains("Gate")).OrderBy(t => t.Distance).OrderBy(t => t.Distance).FirstOrDefault();
                                 if (structure != null)
                                 {
                                     structure.Orbit((int)Cache.Instance.OrbitDistance);
                                     Logging.Log("CombatMissionCtrl." + _pocketActions[_currentAction], "Initiating Orbit around Gate [" + structure.Name + "][ID: " + structure.Id + "]", Logging.teal);
-                                 
-                                }
                                 else
                                 {
                                     structure = Cache.Instance.Entities.Where(i => i.GroupId == (int)Group.LargeCollidableStructure).OrderBy(t => t.Distance).OrderBy(t => t.Distance).FirstOrDefault();
                                     if (structure != null)
-                                    {
-                                        structure.Orbit((int)Cache.Instance.OrbitDistance);
-                                        Logging.Log("CombatMissionCtrl." + _pocketActions[_currentAction], "Initiating Orbit around Beacon,wreck or LCS [" + structure.Name + "][ID: " + structure.Id + "]", Logging.teal);
                                     }
                                     else
                                     {
@@ -107,92 +86,9 @@ namespace Questor.Modules.Activities
                                         }
                                     }
                                 }
-                            }
-                            else
-                            {
                                 Logging.Log("CombatMissionCtrl.NavigateIntoRange", "OrbitStructure disabled", Logging.teal);
-                                target.Orbit(Cache.Instance.OrbitDistance);
-                                Logging.Log("CombatMissionCtrl." + _pocketActions[_currentAction], "Initiating Orbit [" + target.Name + "][ID: " + target.Id + "]", Logging.teal);
-                            }
-                            Cache.Instance.NextOrbit = DateTime.Now.AddSeconds(Time.Instance.OrbitDelay_seconds);
-                        }
-                    }
-                    else
-                    {
-                        Logging.Log("CombatMissionCtrl." + _pocketActions[_currentAction], "Possible out of range[" + target.Distance + (int)Cache.Instance.OrbitDistance + "]. ignoring orbit around structure", Logging.teal);
-                        target.Orbit(Cache.Instance.OrbitDistance);
-                        Logging.Log("CombatMissionCtrlcode." + _pocketActions[_currentAction], "Initiating Orbit [" + target.Name + "][ID: " + target.Id + "]", Logging.teal);
-                        Cache.Instance.NextOrbit = DateTime.Now.AddSeconds(Time.Instance.OrbitDelay_seconds);
-                        return;
-                    }
                     return;
-                }
-            }
-            else //if we aren't speed tanking then check optimalrange setting, if that isn't set use the less of targeting range and weapons range to dictate engagement range
-            {
-                if (DateTime.Now > Cache.Instance.NextApproachAction)
-                {
-                    //if optimalrange is set - use it to determine engagement range
-                    if (Settings.Instance.OptimalRange != 0)
-                    {
-                        if (target.Distance > Settings.Instance.OptimalRange + (int)Distance.OptimalRangeCushion && (Cache.Instance.Approaching == null || Cache.Instance.Approaching.Id != target.Id))
-                        {
-                            target.Approach(Settings.Instance.OptimalRange);
-                            Logging.Log("CombatMissionCtrl." + _pocketActions[_currentAction], "Using Optimal Range: Approaching target [" + target.Name + "][ID: " + target.Id + "][" + Math.Round(target.Distance / 1000, 0) + "k away]", Logging.teal);
-                        }
-                        //I think when approach distance will be reached ship will be stopped so this is not needed
-                        if (target.Distance <= Settings.Instance.OptimalRange && Cache.Instance.Approaching != null)
-                        {
-                            Cache.Instance.DirectEve.ExecuteCommand(DirectCmd.CmdStopShip);
-                            Cache.Instance.Approaching = null;
-                            Logging.Log("CombatMissionCtrl." + _pocketActions[_currentAction], "Using Optimal Range: Stop ship, target at [" + Math.Round(target.Distance / 1000, 0) + "k away] is inside optimal", Logging.teal);
-                        }
-                    }
-                    //if optimalrange is not set use MaxRange (shorter of weapons range and targeting range)
-                    else
-                    {
-                        if (target.Distance > Cache.Instance.MaxRange && (Cache.Instance.Approaching == null || Cache.Instance.Approaching.Id != target.Id))
-                        {
-                            target.Approach((int)(Cache.Instance.WeaponRange * 0.8d));
-                            Logging.Log("CombatMissionCtrl." + _pocketActions[_currentAction], "Using Weapons Range: Approaching target [" + target.Name + "][ID: " + target.Id + "][" + Math.Round(target.Distance / 1000, 0) + "k away]", Logging.teal);
-                        }
-                        //I think when approach distance will be reached ship will be stopped so this is not needed
-                        if (target.Distance <= Cache.Instance.MaxRange && Cache.Instance.Approaching != null)
-                        {
-                            Cache.Instance.DirectEve.ExecuteCommand(DirectCmd.CmdStopShip);
-                            Cache.Instance.Approaching = null;
-                            Logging.Log("CombatMissionCtrl." + _pocketActions[_currentAction], "Using Weapons Range: Stop ship, target is in orbit range", Logging.teal);
-                        }
-                    }
-                    Cache.Instance.NextApproachAction = DateTime.Now.AddSeconds(Time.Instance.ApproachDelay_seconds);
-                    return;
-                }
-            }
-        }
-
-        //
-        // this action still needs some TLC - currently broken (unimplemented)
-        //
-        private void NavigateToObject(EntityCache target)  //this needs to accept a distance parameter....
-        {
-            if (Settings.Instance.SpeedTank)
-            {   //this should be only executed when no specific actions
-                if (DateTime.Now > Cache.Instance.NextOrbit)
-                {
-                    if (target.Distance + (int)Cache.Instance.OrbitDistance < Cache.Instance.MaxRange)
-                    {
-                        Logging.Log("CombatMission." + _pocketActions[_currentAction], "StartOrbiting: Target in range", Logging.teal);
-                        if (!Cache.Instance.IsApproachingOrOrbiting)
-                        {
-                            Logging.Log("CombatMissionCtrl.NavigateToObject", "We are not approaching nor orbiting", Logging.teal);
-                            if (Settings.Instance.OrbitStructure)
-                            {
                                 EntityCache structure = Cache.Instance.Entities.Where(i => i.Name.Contains("Gate")).OrderBy(t => t.Distance).OrderBy(t => t.Distance).FirstOrDefault();
-
-                                if (structure != null)
-                                {
-                                    structure.Orbit((int)Cache.Instance.OrbitDistance);
-                                    Logging.Log("CombatMissionCtrl." + _pocketActions[_currentAction], "Initiating Orbit around Gate [" + structure.Name + "][ID: " + structure.Id + "]", Logging.teal);
                                 }
                                 else
                                 {
@@ -203,45 +99,6 @@ namespace Questor.Modules.Activities
                                         Logging.Log("CombatMissionCtrl." + _pocketActions[_currentAction], "Initiating Orbit around Beacon or LCS [" + structure.Name + "][ID: " + structure.Id + "]", Logging.teal);
                                     }
                                 }
-                            }
-                            else
-                            {
-                                target.Orbit(Cache.Instance.OrbitDistance);
-                                Logging.Log("CombatMissionCtrl." + _pocketActions[_currentAction], "Initiating Orbit [" + target.Name + "][ID: " + target.Id + "]", Logging.teal);
-                            }
-                            Cache.Instance.NextOrbit = DateTime.Now.AddSeconds(Time.Instance.OrbitDelay_seconds);
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        Logging.Log("CombatMission." + _pocketActions[_currentAction], "Possible out of range. ignoring orbit around structure", Logging.teal);
-                        target.Orbit(Cache.Instance.OrbitDistance);
-                        Logging.Log("CombatMissionCtrlcode." + _pocketActions[_currentAction], "Initiating Orbit [" + target.Name + "][ID: " + target.Id + "]", Logging.teal);
-                        Cache.Instance.NextOrbit = DateTime.Now.AddSeconds(Time.Instance.OrbitDelay_seconds);
-                        return;
-                    }
-                }
-            }
-            else //if we aren't speed tanking then check optimalrange setting, if that isn't set use the less of targeting range and weapons range to dictate engagement range
-            {
-                if (DateTime.Now > Cache.Instance.NextApproachAction)
-                {
-                    //if optimalrange is set - use it to determine engagement range
-                    //
-                    // this assumes that both optimal range and missile boats both want to be within 5k of the object they asked us to navigate to
-                    //
-                    if (target.Distance > Cache.Instance.MaxRange && (Cache.Instance.Approaching == null || Cache.Instance.Approaching.Id != target.Id))
-                    {
-                        target.Approach((int)(Distance.SafeDistancefromStructure));
-                        Cache.Instance.NextApproachAction = DateTime.Now.AddSeconds(Time.Instance.ApproachDelay_seconds);
-                        Logging.Log("CombatMission." + _pocketActions[_currentAction], "Using SafeDistanceFromStructure: Approaching target [" + target.Name + "][ID: " + target.Id + "][" + Math.Round(target.Distance / 1000, 0) + "k away]", Logging.teal);
-                    }
-                    return;
-                }
-            }
-        }
-
         private void BookmarkPocketForSalvaging()
         {
             // Nothing to loot
@@ -518,7 +375,7 @@ namespace Questor.Modules.Activities
                         Combat.ReloadAll();
                     }
                 }
-                NavigateIntoRange(target);
+                NavigateOnGrid.NavigateIntoRange(target, "CombatMissionCtrl." + _pocketActions[_currentAction]);
                 return;
             }
 
@@ -991,7 +848,7 @@ namespace Questor.Modules.Activities
                         Combat.ReloadAll();
                     }
                 }
-                NavigateIntoRange(target);
+                NavigateOnGrid.NavigateIntoRange(target, "CombatMissionCtrl." + _pocketActions[_currentAction]);
                 return;
             }
         }
@@ -1065,7 +922,7 @@ namespace Questor.Modules.Activities
                         }
                     }
                 }
-                NavigateIntoRange(target);
+                NavigateOnGrid.NavigateIntoRange(target, "CombatMissionCtrl." + _pocketActions[_currentAction]);
                 return;
             }
         }
@@ -1137,7 +994,7 @@ namespace Questor.Modules.Activities
                         }
                     }
                 }
-                NavigateIntoRange(target);
+                NavigateOnGrid.NavigateIntoRange(target,"CombatMissionCtrl." + _pocketActions[_currentAction]);
             }
             else
             {
@@ -1193,7 +1050,7 @@ namespace Questor.Modules.Activities
                     }
                 }
             }
-            NavigateIntoRange(target);
+            NavigateOnGrid.NavigateIntoRange(target, "CombatMissionCtrl." + _pocketActions[_currentAction]);
         }
 
         //

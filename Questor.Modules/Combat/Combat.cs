@@ -8,6 +8,7 @@
 //   </copyright>
 // -------------------------------------------------------------------------------
 
+using Questor.Modules.BackgroundTasks;
 using Questor.Modules.Caching;
 using Questor.Modules.Activities;
 
@@ -383,7 +384,7 @@ namespace Questor.Modules.Combat
             if (!Cache.Instance.InMission)
             {
                 if (Settings.Instance.DebugActivateWeapons) Logging.Log("Combat", "ActivateWeapons: deactivate: we are NOT in a mission: navigateintorange", Logging.teal);
-                CombatMissionCtrl.NavigateIntoRange(target); //eventually this method should be moved to something like navigate.cs or movement.cs
+                NavigateOnGrid.NavigateIntoRange(target,"Combat");
             }
 
             if (Settings.Instance.DebugActivateWeapons) Logging.Log("Combat", "ActivateWeapons: deactivate: after navigate into range...", Logging.teal);
@@ -873,7 +874,7 @@ namespace Questor.Modules.Combat
                 Cache.Instance.DirectEve.ActiveShip.Entity.IsCloaked || // There is no combat when cloaked
                 Cache.Instance.InWarp)) //you cant do combat while warping!
             {
-                _States.CurrentCombatState = CombatState.Idle;
+                //_States.CurrentCombatState = CombatState.Idle;
                 return;
             }
 
@@ -881,13 +882,6 @@ namespace Questor.Modules.Combat
             {
                 _States.CurrentCombatState = CombatState.Idle;
                 return;
-            }
-            //
-            // only the ship defined in CombatShipName will do combat: we assume all other ships are non-combat ships!!!!
-            //
-            if (Cache.Instance.InSpace && (Cache.Instance.DirectEve.ActiveShip.GivenName.ToLower() != Settings.Instance.CombatShipName.ToLower()))
-            {
-                _States.CurrentCombatState = CombatState.Idle;
             }
 
             if (!Cache.Instance.Weapons.Any() && Cache.Instance.DirectEve.ActiveShip.GivenName.ToLower() == Settings.Instance.CombatShipName)

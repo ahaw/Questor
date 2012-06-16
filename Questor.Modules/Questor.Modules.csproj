@@ -61,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BackgroundTasks\NavigateOnGrid.cs" />
     <Compile Include="Caching\TargetingCache.cs" />
     <Compile Include="States\CombatHelperBehaviorState.cs" />
     <Compile Include="States\DedicatedBookmarkSalvagerBehaviorState.cs" />

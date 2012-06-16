@@ -179,48 +179,6 @@ namespace Questor.Behaviors
             }
         }
 
-        private void AvoidBumpingThings()
-        {
-            // always shoot at NPCs while getting un-hung
-            //
-            if (Cache.Instance.InSpace)
-            {
-                //_combat.ProcessState();
-                //
-                // only use drones if warp scrambled as we do not want to leave them behind accidentally
-                //
-                if (Cache.Instance.TargetedBy.Any(t => t.IsWarpScramblingMe))
-                {
-                    //_drones.ProcessState();
-                }
-            }
-            else return;
-            //
-            // if we are "too close" to the bigObject move away... (is orbit the best thing to do here?)
-            //
-            EntityCache thisBigObject = Cache.Instance.BigObjects.FirstOrDefault();
-            if (thisBigObject != null)
-            {
-                if (thisBigObject.Distance >= (int)Distance.TooCloseToStructure)
-                {
-                    //we are no longer "too close" and can proceed.
-                }
-                else
-                {
-                    if (DateTime.Now > Cache.Instance.NextOrbit)
-                    {
-                        thisBigObject.Orbit((int)Distance.SafeDistancefromStructure);
-                        Logging.Log("DedicatedBookmarkSalvagerBehavior", "" + _States.CurrentDedicatedBookmarkSalvagerBehaviorState +
-                                    ": initiating Orbit of [" + thisBigObject.Name +
-                                    "] orbiting at [" + Distance.SafeDistancefromStructure + "]", Logging.white);
-                        Cache.Instance.NextOrbit = DateTime.Now.AddSeconds(Time.Instance.OrbitDelay_seconds);
-                    }
-                    return;
-                    //we are still too close, do not continue through the rest until we are not "too close" anymore
-                }
-            }
-        }
-
         public void ProcessState()
         {
             // Invalid settings, quit while we're ahead
@@ -455,7 +413,7 @@ namespace Questor.Behaviors
                 case DedicatedBookmarkSalvagerBehaviorState.GotoBase:
 
                     if (Settings.Instance.DebugGotobase) Logging.Log("DedicatedBookmarkSalvagerBehavior", "GotoBase: AvoidBumpingThings()", Logging.white);
-                    AvoidBumpingThings();
+                    NavigateOnGrid.AvoidBumpingThings(Cache.Instance.BigObjects.FirstOrDefault(), "DedicatedBookmarkSalvagerBehaviorState.GotoBase");
                     if (Settings.Instance.DebugGotobase) Logging.Log("DedicatedBookmarkSalvagerBehavior", "GotoBase: TravelToAgentsStation()", Logging.white);
                     TravelToAgentsStation();
                     if (_States.CurrentTravelerState == TravelerState.AtDestination) // || DateTime.Now.Subtract(Cache.Instance.EnteredCloseQuestor_DateTime).TotalMinutes > 10)
