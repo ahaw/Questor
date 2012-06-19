@@ -17,6 +17,38 @@ namespace Questor.Modules.Lookup
 
     public class CharSchedule
     {
+        public string User { get; private set; }
+
+        public string PW { get; private set; }
+
+        public string Name { get; private set; }
+
+        public DateTime Start1 { get; set; }
+
+        public DateTime Stop1 { get; set; }
+
+        public DateTime Start2 { get; set; }
+
+        public DateTime Stop2 { get; set; }
+
+        public DateTime Start3 { get; set; }
+
+        public DateTime Stop3 { get; set; }
+
+        public double RunTime { get; set; }
+
+        public bool StopTimeSpecified { get; set; }
+
+        public bool StartTimeSpecified { get; set; }
+        
+        public bool StopTime2Specified { get; set; }
+
+        public bool StartTime2Specified { get; set; }
+        
+        public bool StopTime3Specified { get; set; }
+
+        public bool StartTime3Specified { get; set; }
+
         public CharSchedule(XElement element)
         {
             //var timeformat = new CultureInfo("en-US");
@@ -26,67 +58,145 @@ namespace Questor.Modules.Lookup
 
             StopTimeSpecified = false;
             StartTimeSpecified = false;
-            var start = (string)element.Attribute("start");
-            var stop = (string)element.Attribute("stop");
-            DateTime startTime;
-            DateTime stopTime;
-            if (start != null)
+            StopTime2Specified = false;
+            StartTime2Specified = false;
+            StopTime3Specified = false;
+            StartTime3Specified = false;
+            
+            var startxml1 = (string)element.Attribute("start");
+            var stopxml1 = (string)element.Attribute("stop");
+            var startxml2 = (string)element.Attribute("start2");
+            var stopxml2 = (string)element.Attribute("stop2");
+            var startxml3 = (string)element.Attribute("start3");
+            var stopxml3 = (string)element.Attribute("stop3");
+            DateTime startTime1 = DateTime.MaxValue;
+            DateTime stopTime1 = DateTime.MinValue;
+            DateTime startTime2 = DateTime.MaxValue;
+            DateTime stopTime2 = DateTime.MinValue;
+            DateTime startTime3 = DateTime.MaxValue;
+            DateTime stopTime3 = DateTime.MinValue;
+            
+            //
+            // schedule #1
+            // start time parsing
+            if (startxml1 != null)
             {
-                if (!DateTime.TryParseExact(start, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out startTime))
+                if (!DateTime.TryParseExact(startxml1, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out startTime1))
                 {
                     Logging.Log("CharSchedule", Name + ": Couldn't parse starttime.", Logging.red);
-                    startTime = DateTime.Now.AddSeconds(20);
+                    startTime1 = DateTime.Now.AddSeconds(20);
                 }
                 else
                     StartTimeSpecified = true;
+               
+                Start1 = startTime1;
             }
             else
             {
                 Logging.Log("CharSchedule", "No start time specified. Starting now.", Logging.orange);
-                startTime = DateTime.Now.AddSeconds(20);
+                startTime1 = DateTime.Now.AddSeconds(20);
+                Start1 = startTime1;
             }
-            Start = startTime;
 
-            if (stop != null)
+            // stop time parsing
+            if (stopxml1 != null && StartTimeSpecified)
             {
-                if (!DateTime.TryParseExact(stop, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out stopTime))
+                if (!DateTime.TryParseExact(stopxml1, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out stopTime1))
                 {
-                    Logging.Log("CharSchedule", Name + ": Couldn't parse stoptime.", Logging.red);
-                    stopTime = DateTime.Now.AddHours(24);
+                    Logging.Log("CharSchedule", Name + ": Couldn't parse stoptime: Assuming 4 hours", Logging.red);
+                    stopTime1 = DateTime.Now.AddHours(4);
                 }
                 else
                     StopTimeSpecified = true;
+
+                Stop1 = stopTime1;
             }
             else
             {
-                Logging.Log("CharSchedule", "No stop time specified.", Logging.red);
-                stopTime = DateTime.Now.AddHours(24);
+                Logging.Log("CharSchedule", "No stop time specified: Assuming 4 hours", Logging.red);
+                stopTime1 = DateTime.Now.AddHours(4);
+                Stop1 = stopTime1;
             }
-            Stop = stopTime;
+
+            //
+            // schedule #2
+            // start time parsing
+            if (startxml2 != null)
+            {
+                if (!DateTime.TryParseExact(startxml2, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out startTime2))
+                {
+                    Logging.Log("CharSchedule", Name + ": Couldn't parse starttime2.", Logging.red);
+                    startTime2 = DateTime.Now.AddSeconds(20);
+                }
+                else
+                    StartTime2Specified = true;
+                
+                Start2 = startTime2;
+            }
+
+            // stop time parsing
+            if (stopxml2 != null && StartTime2Specified)
+            {
+                if (!DateTime.TryParseExact(stopxml2, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out stopTime2))
+                {
+                    Logging.Log("CharSchedule", Name + ": Couldn't parse stoptime2: Assuming 4 hours.", Logging.red);
+                    stopTime2 = DateTime.Now.AddHours(4);
+                }
+                else
+                    StopTime2Specified = true;
+
+                Stop2 = stopTime2;
+            }
+            else
+            {
+                Logging.Log("CharSchedule", "No stop time specified: Assuming 4 hours", Logging.red);
+                stopTime2 = DateTime.Now.AddHours(4);
+                Stop2 = stopTime2;
+            }
+
+            //
+            // schedule #3
+            // start time parsing
+            if (startxml3 != null)
+            {
+                if (!DateTime.TryParseExact(startxml3, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out startTime3))
+                {
+                    Logging.Log("CharSchedule", Name + ": Couldn't parse starttime3", Logging.red);
+                    startTime3 = DateTime.Now.AddSeconds(20);
+                }
+                else
+                    StartTime3Specified = true;
+                
+                Start3 = startTime3;
+            }
+
+            // stop time parsing
+            if (stopxml3 != null && StartTime3Specified)
+            {
+                if (!DateTime.TryParseExact(stopxml3, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out stopTime3))
+                {
+                    Logging.Log("CharSchedule", Name + ": Couldn't parse stoptime3: Assuming 4 hours.", Logging.red);
+                    stopTime3 = DateTime.Now.AddHours(4);
+                }
+                else
+                    StopTime3Specified = true;
+
+                Stop3 = stopTime3;
+            }
+            else
+            {
+                Logging.Log("CharSchedule", "No stop time specified: Assuming 4 hours", Logging.red);
+                stopTime3 = DateTime.Now.AddHours(4);
+                Stop3 = stopTime3;
+            }
 
             if ((string)element.Attribute("runtime") != null)
             {
-                RunTime = (double)element.Attribute("runtime");
-                StopTimeSpecified = true;
+                Logging.Log("CharSchedule","RunTime Attribute no longer supported: use StartTime and StopTime",Logging.orange);
+                RunTime = -1;
             }
             else
                 RunTime = -1;
         }
-
-        public string User { get; private set; }
-
-        public string PW { get; private set; }
-
-        public string Name { get; private set; }
-
-        public DateTime Start { get; set; }
-
-        public DateTime Stop { get; set; }
-
-        public double RunTime { get; set; }
-
-        public bool StopTimeSpecified { get; set; }
-
-        public bool StartTimeSpecified { get; set; }
     }
 }

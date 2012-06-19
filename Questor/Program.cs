@@ -10,6 +10,7 @@
 
 using System.Globalization;
 using LavishScriptAPI;
+using Questor.Modules.Caching;
 
 namespace Questor
 {
@@ -45,8 +46,6 @@ namespace Questor
         private static int _maxRuntime;
         private static bool _chantlingScheduler;
 
-        public static DateTime StopTime;
-        public static DateTime ScheduledstopTime;
         private static double _minutesToStart;
         private static bool _readyToStarta;
         private static bool _readyToStart;
@@ -58,16 +57,9 @@ namespace Questor
         public static bool StopTimeSpecified; //false;
 
         private static DateTime _lastPulse;
-        private static DateTime _startTime;
-
-        public static DateTime startTime
-        {
-            get
-            {
-                return _startTime;
-            }
-        }
-
+        public static DateTime StartTime = DateTime.MaxValue;
+        public static DateTime StopTime = DateTime.MinValue;
+        
         public static int MaxRuntime
         {
             get
@@ -150,70 +142,100 @@ namespace Questor
                     return;
                 }
                 else
-                {
-                    Logging.Log("Startup", "User: " + schedule.User + " PW: " + schedule.PW + " Name: " + schedule.Name + " Start: " + schedule.Start + " Stop: " +
-                             schedule.Stop + " RunTime: " + schedule.RunTime, Logging.white);
+                { 
                     if (schedule.User == null || schedule.PW == null)
                     {
                         Logging.Log("Startup", "Error - Login details not specified in Schedules.xml!", Logging.red);
                         return;
                     }
-                    else
-                    {
-                        _username = schedule.User;
-                        _password = schedule.PW;
-                    }
-                    _startTime = schedule.Start;
-
+                    _username = schedule.User;
+                    _password = schedule.PW;
+                    Logging.Log("Startup", "User: " + schedule.User + " Name: " + schedule.Name, Logging.white);
+                    
                     if (schedule.StartTimeSpecified)
-                        _startTime = _startTime.AddSeconds(R.Next(0, (RandStartDelay * 60)));
-
-                    //_scheduledstartTime = schedule.Start;
-                    ScheduledstopTime = schedule.Stop;
-                    StopTime = schedule.Stop;
-
-                    //if ((DateTime.Now > _scheduledstopTime))
-                    //{
-                    //	_startTime = _startTime.AddDays(1); //otherwise, start tomorrow at start time
-                    //	_readyToStarta = false;
-                    //}
-                    if ((DateTime.Now > _startTime))
                     {
-                        if ((DateTime.Now.Subtract(_startTime).TotalMinutes < 1200)) //if we're less than x hours past start time, start now
+                        if (schedule.Start1 < schedule.Stop1) schedule.Stop1 = schedule.Stop1.AddDays(1);
+                        if (DateTime.Now.AddHours(2) > schedule.Start1 && DateTime.Now < schedule.Stop1)
                         {
-                            _startTime = DateTime.Now;
+                            StartTime = schedule.Start1;
+                            StopTime = schedule.Stop1;
+                            Logging.Log("Startup", "Schedule1: Start1: " + schedule.Start1 + " Stop1: " + schedule.Stop1, Logging.white);
+                        }
+                    }
+                    if (schedule.StartTime2Specified)
+                    {
+                        if (DateTime.Now > schedule.Stop1 || DateTime.Now.DayOfYear > schedule.Stop1.DayOfYear) //if after schedule1 stoptime or the next day
+                        {
+                            if (schedule.Start2 < schedule.Stop2) schedule.Stop2 = schedule.Stop2.AddDays(1);
+                            if (DateTime.Now.AddHours(2) > schedule.Start2 && DateTime.Now < schedule.Stop2)
+                            {
+                                StartTime = schedule.Start2;
+                                StopTime = schedule.Stop2;
+                                Logging.Log("Startup", "Schedule2: Start2: " + schedule.Start2 + " Stop2: " + schedule.Stop2, Logging.white);
+                            }
+                        }
+                    }
+                    if (schedule.StartTime3Specified)
+                    {
+                        if (DateTime.Now > schedule.Stop2 || DateTime.Now.DayOfYear > schedule.Stop2.DayOfYear) //if after schedule2 stoptime or the next day
+                        {
+                            if (schedule.Start3 < schedule.Stop3) schedule.Stop3 = schedule.Stop3.AddDays(1);
+                            if (DateTime.Now.AddHours(2) > schedule.Start3 && DateTime.Now < schedule.Stop3)
+                            {
+                                StartTime = schedule.Start3;
+                                StopTime = schedule.Stop3;
+                                Logging.Log("Startup",
+                                            "Schedule3: Start3: " + schedule.Start3 + " Stop3: " + schedule.Stop3,
+                                            Logging.white);
+                            }
+                        }
+                    }
+                    //
+                    // if we havent found a worksable schedule yet assume schedule 1 is correct. what we want.
+                    //
+                    if (schedule.StartTimeSpecified && StartTime == DateTime.MaxValue)
+                    {
+                        StartTime = schedule.Start1;
+                        StopTime = schedule.Stop1;
+                        Logging.Log("Startup", "Forcing Schedule 1 because none of the schedules started within 2 hours or were already in progress", Logging.white);
+                        Logging.Log("Startup", "Schedule 1: Start1: " + schedule.Start1 + " Stop1: " + schedule.Stop1, Logging.white);
+                    }
+                    
+                    if (schedule.StartTimeSpecified || schedule.StartTime2Specified || schedule.StartTime3Specified)
+                        StartTime = StartTime.AddSeconds(R.Next(0, (RandStartDelay * 60)));
+
+                    if ((DateTime.Now > StartTime))
+                    {
+                        if ((DateTime.Now.Subtract(StartTime).TotalMinutes < 1200)) //if we're less than x hours past start time, start now
+                        {
+                            StartTime = DateTime.Now;
                             _readyToStarta = true;
                         }
                         else
-                            _startTime = _startTime.AddDays(1); //otherwise, start tomorrow at start time
+                            StartTime = StartTime.AddDays(1); //otherwise, start tomorrow at start time
                     }
                     else
-                        if ((_startTime.Subtract(DateTime.Now).TotalMinutes > 1200)) //if we're more than x hours shy of start time, start now
+                        if ((StartTime.Subtract(DateTime.Now).TotalMinutes > 1200)) //if we're more than x hours shy of start time, start now
                         {
-                            _startTime = DateTime.Now;
+                            StartTime = DateTime.Now;
                             _readyToStarta = true;
                         }
 
-                    if (StopTime < _startTime)
+                    if (StopTime < StartTime)
                         StopTime = StopTime.AddDays(1);
 
-                    if (schedule.RunTime > 0) //if runtime is specified, overrides stop time
-                        StopTime = _startTime.AddMinutes(schedule.RunTime); //minutes of runtime
+                    //if (schedule.RunTime > 0) //if runtime is specified, overrides stop time
+                    //    StopTime = StartTime.AddMinutes(schedule.RunTime); //minutes of runtime
 
-                    if (schedule.RunTime < 18 && schedule.RunTime > 0)     //if runtime is 10 or less, assume they meant hours
-                        StopTime = _startTime.AddHours(schedule.RunTime);   //hours of runtime
+                    //if (schedule.RunTime < 18 && schedule.RunTime > 0)     //if runtime is 10 or less, assume they meant hours
+                    //    StopTime = StartTime.AddHours(schedule.RunTime);   //hours of runtime
 
-                    string stopTimeText = "No stop time specified";
-                    StopTimeSpecified = schedule.StopTimeSpecified;
-                    if (StopTimeSpecified)
-                        stopTimeText = StopTime.ToString(CultureInfo.InvariantCulture);
-
-                    Logging.Log("Startup", " Start Time: " + _startTime + " - Stop Time: " + stopTimeText, Logging.white);
+                    Logging.Log("Startup", " Start Time: " + StartTime + " - Stop Time: " + StopTime, Logging.white);
 
                     if (!_readyToStarta)
                     {
-                        _minutesToStart = _startTime.Subtract(DateTime.Now).TotalMinutes;
-                        Logging.Log("Startup", "Starting at " + _startTime + ". " + String.Format("{0:0.##}", _minutesToStart) + " minutes to go.", Logging.yellow);
+                        _minutesToStart = StartTime.Subtract(DateTime.Now).TotalMinutes;
+                        Logging.Log("Startup", "Starting at " + StartTime + ". " + String.Format("{0:0.##}", _minutesToStart) + " minutes to go.", Logging.yellow);
                         Timer.Elapsed += new ElapsedEventHandler(TimerEventProcessor);
                         if (_minutesToStart > 0)
                             Timer.Interval = (int)(_minutesToStart * 60000);
@@ -241,14 +263,27 @@ namespace Questor
                     Logging.Log("Startup", string.Format("DirectEVE: Exception {0}...", ex), Logging.white);
                 }
 
-                _directEve.OnFrame += OnFrame;
+                try
+                {
+                    _directEve.OnFrame += OnFrame;
+                }
+                catch (Exception ex)
+                {
+                    Logging.Log("Startup", string.Format("DirectEVE.OnFrame: Exception {0}...", ex), Logging.white);
+                }
 
                 while (!_done)
                 {
                     System.Threading.Thread.Sleep(50);
                 }
-
-                _directEve.Dispose();
+                try
+                {
+                    _directEve.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    Logging.Log("Startup", string.Format("DirectEVE.Dispose: Exception {0}...", ex), Logging.white);
+                }
             }
 
             if (!string.IsNullOrEmpty(_username) && !string.IsNullOrEmpty(_password) && !string.IsNullOrEmpty(_character))
@@ -278,9 +313,8 @@ namespace Questor
                     return;
             }
 
-            _startTime = DateTime.Now;
-            Settings.Instance.LoginUsername = _username;
-            Settings.Instance.LoginCharacter = _character;
+            StartTime = DateTime.Now;
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new QuestorfrmMain());
@@ -402,7 +436,7 @@ namespace Questor
                         }
                         if (update)
                         {
-                            int secRestart = (400 * 3) + Settings.Instance.RandomNumber(3, 18) * 100 + Settings.Instance.RandomNumber(1, 9) * 10;
+                            int secRestart = (400 * 3) + Cache.Instance.RandomNumber(3, 18) * 100 + Cache.Instance.RandomNumber(1, 9) * 10;
                             LavishScript.ExecuteCommand("uplink exec Echo [${Time}] timedcommand " + secRestart + " OSExecute taskkill /IM launcher.exe");
                         }
                         if (sayyes)

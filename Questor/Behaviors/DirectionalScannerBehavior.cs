@@ -73,8 +73,8 @@ namespace Questor.Behaviors
             // States.CurrentDirectionalScannerBehaviorState fixed on ExecuteMission
             _States.CurrentDirectionalScannerBehaviorState = DirectionalScannerBehaviorState.Idle;
             _States.CurrentArmState = ArmState.Idle;
-            _States.CurrentCombatState = CombatState.Idle;
-            _States.CurrentDroneState = DroneState.Idle;
+            //_States.CurrentCombatState = CombatState.Idle;
+            //_States.CurrentDroneState = DroneState.Idle;
             _States.CurrentUnloadLootState = UnloadLootState.Idle;
             _States.CurrentTravelerState = TravelerState.Idle;
         }

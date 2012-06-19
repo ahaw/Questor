@@ -77,7 +77,7 @@ namespace Questor
             Cache.Instance.StopTimeSpecified = Program.StopTimeSpecified;
             Cache.Instance.MaxRuntime = Program.MaxRuntime;
             Cache.Instance.StopTime = Program.StopTime;
-            Cache.Instance.StartTime = Program.startTime;
+            Cache.Instance.StartTime = Program.StartTime;
             Cache.Instance.QuestorStarted_DateTime = DateTime.Now;
 
             // get the current process

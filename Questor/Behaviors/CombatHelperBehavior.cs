@@ -73,8 +73,8 @@ namespace Questor.Behaviors
             // States.CurrentCombatHelperBehaviorState fixed on ExecuteMission
             _States.CurrentCombatHelperBehaviorState = CombatHelperBehaviorState.Idle;
             _States.CurrentArmState = ArmState.Idle;
-            _States.CurrentCombatState = CombatState.Idle;
-            _States.CurrentDroneState = DroneState.Idle;
+            //_States.CurrentCombatState = CombatState.Idle;
+            //_States.CurrentDroneState = DroneState.Idle;
             _States.CurrentUnloadLootState = UnloadLootState.Idle;
             _States.CurrentTravelerState = TravelerState.Idle;
         }

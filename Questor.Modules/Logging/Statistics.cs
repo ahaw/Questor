@@ -121,7 +121,7 @@ namespace Questor.Modules.Logging
             // build header
             //
             string objectline = "Name;Distance;TypeId;GroupId;CategoryId;IsNPC;IsPlayer;TargetValue;Velocity;ID;\r\n";
-            Logging.Log("Statistics",";PocketObjectStatistics;" + objectline,Logging.white);
+            //Logging.Log("Statistics",";PocketObjectStatistics;" + objectline,Logging.white);
             File.AppendAllText(Settings.Instance.PocketObjectStatisticsFile, objectline);
 
             //
@@ -145,7 +145,7 @@ namespace Questor.Modules.Logging
                 // or at least know the distances between all the NPCs... thus be able to infer which NPCs were in which 'groups'
                 // 
 
-                Logging.Log("Statistics", ";PocketObjectStatistics;" + objectline, Logging.white);
+                //Logging.Log("Statistics", ";PocketObjectStatistics;" + objectline, Logging.white);
                 File.AppendAllText(Settings.Instance.PocketObjectStatisticsFile, objectline);
             }
             return true; 

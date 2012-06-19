@@ -98,8 +98,8 @@ namespace Questor.Behaviors
             // States.CurrentCombatMissionBehaviorState fixed on ExecuteMission
             _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.Idle;
             _States.CurrentArmState = ArmState.Idle;
-            _States.CurrentCombatState = CombatState.Idle;
-            _States.CurrentDroneState = DroneState.Idle;
+            //_States.CurrentCombatState = CombatState.Idle;
+            //_States.CurrentDroneState = DroneState.Idle;
             _States.CurrentUnloadLootState = UnloadLootState.Idle;
             _States.CurrentTravelerState = TravelerState.Idle;
         }
@@ -675,7 +675,7 @@ namespace Questor.Behaviors
 
                         // Seeing as we just warped to the mission, start the mission controller
                         _States.CurrentCombatMissionCtrlState = CombatMissionCtrlState.Start;
-                        _States.CurrentCombatState = CombatState.CheckTargets;
+                        //_States.CurrentCombatState = CombatState.CheckTargets;
                         _traveler.Destination = null;
                     }
                     break;
@@ -714,7 +714,7 @@ namespace Questor.Behaviors
                     if (_States.CurrentCombatState == CombatState.OutOfAmmo)
                     {
                         Logging.Log("Combat", "Out of Ammo!", Logging.orange);
-                        if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.ExecuteMission) _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.GotoBase;
+                        _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.GotoBase;
                         // Clear looted containers
                         Cache.Instance.LootedContainers.Clear();
                         //Cache.Instance.InvalidateBetweenMissionsCache();
@@ -722,7 +722,7 @@ namespace Questor.Behaviors
 
                     if (_States.CurrentCombatMissionCtrlState == CombatMissionCtrlState.Done)
                     {
-                        if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.ExecuteMission) _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.GotoBase;
+                        _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.GotoBase;
 
                         // Clear looted containers
                         Cache.Instance.LootedContainers.Clear();
@@ -733,7 +733,7 @@ namespace Questor.Behaviors
                     if (_States.CurrentCombatMissionCtrlState == CombatMissionCtrlState.Error)
                     {
                         Logging.Log("MissionController", "Error", Logging.red);
-                        if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.ExecuteMission) _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.GotoBase;
+                        _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.GotoBase;
 
                         // Clear looted containers
                         Cache.Instance.LootedContainers.Clear();
