@@ -546,42 +546,67 @@ namespace ValueDump
                     break;
 
                 case ValueDumpState.RefineItems:
-                    if (reprorcessingWindow == null)
+                    bool refine = false;
+                    if (refine)
                     {
-                        if (DateTime.Now.Subtract(_lastExecute).TotalSeconds > (int)Time.Instance.Marketlookupdelay_seconds)
+                        if (reprorcessingWindow == null)
                         {
-                            IEnumerable<DirectItem> refineItems = Cache.Instance.ItemHangar.Items.Where(i => ItemsToRefine.Any(r => r.Id == i.ItemId));
-                            Cache.Instance.DirectEve.ReprocessStationItems(refineItems);
+                            if (DateTime.Now.Subtract(_lastExecute).TotalSeconds > (int)Time.Instance.Marketlookupdelay_seconds)
+                            {
+                                IEnumerable<DirectItem> refineItems = Cache.Instance.ItemHangar.Items.Where(i => ItemsToRefine.Any(r => r.Id == i.ItemId));
 
-                            _lastExecute = DateTime.Now;
-                        }
-                        return;
-                    }
-
-                    if (reprorcessingWindow.NeedsQuote)
-                    {
-                        if (DateTime.Now.Subtract(_lastExecute).TotalSeconds > (int)Time.Instance.Marketlookupdelay_seconds)
-                        {
-                            reprorcessingWindow.GetQuotes();
-                            _lastExecute = DateTime.Now;
+                                    Cache.Instance.DirectEve.ReprocessStationItems(refineItems);
+                            
+                                _lastExecute = DateTime.Now;
+                            }
+                            return;
                         }
 
-                        return;
-                    }
+                        if (reprorcessingWindow.NeedsQuote)
+                        {
+                            if (DateTime.Now.Subtract(_lastExecute).TotalSeconds > (int)Time.Instance.Marketlookupdelay_seconds)
+                            {
+                                reprorcessingWindow.GetQuotes();
+                                _lastExecute = DateTime.Now;
+                            }
 
-                    // Wait till we have a quote
-                    if (reprorcessingWindow.Quotes.Count == 0)
-                    {
-                        _lastExecute = DateTime.Now;
-                        return;
-                    }
+                            return;
+                        }
 
-                    // Wait another 5 seconds to view the quote and then reprocess the stuff
-                    if (DateTime.Now.Subtract(_lastExecute).TotalSeconds > (int)Time.Instance.Marketlookupdelay_seconds)
+                        // Wait till we have a quote
+                        if (reprorcessingWindow.Quotes.Count == 0)
+                        {
+                            _lastExecute = DateTime.Now;
+                            return;
+                        }
+
+                        // Wait another 5 seconds to view the quote and then reprocess the stuff
+                        if (DateTime.Now.Subtract(_lastExecute).TotalSeconds > (int)Time.Instance.Marketlookupdelay_seconds)
+                        {
+                            // TODO: We should wait for the items to appear in our hangar and then sell them...
+                            reprorcessingWindow.Reprocess();
+                            State = ValueDumpState.Idle;
+                        }
+                    }
+                    else
                     {
-                        // TODO: We should wait for the items to appear in our hangar and then sell them...
-                        reprorcessingWindow.Reprocess();
-                        State = ValueDumpState.Idle;
+                        IEnumerable<DirectItem> refineItems = Cache.Instance.ItemHangar.Items.Where(i => ItemsToRefine.Any(r => r.Id == i.ItemId));
+                        if (!Cache.Instance.OpenCargoHold("ValueDump")) break;
+
+                        if (!Cache.Instance.OpenAmmoHangar("ValueDump")) break;
+                        if (refineItems != null)
+                        {
+                            Logging.Log("Arm", "Moving loot to refine to CargoHold", Logging.white);
+
+                            Cache.Instance.CargoHold.Add(refineItems);
+                            _lastExecute = DateTime.Now;
+                            break;
+                        }
+                        else
+                        {
+                            State = ValueDumpState.Idle;
+                        }
+
                     }
                     break;
             }

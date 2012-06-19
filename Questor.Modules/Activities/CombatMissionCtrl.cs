@@ -62,43 +62,6 @@ namespace Questor.Modules.Activities
             _currentAction++;
         }
 
-                            {
-                                Logging.Log("CombatMissionCtrl.NavigateIntoRange", "OrbitStructure enabled", Logging.teal);
-                                if (structure != null)
-                                {
-                                    structure.Orbit((int)Cache.Instance.OrbitDistance);
-                                    Logging.Log("CombatMissionCtrl." + _pocketActions[_currentAction], "Initiating Orbit around Gate [" + structure.Name + "][ID: " + structure.Id + "]", Logging.teal);
-                                else
-                                {
-                                    structure = Cache.Instance.Entities.Where(i => i.GroupId == (int)Group.LargeCollidableStructure).OrderBy(t => t.Distance).OrderBy(t => t.Distance).FirstOrDefault();
-                                    if (structure != null)
-                                    }
-                                    else
-                                    {
-                                        if (Settings.Instance.OrbitStructure)
-                                        {
-                                            structure = Cache.Instance.Entities.Where(i => i.Name.Contains("Beacon")).OrderBy(t => t.Distance).OrderBy(t => t.Distance).FirstOrDefault();
-                                            if (structure != null)
-                                            {
-                                                structure.Orbit((int)Cache.Instance.OrbitDistance);
-                                                Logging.Log("CombatMissionCtrl." + _pocketActions[_currentAction], "Initiating Orbit around Beacon or LCS [" + structure.Name + "][ID: " + structure.Id + "]", Logging.teal);
-                                            }
-                                        }
-                                    }
-                                }
-                                Logging.Log("CombatMissionCtrl.NavigateIntoRange", "OrbitStructure disabled", Logging.teal);
-                    return;
-                                EntityCache structure = Cache.Instance.Entities.Where(i => i.Name.Contains("Gate")).OrderBy(t => t.Distance).OrderBy(t => t.Distance).FirstOrDefault();
-                                }
-                                else
-                                {
-                                    structure = Cache.Instance.Entities.Where(i => i.GroupId == (int)Group.LargeCollidableStructure || i.Name.Contains("Beacon")).OrderBy(t => t.Distance).OrderBy(t => t.Distance).FirstOrDefault();
-                                    if (structure != null)
-                                    {
-                                        structure.Orbit((int)Cache.Instance.OrbitDistance);
-                                        Logging.Log("CombatMissionCtrl." + _pocketActions[_currentAction], "Initiating Orbit around Beacon or LCS [" + structure.Name + "][ID: " + structure.Id + "]", Logging.teal);
-                                    }
-                                }
         private void BookmarkPocketForSalvaging()
         {
             // Nothing to loot

@@ -355,7 +355,16 @@ namespace Questor.Modules.Actions
 
             if (nextAction > DateTime.Now)
                 return false;
+            var gates = Cache.Instance.EntitiesByName("Acceleration Gate");
 
+            if (Math.Round((distance / 1000)) < (int)Distance.MaxPocketsDistance && gates.Count()!=0)
+            {
+                
+                Logging.Log("QuestorManager.BookmarkDestination",
+                "Warp to bookmark in same pocket requested but acceleration gate found delaying."
+                , Logging.white);
+                return true;
+            }
             Logging.Log("TravelerDestination.BookmarkDestination", "Warping to bookmark [" + bookmark.Title + "][" + Math.Round((distance / 1000) / 149598000, 2) + "] AU away. Which is ["+ Math.Round((distance / 1000),2)+"]", Logging.green);
             Cache.Instance.DoNotBreakInvul = false;
             bookmark.WarpTo();

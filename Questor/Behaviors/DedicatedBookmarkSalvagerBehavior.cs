@@ -366,7 +366,8 @@ namespace Questor.Behaviors
                         break;
 
                     Logging.Log("DedicatedBookmarkSalvagerBehavior", "Heading back to base", Logging.white);
-                    if (_States.CurrentDedicatedBookmarkSalvagerBehaviorState == DedicatedBookmarkSalvagerBehaviorState.DelayedGotoBase) _States.CurrentDedicatedBookmarkSalvagerBehaviorState = DedicatedBookmarkSalvagerBehaviorState.GotoBase;
+                    if (_States.CurrentDedicatedBookmarkSalvagerBehaviorState == DedicatedBookmarkSalvagerBehaviorState.DelayedGotoBase) 
+                        _States.CurrentDedicatedBookmarkSalvagerBehaviorState = DedicatedBookmarkSalvagerBehaviorState.GotoBase;
                     break;
 
                 case DedicatedBookmarkSalvagerBehaviorState.Start:
@@ -443,7 +444,7 @@ namespace Questor.Behaviors
                         Cache.Instance.LootAlreadyUnloaded = true;
                         _States.CurrentUnloadLootState = UnloadLootState.Idle;
                         _States.CurrentDedicatedBookmarkSalvagerBehaviorState = DedicatedBookmarkSalvagerBehaviorState.CheckBookmarkAge;
-                        Statistics.Instance.FinishedSalvaging = DateTime.Now;
+                        
                     }
                     break;
 
@@ -555,29 +556,36 @@ namespace Questor.Behaviors
                     string target = "Acceleration Gate";
                     Cache.Instance.EntitiesByName(target);
 
-                    if ( GateInSalvage() )
+                    if (_States.CurrentTravelerState == TravelerState.AtDestination)
                     {
-                        //we know we are connected here
-                        Cache.Instance.LastKnownGoodConnectedTime = DateTime.Now;
-                        Cache.Instance.MyWalletBalance = Cache.Instance.DirectEve.Me.Wealth;
+                        if (GateInSalvage())
+                        {
+                            Logging.Log("DedicatedBookmarkSalvagerBehavior", "GotoSalvageBookmark: We found gate in salvage bookmark. Going back to Base", Logging.white);
+                            //we know we are connected here
+                            Cache.Instance.LastKnownGoodConnectedTime = DateTime.Now;
+                            Cache.Instance.MyWalletBalance = Cache.Instance.DirectEve.Me.Wealth;
 
-                        if (_States.CurrentDedicatedBookmarkSalvagerBehaviorState == DedicatedBookmarkSalvagerBehaviorState.GotoSalvageBookmark) _States.CurrentDedicatedBookmarkSalvagerBehaviorState = DedicatedBookmarkSalvagerBehaviorState.GotoBase;
-                        _traveler.Destination = null;
-                        _nextSalvageTrip = DateTime.Now.AddMinutes(Time.Instance.DelayBetweenSalvagingSessions_minutes);
-                        return;
-                    }
+                            if (_States.CurrentDedicatedBookmarkSalvagerBehaviorState == DedicatedBookmarkSalvagerBehaviorState.GotoSalvageBookmark)
+                            {
+                                _States.CurrentDedicatedBookmarkSalvagerBehaviorState = DedicatedBookmarkSalvagerBehaviorState.GotoBase;
+                            }
+                            _traveler.Destination = null;
+                            _nextSalvageTrip = DateTime.Now.AddMinutes(Time.Instance.DelayBetweenSalvagingSessions_minutes);
+                            return;
+                        }
+                        else
+                        {
+                            Logging.Log("DedicatedBookmarkSalvagerBehavior", "GotoSalvageBookmark: Gate not found, we can start salvaging", Logging.white);
+                            
+                            //we know we are connected here
+                            Cache.Instance.LastKnownGoodConnectedTime = DateTime.Now;
+                            Cache.Instance.MyWalletBalance = Cache.Instance.DirectEve.Me.Wealth;
 
-
-                    if (_States.CurrentTravelerState == TravelerState.AtDestination || GateInSalvage())
-                    {
-                        //we know we are connected here
-                        Cache.Instance.LastKnownGoodConnectedTime = DateTime.Now;
-                        Cache.Instance.MyWalletBalance = Cache.Instance.DirectEve.Me.Wealth;
-
-                        if (_States.CurrentDedicatedBookmarkSalvagerBehaviorState == DedicatedBookmarkSalvagerBehaviorState.GotoSalvageBookmark)
-                            _States.CurrentDedicatedBookmarkSalvagerBehaviorState = DedicatedBookmarkSalvagerBehaviorState.Salvage;
-                        _traveler.Destination = null;
-                        return;
+                            if (_States.CurrentDedicatedBookmarkSalvagerBehaviorState == DedicatedBookmarkSalvagerBehaviorState.GotoSalvageBookmark)
+                                _States.CurrentDedicatedBookmarkSalvagerBehaviorState = DedicatedBookmarkSalvagerBehaviorState.Salvage;
+                            _traveler.Destination = null;
+                            return;
+                        }
                     }
 
                     if (Settings.Instance.DebugStates)
@@ -620,11 +628,12 @@ namespace Questor.Behaviors
 
                         if (Settings.Instance.UnloadLootAtStation && Cache.Instance.CargoHold.Window.IsReady && (Cache.Instance.CargoHold.Capacity - Cache.Instance.CargoHold.UsedCapacity) < Settings.Instance.ReserveCargoCapacity)
                         {
-                            Logging.Log("DedicatedBookmarkSalvagerBehavior.Salvage", "We are full, go to base to unload", Logging.white);
+                            Logging.Log("DedicatedBookmarkSalvagerBehavior.Salvage", "Cargo hold is full, go to base to unload", Logging.white);
                             if (_States.CurrentDedicatedBookmarkSalvagerBehaviorState == DedicatedBookmarkSalvagerBehaviorState.Salvage)
                             {
                                 _States.CurrentDedicatedBookmarkSalvagerBehaviorState = DedicatedBookmarkSalvagerBehaviorState.GotoBase;
                             }
+
                             break;
                         }
 

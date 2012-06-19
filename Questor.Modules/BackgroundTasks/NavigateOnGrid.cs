@@ -38,7 +38,7 @@ namespace Questor.Modules.BackgroundTasks
                             Logging.Log(module, 
                                        ": initiating Orbit of [" + thisBigObject.Name +
                                           "] orbiting at [" + Distance.SafeDistancefromStructure + "]", Logging.white);
-                            Cache.Instance.NextOrbit = DateTime.Now.AddSeconds((int)Time.OrbitDelay_seconds);
+                            Cache.Instance.NextOrbit = DateTime.Now.AddSeconds(Time.Instance.OrbitDelay_seconds);
                         }
                         return;
                         //we are still too close, do not continue through the rest until we are not "too close" anymore
@@ -63,33 +63,58 @@ namespace Questor.Modules.BackgroundTasks
                         //Logging.Log("CombatMissionCtrl." + _pocketActions[_currentAction] ,"StartOrbiting: Target in range");
                         if (!Cache.Instance.IsApproachingOrOrbiting)
                         {
-                            Logging.Log("CombatMissionCtrl.NavigateIntoRange", "We are not approaching nor orbiting", Logging.teal);
-
-                            EntityCache structure = Cache.Instance.Entities.Where(i => i.Name.Contains("Gate")).OrderBy(t => t.Distance).OrderBy(t => t.Distance).FirstOrDefault();
-
-                            if (Settings.Instance.OrbitStructure && structure != null)
+                            Logging.Log(module, "We are not approaching nor orbiting and orbit structure enabled", Logging.teal);
+                            if (Settings.Instance.OrbitStructure)
                             {
-                                structure.Orbit((int)Cache.Instance.OrbitDistance);
-                                Logging.Log(module, "Initiating Orbit [" + structure.Name + "][ID: " + structure.Id + "]", Logging.teal);
+                                EntityCache structure = Cache.Instance.Entities.Where(i => i.Name.Contains("Gate")).OrderBy(t => t.Distance).OrderBy(t => t.Distance).FirstOrDefault();
+                                if (structure != null)
+                                {
+                                    structure.Orbit((int)Cache.Instance.OrbitDistance);
+                                    Logging.Log(module, "Initiating Orbit around Gate [" + structure.Name + "][ID: " + structure.Id + "]", Logging.teal);
+
+                                }
+                                else
+                                {
+                                    structure = Cache.Instance.Entities.Where(i => i.GroupId == (int)Group.LargeCollidableStructure).OrderBy(t => t.Distance).OrderBy(t => t.Distance).FirstOrDefault();
+                                    if (structure != null)
+                                    {
+                                        structure.Orbit((int)Cache.Instance.OrbitDistance);
+                                        Logging.Log(module, "Initiating Orbit around Beacon,wreck or LCS [" + structure.Name + "][ID: " + structure.Id + "]", Logging.teal);
+                                    }
+                                    else
+                                    {
+                                        if (Settings.Instance.OrbitStructure)
+                                        {
+                                            structure = Cache.Instance.Entities.Where(i => i.Name.Contains("Beacon")).OrderBy(t => t.Distance).OrderBy(t => t.Distance).FirstOrDefault();
+                                            if (structure != null)
+                                            {
+                                                structure.Orbit((int)Cache.Instance.OrbitDistance);
+                                                Logging.Log(module, "Initiating Orbit around Beacon or LCS [" + structure.Name + "][ID: " + structure.Id + "]", Logging.teal);
+                                            }
+                                        }
+                                    }
+                                }
                             }
                             else
                             {
+                                Logging.Log("CombatMissionCtrl.NavigateIntoRange", "OrbitStructure disabled", Logging.teal);
                                 target.Orbit(Cache.Instance.OrbitDistance);
                                 Logging.Log(module, "Initiating Orbit [" + target.Name + "][ID: " + target.Id + "]", Logging.teal);
                             }
-                            Cache.Instance.NextOrbit = DateTime.Now.AddSeconds((int)Time.OrbitDelay_seconds);
-                            return;
+                            Cache.Instance.NextOrbit = DateTime.Now.AddSeconds(Time.Instance.OrbitDelay_seconds);
                         }
                     }
                     else
                     {
-                        Logging.Log(module, "Possible out of range. ignoring orbit around structure", Logging.teal);
+                        Logging.Log(module, "Possible out of range[" + target.Distance + (int)Cache.Instance.OrbitDistance + "]. ignoring orbit around structure", Logging.teal);
                         target.Orbit(Cache.Instance.OrbitDistance);
                         Logging.Log(module, "Initiating Orbit [" + target.Name + "][ID: " + target.Id + "]", Logging.teal);
-                        Cache.Instance.NextOrbit = DateTime.Now.AddSeconds((int)Time.OrbitDelay_seconds);
+                        Cache.Instance.NextOrbit = DateTime.Now.AddSeconds(Time.Instance.OrbitDelay_seconds);
                         return;
                     }
+                    return;
                 }
+
             }
             else //if we aren't speed tanking then check optimalrange setting, if that isn't set use the less of targeting range and weapons range to dictate engagement range
             {
@@ -127,7 +152,7 @@ namespace Questor.Modules.BackgroundTasks
                             Logging.Log(module, "Using Weapons Range: Stop ship, target is in orbit range", Logging.teal);
                         }
                     }
-                    Cache.Instance.NextApproachAction = DateTime.Now.AddSeconds((int)Time.ApproachDelay_seconds);
+                    Cache.Instance.NextApproachAction = DateTime.Now.AddSeconds(Time.Instance.ApproachDelay_seconds);
                     return;
                 }
             }
@@ -158,7 +183,7 @@ namespace Questor.Modules.BackgroundTasks
                                 target.Orbit(Cache.Instance.OrbitDistance);
                                 Logging.Log(module, "Initiating Orbit [" + target.Name + "][ID: " + target.Id + "]", Logging.teal);
                             }
-                            Cache.Instance.NextOrbit = DateTime.Now.AddSeconds((int)Time.OrbitDelay_seconds);
+                            Cache.Instance.NextOrbit = DateTime.Now.AddSeconds(Time.Instance.OrbitDelay_seconds);
                             return;
                         }
                     }
@@ -167,7 +192,7 @@ namespace Questor.Modules.BackgroundTasks
                         Logging.Log(module, "Possible out of range. ignoring orbit around structure", Logging.teal);
                         target.Orbit(Cache.Instance.OrbitDistance);
                         Logging.Log(module, "Initiating Orbit [" + target.Name + "][ID: " + target.Id + "]", Logging.teal);
-                        Cache.Instance.NextOrbit = DateTime.Now.AddSeconds((int)Time.OrbitDelay_seconds);
+                        Cache.Instance.NextOrbit = DateTime.Now.AddSeconds(Time.Instance.OrbitDelay_seconds);
                         return;
                     }
                 }
@@ -183,7 +208,7 @@ namespace Questor.Modules.BackgroundTasks
                     if (target.Distance > Cache.Instance.MaxRange && (Cache.Instance.Approaching == null || Cache.Instance.Approaching.Id != target.Id))
                     {
                         target.Approach((int)(Distance.SafeDistancefromStructure));
-                        Cache.Instance.NextApproachAction = DateTime.Now.AddSeconds((int)Time.ApproachDelay_seconds);
+                        Cache.Instance.NextApproachAction = DateTime.Now.AddSeconds(Time.Instance.ApproachDelay_seconds);
                         Logging.Log(module, "Using SafeDistanceFromStructure: Approaching target [" + target.Name + "][ID: " + target.Id + "][" + Math.Round(target.Distance / 1000, 0) + "k away]", Logging.teal);
                     }
                     return;
