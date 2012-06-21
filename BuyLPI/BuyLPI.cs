@@ -215,7 +215,7 @@ namespace BuyLPI
 
             // Set next action + loyalty point timeout
             _nextAction = DateTime.Now.AddMilliseconds(WaitMillis);
-            _loyaltyPointTimeout = DateTime.Now.AddSeconds(10);
+            _loyaltyPointTimeout = DateTime.Now.AddSeconds(25);
 
             if (_quantity.HasValue)
             {

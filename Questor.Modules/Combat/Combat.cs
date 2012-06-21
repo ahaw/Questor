@@ -781,7 +781,7 @@ namespace Questor.Modules.Combat
             }
 
             // Do we have too many low value targets targeted?
-            while (lowValueTargets.Count > maxLowValueTarget)
+            while (lowValueTargets.Count > Math.Max(maxLowValueTarget - Cache.Instance.PriorityTargets.Count(), 0))
             {
                 // Unlock any target
                 EntityCache target = lowValueTargets.OrderByDescending(t => t.Distance).First();

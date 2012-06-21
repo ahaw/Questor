@@ -203,7 +203,7 @@ namespace Questor.Modules.BackgroundTasks
                 // Should we deactivate the module?
                 bool deactivate = !Cache.Instance.IsApproaching;
                 deactivate &= module.IsActive;
-                deactivate &= (!Cache.Instance.Entities.Any(e => e.IsAttacking) || !Settings.Instance.SpeedTank);
+                deactivate &= ((!Cache.Instance.Entities.Any(e => e.IsAttacking) && DateTime.Now > Statistics.Instance.StartedPocket.AddSeconds(60)) || !Settings.Instance.SpeedTank);
 
                 // This only applies when not speed tanking
                 if (!Settings.Instance.SpeedTank && Cache.Instance.IsApproachingOrOrbiting)

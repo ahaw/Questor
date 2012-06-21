@@ -17,6 +17,8 @@
   <debugGotobase>false</debugGotobase>
   <debugIdle>false</debugIdle>
   <debugAutoStart>false</debugAutoStart>
+  <debugHangars>false</debugHangars>
+  <debugLogging>false</debugLogging>
   <debugSalvage>false</debugSalvage>
   <useInnerspace>true</useInnerspace>
   

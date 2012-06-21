@@ -159,8 +159,8 @@ namespace Questor.Modules.BackgroundTasks
             switch (_States.CurrentCleanupState)
             {
                 case CleanupState.Idle:
-                    //Cleanup State should only run every 10 seconds
-                    if (DateTime.Now.Subtract(_lastCleanupAction).TotalSeconds < 10)
+                    //Cleanup State should only run every 4 seconds
+                    if (DateTime.Now.Subtract(_lastCleanupAction).TotalSeconds < 4)
                         return;
                     _States.CurrentCleanupState = CleanupState.CheckModalWindows;
                     break;
