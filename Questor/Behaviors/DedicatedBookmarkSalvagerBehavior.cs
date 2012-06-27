@@ -606,7 +606,7 @@ namespace Questor.Behaviors
                         if (bookmark != null)
                         {
                             _bookmarkdeletionattempt++;
-                            if (_bookmarkdeletionattempt <= 3 && DateTime.Now > _nextBookmarkDeletionAttempt)
+                            if (_bookmarkdeletionattempt <= Settings.Instance.NoOfBookmarksDeletedAtOnce && DateTime.Now > _nextBookmarkDeletionAttempt)
                             {
                                 Logging.Log("DedicatedBookmarkSalvagerBehavior.Salvage", "could not be completed because of NPCs left in the mission: deleting salvage bookmark", Logging.white);
                                 bookmark.Delete();
@@ -649,8 +649,8 @@ namespace Questor.Behaviors
                             if (onGridBookmark != null)
                             {
                                 _bookmarkdeletionattempt++;
-                                Cache.Instance.NextRemoveBookmarkAction = DateTime.Now.AddSeconds((int)Time.RemoveBookmarkDelay_seconds);
-                                if (_bookmarkdeletionattempt <= 3 && DateTime.Now > _nextBookmarkDeletionAttempt)
+                                Cache.Instance.NextRemoveBookmarkAction = DateTime.Now.AddSeconds((int)Time.Instance.RemoveBookmarkDelay_seconds);
+                                if (_bookmarkdeletionattempt <= Settings.Instance.NoOfBookmarksDeletedAtOnce && DateTime.Now > _nextBookmarkDeletionAttempt)
                                 {
                                     Logging.Log("DedicatedBookmarkSalvagerBehavior.Salvage", "Finished salvaging the room: removing salvage bookmark:" + onGridBookmark.Title, Logging.white);
                                     onGridBookmark.Delete();
@@ -667,7 +667,7 @@ namespace Questor.Behaviors
                             }
                             else
                             {
-                                _bookmarkdeletionattempt = 1;
+                                _bookmarkdeletionattempt = 0;
                                 _nextSalvageTrip = DateTime.Now;
                                 Statistics.Instance.FinishedSalvaging = DateTime.Now;
                                 _States.CurrentDedicatedBookmarkSalvagerBehaviorState = DedicatedBookmarkSalvagerBehaviorState.CheckBookmarkAge;
