@@ -70,7 +70,7 @@ namespace Questor.Modules.BackgroundTasks
                         Logging.Log("Questor", "Logging Off eve in 15 seconds.", Logging.white);
                         CloseQuestorflag = false;
                         CloseQuestorDelay =
-                            DateTime.Now.AddSeconds((int)Time.CloseQuestorDelayBeforeExit_seconds);
+                            DateTime.Now.AddSeconds((int)Time.Instance.CloseQuestorDelayBeforeExit_seconds);
                     }
                     if (CloseQuestorDelay.AddSeconds(-10) < DateTime.Now)
                     {
@@ -128,7 +128,7 @@ namespace Questor.Modules.BackgroundTasks
                                         _closeQuestorCMDUplink = false;
                                         CloseQuestorDelay =
                                         DateTime.Now.AddSeconds(
-                                            (int)Time.CloseQuestorDelayBeforeExit_seconds);
+                                            (int)Time.Instance.CloseQuestorDelayBeforeExit_seconds);
                                     }
                                     if ((CloseQuestorDelay.AddSeconds(-10) == DateTime.Now) &&
                                         (!_closeQuestor10SecWarningDone))
@@ -176,7 +176,7 @@ namespace Questor.Modules.BackgroundTasks
                                         _closeQuestorCMDUplink = false;
                                         CloseQuestorDelay =
                                         DateTime.Now.AddSeconds(
-                                        (int)Time.CloseQuestorDelayBeforeExit_seconds);
+                                        (int)Time.Instance.CloseQuestorDelayBeforeExit_seconds);
                                     }
                                     if ((CloseQuestorDelay.AddSeconds(-10) == DateTime.Now) &&
                                         (!_closeQuestor10SecWarningDone))
@@ -233,7 +233,7 @@ namespace Questor.Modules.BackgroundTasks
                                         _closeQuestorCMDUplink = false;
                                         CloseQuestorDelay =
                                             DateTime.Now.AddSeconds(
-                                                (int)Time.CloseQuestorDelayBeforeExit_seconds);
+                                                (int)Time.Instance.CloseQuestorDelayBeforeExit_seconds);
                                     }
                                     if ((CloseQuestorDelay.AddSeconds(-10) == DateTime.Now) &&
                                         (!_closeQuestor10SecWarningDone))
@@ -261,7 +261,7 @@ namespace Questor.Modules.BackgroundTasks
                                         _closeQuestorCMDUplink = false;
                                         CloseQuestorDelay =
                                             DateTime.Now.AddSeconds(
-                                                (int)Time.CloseQuestorDelayBeforeExit_seconds);
+                                                (int)Time.Instance.CloseQuestorDelayBeforeExit_seconds);
                                     }
                                     if ((CloseQuestorDelay.AddSeconds(-10) == DateTime.Now) &&
                                         (!_closeQuestor10SecWarningDone))

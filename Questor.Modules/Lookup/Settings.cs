@@ -144,6 +144,7 @@ namespace Questor.Modules.Lookup
         //
         private bool _killSentries;
         public int NumberOfModulesToActivateInCycle = 1;
+        public int NoOfBookmarksDeletedAtOnce = 1;
         public bool KillSentries
         {
             get

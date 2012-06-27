@@ -1009,7 +1009,7 @@ namespace Questor.Behaviors
                         if (Settings.Instance.DeleteBookmarksWithNPC)
                         {
                             _bookmarkdeletionattempt++;
-                            if (_bookmarkdeletionattempt <= 3 && DateTime.Now > _nextBookmarkDeletionAttempt)
+                            if (_bookmarkdeletionattempt <= Settings.Instance.NoOfBookmarksDeletedAtOnce && DateTime.Now > _nextBookmarkDeletionAttempt)
                             {
                                 Logging.Log("CombatMissionsBehavior.Salvage", "could not be completed because of NPCs left in the mission: deleting salvage bookmark", Logging.white);
                                 bookmark.Delete();
@@ -1039,7 +1039,7 @@ namespace Questor.Behaviors
                             {
                                 _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.GotoSalvageBookmark;
                             }
-                            DirectBookmark bookmark = missionSalvageBookmarks.OrderBy(i => i.CreatedOn).FirstOrDefault();
+                            bookmark = missionSalvageBookmarks.OrderBy(i => i.CreatedOn).FirstOrDefault();
 
                             _traveler.Destination = new BookmarkDestination(bookmark);
 
@@ -1067,7 +1067,7 @@ namespace Questor.Behaviors
                             if (onGridBookmark != null)
                             {
                                 _bookmarkdeletionattempt++;
-                                if (_bookmarkdeletionattempt <= 3 && DateTime.Now > _nextBookmarkDeletionAttempt)
+                                if (_bookmarkdeletionattempt <= Settings.Instance.NoOfBookmarksDeletedAtOnce && DateTime.Now > _nextBookmarkDeletionAttempt)
                                 {
                                     Logging.Log("CombatMissionsBehavior.Salvage", "Finished salvaging the room: removing salvage bookmark:" + onGridBookmark.Title, Logging.white);
                                     onGridBookmark.Delete();
@@ -1105,11 +1105,11 @@ namespace Questor.Behaviors
                                     DirectBookmark bookmark;
                                     if (Settings.Instance.FirstSalvageBookmarksInSystem)
                                     {
-                                         bookmark = bookmarks.FirstOrDefault(c => c.LocationId == Cache.Instance.DirectEve.Session.SolarSystemId) ?? bookmarks.FirstOrDefault();
+                                        bookmark = afterMissionSalvageBookmarks.FirstOrDefault(c => c.LocationId == Cache.Instance.DirectEve.Session.SolarSystemId) ?? afterMissionSalvageBookmarks.FirstOrDefault();
                                     }
                                     else
                                     {
-                                        bookmark = bookmarks.OrderBy(i=> i.CreatedOn).FirstOrDefault()?? bookmarks.FirstOrDefault();
+                                        bookmark = afterMissionSalvageBookmarks.OrderBy(i => i.CreatedOn).FirstOrDefault() ?? afterMissionSalvageBookmarks.FirstOrDefault();
                                     }
                                     _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.GotoSalvageBookmark;
                                     _traveler.Destination = new BookmarkDestination(bookmark);

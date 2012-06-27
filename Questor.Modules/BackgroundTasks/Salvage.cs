@@ -501,7 +501,7 @@ namespace Questor.Modules.BackgroundTasks
                             // then picking it up again :/ (granted it should never happen unless
                             // mission item volume > reserved volume
                             Cache.Instance.CargoHold.Jettison(moveTheseItems.Select(i => i.ItemId));
-                            Cache.Instance.NextLootAction = DateTime.Now.AddMilliseconds((int)Time.LootingDelay_milliseconds);
+                            Cache.Instance.NextLootAction = DateTime.Now.AddMilliseconds((int)Time.Instance.LootingDelay_milliseconds);
                             Cache.Instance.LastJettison = DateTime.Now;
                             return;
                         }
