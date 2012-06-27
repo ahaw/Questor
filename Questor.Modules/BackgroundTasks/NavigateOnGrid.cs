@@ -13,6 +13,9 @@ namespace Questor.Modules.BackgroundTasks
 
     public class NavigateOnGrid
     {
+        public static DateTime AvoidBumpingThingsTimeStamp = DateTime.MinValue;
+        public static int SafeDistanceFromStructureMultiplier = 1;
+
         public static void AvoidBumpingThings(EntityCache thisBigObject, string module)
         {
             //if It hasn't been at least 60 seconds since we last session changed do not do anything
@@ -29,15 +32,33 @@ namespace Questor.Modules.BackgroundTasks
                     if (thisBigObject.Distance >= (int)Distance.TooCloseToStructure)
                     {
                         //we are no longer "too close" and can proceed.
+                        AvoidBumpingThingsTimeStamp = DateTime.MinValue;
+                        SafeDistanceFromStructureMultiplier = 1;
                     }
                     else
                     {
                         if (DateTime.Now > Cache.Instance.NextOrbit)
                         {
-                            thisBigObject.Orbit((int)Distance.SafeDistancefromStructure);
+                            if (DateTime.Now > AvoidBumpingThingsTimeStamp.AddSeconds(30))
+                            {
+                                if (SafeDistanceFromStructureMultiplier <= 4)
+                                {
+                                    AvoidBumpingThingsTimeStamp = DateTime.Now;
+                                    SafeDistanceFromStructureMultiplier++;
+                                }
+                                if (DateTime.Now > AvoidBumpingThingsTimeStamp.AddMinutes(15))
+                                {
+                                    Cache.Instance.CloseQuestorCMDLogoff = false;
+                                    Cache.Instance.CloseQuestorCMDExitGame = true;
+                                    Cache.Instance.ReasonToStopQuestor = "navigateOnGrid: We have been stuck on an object for over 15 min";
+                                    Logging.Log("ReasonToStopQuestor", Cache.Instance.ReasonToStopQuestor, Logging.yellow);
+                                    Cache.Instance.SessionState = "Quitting";
+                                }
+                            }
+                            thisBigObject.Orbit((int)Distance.SafeDistancefromStructure * SafeDistanceFromStructureMultiplier);
                             Logging.Log(module, 
                                        ": initiating Orbit of [" + thisBigObject.Name +
-                                          "] orbiting at [" + Distance.SafeDistancefromStructure + "]", Logging.white);
+                                          "] orbiting at [" + ((int)Distance.SafeDistancefromStructure * SafeDistanceFromStructureMultiplier) + "]", Logging.white);
                             Cache.Instance.NextOrbit = DateTime.Now.AddSeconds(Time.Instance.OrbitDelay_seconds);
                         }
                         return;
