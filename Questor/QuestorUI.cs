@@ -24,33 +24,51 @@ namespace Questor
     public partial class QuestorfrmMain : Form
     {
         private readonly Questor _questor;
-        //private DateTime _lastlogmessage;
-        private int _guiVisibleWarningGiven = 0;
+        //private DateTime _lastlogmessage
+        private DateTime NextConsoleLogRefresh = DateTime.MinValue;
 
         public QuestorfrmMain()
         {
+            if (Settings.Instance.DebugUI) Logging.Log("QuestorUI", "QuestorfrmMain", Logging.white);
+            if (Settings.Instance.DebugUI) Logging.Log("QuestorUI", "InitializeComponent", Logging.white);
             InitializeComponent();
+            if (Settings.Instance.DebugUI) Logging.Log("QuestorUI", "_questor = new Questor(this);", Logging.white);
             _questor = new Questor(this);
+            if (Settings.Instance.DebugUI) Logging.Log("QuestorUI", "PopulateStateComboBoxes", Logging.white);
             PopulateStateComboBoxes();
+            if (Settings.Instance.DebugUI) Logging.Log("QuestorUI", "PopulateBehaviorStateComboBox", Logging.white);
             PopulateBehaviorStateComboBox();
+            if (Settings.Instance.DebugUI) Logging.Log("QuestorUI", "CreateLavishCommands", Logging.white);
             CreateLavishCommands();
+            if (Settings.Instance.DebugUI) Logging.Log("QuestorUI", "this.Show();", Logging.white);
             this.Show();
+            if (Settings.Instance.DebugAttachVSDebugger)
+            {
+                if (!System.Diagnostics.Debugger.IsAttached)
+                {
+                    Logging.Log("QuestorUI", "VS Debugger is not yet attached: System.Diagnostics.Debugger.Launch()", Logging.teal);
+                    System.Diagnostics.Debugger.Launch();
+                }
+            }
         }
 
         private void QuestorfrmMainFormClosed(object sender, FormClosedEventArgs e)
         {
+            if (Settings.Instance.DebugUI) Logging.Log("QuestorUI", "QuestorfrmMainFormClosed", Logging.white);
+
             Cache.Instance.DirectEve.Dispose();
             Cache.Instance.DirectEve = null;
         }
 
         private void PopulateStateComboBoxes()
         {
+            if (Settings.Instance.DebugUI) Logging.Log("QuestorUI", "PopulateStateComboBoxes", Logging.white);
             QuestorStateComboBox.Items.Clear();
             foreach (string text in Enum.GetNames(typeof(QuestorState)))
                 QuestorStateComboBox.Items.Add(text);
 
             if (Settings.Instance.CharacterMode != null)
-            {    
+            {
                 //
                 // populate combo boxes with the various states that are possible
                 //
@@ -116,8 +134,26 @@ namespace Questor
             }
         }
 
+        private void PopulateMissionLists()
+        {
+            //Logging.Log("QuestorUI","populating MissionBlacklisttextbox",Logging.white);
+            BlacklistedMissionstextbox.Text = "";
+            foreach (string blacklistedmission in Settings.Instance.MissionBlacklist)
+            {
+                BlacklistedMissionstextbox.AppendText(blacklistedmission + "\r\n");
+            }
+
+            //Logging.Log("QuestorUI", "populating MissionBlacklisttextbox", Logging.white);
+            GreyListedMissionsTextBox.Text = "";
+            foreach (string greylistedmission in Settings.Instance.MissionGreylist)
+            {
+                GreyListedMissionsTextBox.AppendText(greylistedmission + "\r\n");
+            }
+        }
+
         private void PopulateBehaviorStateComboBox()
         {
+            if (Settings.Instance.DebugUI) Logging.Log("QuestorUI", "PopulateBehaviorStateComboBox", Logging.white);
             if (Settings.Instance.CharacterMode != null)
             {
                 //
@@ -167,7 +203,7 @@ namespace Questor
         public void CloseQuestor()
         {
             int secRestart = (600 * 3) + Cache.Instance.RandomNumber(3, 18) * 100 + Cache.Instance.RandomNumber(1, 9) * 10;
-                    
+
             Cache.Instance.SessionState = "Quitting!!";
             //so that IF we changed the state we would not be caught in a loop of re-entering closequestor
             if (!Cache.Instance.CloseQuestorCMDLogoff && !Cache.Instance.CloseQuestorCMDExitGame)
@@ -176,7 +212,7 @@ namespace Questor
             }
 
             if (Settings.Instance.AutoStart)
-                //if autostart is disabled do not schedule a restart of questor - let it stop gracefully.
+            //if autostart is disabled do not schedule a restart of questor - let it stop gracefully.
             {
                 if (Cache.Instance.CloseQuestorCMDLogoff)
                 {
@@ -189,7 +225,7 @@ namespace Questor
                     Logging.Log("QuestorUI",
                                 "you can change this option by setting the wallet and eveprocessmemoryceiling options to use exit instead of logoff: see the settings.xml file",
                                 Logging.white);
-                    
+
                     Logging.Log("QuestorUI", "Exiting eve now.", Logging.white);
 
                     Cache.Instance.DirecteveDispose();
@@ -226,10 +262,10 @@ namespace Questor
                             else
                             {
                                 if (Settings.Instance.CloseQuestorCMDUplinkInnerspaceProfile)
-                                    //if configured as true we will use the innerspace profile to restart this session
+                                //if configured as true we will use the innerspace profile to restart this session
                                 {
                                     //Logging.Log("Questor: We are in station: CloseQuestorCMDUplinkInnerspaceProfile is ["+ CloseQuestorCMDUplinkInnerspaceProfile.tostring() +"]");
-                                    
+
                                     Logging.Log(
                                         "QuestorUI",
                                         "Starting a timer in the innerspace uplink to restart this innerspace profile session",
@@ -245,7 +281,7 @@ namespace Questor
                                         "QuestorUI",
                                         "Done: quitting this session so the new innerspace session can take over",
                                         Logging.white);
-                                    
+
                                     Cache.Instance.DirecteveDispose();
                                     Process.GetCurrentProcess().Kill();
                                     Environment.Exit(0);
@@ -253,10 +289,10 @@ namespace Questor
                                     return;
                                 }
                                 else if (Settings.Instance.CloseQuestorCMDUplinkIsboxerCharacterSet)
-                                    //if configured as true we will use isboxer to restart this session
+                                //if configured as true we will use isboxer to restart this session
                                 {
                                     //Logging.Log("Questor: We are in station: CloseQuestorCMDUplinkIsboxerProfile is ["+ CloseQuestorCMDUplinkIsboxerProfile.tostring() +"]");
-                                    
+
                                     Logging.Log(
                                         "QuestorUI",
                                         "Starting a timer in the innerspace uplink to restart this isboxer character set",
@@ -280,7 +316,7 @@ namespace Questor
                                     return;
                                 }
                                 else if (Settings.Instance.CloseQuestorArbitraryOSCmd)
-                                    // will execute an arbitrary OS command through the IS Uplink
+                                // will execute an arbitrary OS command through the IS Uplink
                                 {
                                     Logging.Log(
                                         "QuestorUI",
@@ -296,12 +332,12 @@ namespace Questor
                                         "uplink exec timedcommand " + secRestart + " OSExecute " +
                                         Settings.Instance.CloseQuestorOSCmdContents.ToString(CultureInfo.InvariantCulture));
                                     Logging.Log("QuestorUI", "Done: quitting this session", Logging.white);
-                                       
+
                                     Cache.Instance.DirecteveDispose();
                                     Process.GetCurrentProcess().Kill();
                                     Environment.Exit(0);
                                     //Application.Exit();
-                                return;
+                                    return;
                                 }
                                 else if (!Settings.Instance.CloseQuestorCMDUplinkInnerspaceProfile &&
                                          !Settings.Instance.CloseQuestorCMDUplinkIsboxerCharacterSet &&
@@ -311,7 +347,7 @@ namespace Questor
                                         "QuestorUI",
                                         "CloseQuestorArbitraryOSCmd, CloseQuestorCMDUplinkInnerspaceProfile and CloseQuestorCMDUplinkIsboxerProfile all false",
                                         Logging.white);
-                                    
+
                                     Cache.Instance.DirecteveDispose();
                                     Process.GetCurrentProcess().Kill();
                                     Environment.Exit(0);
@@ -330,9 +366,9 @@ namespace Questor
                         Logging.Log("QuestorUI",
                                     "CloseQuestor: Currently the questor will exit (and not restart itself) in this configuration, this likely needs additional work to make questor reentrant so we can use a scheduled task?!",
                                     Logging.white);
-                       
+
                         Process.GetCurrentProcess().Kill();
-                        Environment.Exit(0);      
+                        Environment.Exit(0);
                         //Application.Exit();
                     }
                 }
@@ -428,6 +464,7 @@ namespace Questor
 
         private void UpdateUiTick(object sender, EventArgs e)
         {
+            //if (Settings.Instance.DebugUI) Logging.Log("QuestorUI", "UpdateUiTick", Logging.white);
             // The if's in here stop the UI from flickering
             string text = "Questor";
             if (_questor.CharacterName != string.Empty)
@@ -442,12 +479,12 @@ namespace Questor
             if (Text != text)
                 Text = text;
 
-            lastSessionisreadyData.Text = "[" + Math.Round(DateTime.Now.Subtract(Cache.Instance.LastSessionIsReady).TotalSeconds,0) + "] sec ago";
-            LastFrameData.Text = "[" + Math.Round(DateTime.Now.Subtract(Cache.Instance.LastFrame).TotalSeconds,0) + "] sec ago";
-            lastInSpaceData.Text = "[" + Math.Round(DateTime.Now.Subtract(Cache.Instance.LastInSpace).TotalSeconds,0) + "] sec ago";
-            lastInStationData.Text = "[" + Math.Round(DateTime.Now.Subtract(Cache.Instance.LastInStation).TotalSeconds,0) + "] sec ago";
-            lastKnownGoodConnectedTimeData.Text = "[" + Math.Round(DateTime.Now.Subtract(Cache.Instance.LastKnownGoodConnectedTime).TotalSeconds,0) + "] min ago";
-            
+            lastSessionisreadyData.Text = "[" + Math.Round(DateTime.Now.Subtract(Cache.Instance.LastSessionIsReady).TotalSeconds, 0) + "] sec ago";
+            LastFrameData.Text = "[" + Math.Round(DateTime.Now.Subtract(Cache.Instance.LastFrame).TotalSeconds, 0) + "] sec ago";
+            lastInSpaceData.Text = "[" + Math.Round(DateTime.Now.Subtract(Cache.Instance.LastInSpace).TotalSeconds, 0) + "] sec ago";
+            lastInStationData.Text = "[" + Math.Round(DateTime.Now.Subtract(Cache.Instance.LastInStation).TotalSeconds, 0) + "] sec ago";
+            lastKnownGoodConnectedTimeData.Text = "[" + Math.Round(DateTime.Now.Subtract(Cache.Instance.LastKnownGoodConnectedTime).TotalSeconds, 0) + "] min ago";
+
             if (Cache.Instance.SessionState == "Quitting")
             {
                 if (Cache.Instance.ReasonToStopQuestor == "A message from ccp indicated we were disconnected")
@@ -466,8 +503,8 @@ namespace Questor
 
             if (_States.CurrentQuestorState == QuestorState.CombatMissionsBehavior)
             {
-                if ((string) BehaviorComboBox.SelectedItem != _States.CurrentCombatMissionBehaviorState.ToString() && !BehaviorComboBox.DroppedDown)
-                    BehaviorComboBox.SelectedItem = _States.CurrentCombatMissionBehaviorState.ToString();;
+                if ((string)BehaviorComboBox.SelectedItem != _States.CurrentCombatMissionBehaviorState.ToString() && !BehaviorComboBox.DroppedDown)
+                    BehaviorComboBox.SelectedItem = _States.CurrentCombatMissionBehaviorState.ToString(); ;
             }
 
             if (_States.CurrentQuestorState == QuestorState.DedicatedBookmarkSalvagerBehavior)
@@ -559,6 +596,7 @@ namespace Questor
                 Top = Settings.Instance.WindowYPosition.Value;
                 Settings.Instance.WindowYPosition = null;
             }
+
             if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.ExecuteMission && Cache.Instance.CurrentPocketAction != null)
             {
                 string newlblCurrentPocketActiontext = "[ " + Cache.Instance.CurrentPocketAction + " ] Action";
@@ -581,6 +619,7 @@ namespace Questor
                 if (lblCurrentPocketAction.Text != newlblCurrentPocketActiontext)
                     lblCurrentPocketAction.Text = newlblCurrentPocketActiontext;
             }
+
             if (!String.IsNullOrEmpty(Cache.Instance.MissionName))
             {
                 if (!String.IsNullOrEmpty(Settings.Instance.MissionsPath))
@@ -702,11 +741,14 @@ namespace Questor
 
             if (!String.IsNullOrEmpty(Cache.Instance.ExtConsole))
             {
-                if (txtExtConsole.Lines.Count() >= Settings.Instance.MaxLineConsole)
-                    txtExtConsole.Text = "";
-
-                txtExtConsole.AppendText(Cache.Instance.ExtConsole);
-                Cache.Instance.ExtConsole = null;
+                if (DateTime.Now > NextConsoleLogRefresh)
+                {
+                    if (txtExtConsole.Lines.Count() >= Settings.Instance.MaxLineConsole)
+                        txtExtConsole.Text = "";
+                    txtExtConsole.AppendText(Cache.Instance.ExtConsole);
+                    Cache.Instance.ExtConsole = null;
+                    NextConsoleLogRefresh = DateTime.Now.AddSeconds(1);
+                }
             }
 
             int extraWaitSeconds = 0;
@@ -714,7 +756,8 @@ namespace Questor
             {
                 extraWaitSeconds = 60;
             }
-            if (DateTime.Now.Subtract(Cache.Instance.LastFrame).TotalSeconds > (Time.Instance.NoFramesRestart_seconds + extraWaitSeconds) && DateTime.Now.Subtract(Program.AppStarted).TotalSeconds > 300)
+
+            if (DateTime.Now.Subtract(Cache.Instance.LastFrame).TotalSeconds > ((int)Time.NoFramesRestart_seconds + extraWaitSeconds) && DateTime.Now.Subtract(Program.AppStarted).TotalSeconds > 300)
             {
                 if (DateTime.Now.Subtract(Cache.Instance.LastLogMessage).TotalSeconds > 30)
                 {
@@ -998,7 +1041,7 @@ namespace Questor
         //    int number2;
         //    if (int.TryParse(textBoxMaxRunTime.Text, out number2))
         //    {
-        //        Cache.Instance.MaxRuntime = number2;
+        //Cache.Instance.MaxRuntime = number2;
         //    }
         //    else
         //    {
@@ -1051,6 +1094,7 @@ namespace Questor
             _States.CurrentQuestorState = (QuestorState)Enum.Parse(typeof(QuestorState), QuestorStateComboBox.Text);
             if (Settings.Instance.DebugStates) Logging.Log("QuestorUI", "QuestorState has been changed to [" + QuestorStateComboBox.Text + "]", Logging.white);
             PopulateBehaviorStateComboBox();
+            PopulateMissionLists();
             // If you are at the controls enough to change states... assume that panic needs to do nothing
             //_questor.panicstatereset = true; //this cannot be reset when the index changes, as that happens during natural state changes, this needs to be a mouse event
         }
@@ -1062,27 +1106,50 @@ namespace Questor
             {
                 _States.CurrentCombatMissionBehaviorState =
                     (CombatMissionsBehaviorState)
-                    Enum.Parse(typeof (CombatMissionsBehaviorState), BehaviorComboBox.Text);
+                    Enum.Parse(typeof(CombatMissionsBehaviorState), BehaviorComboBox.Text);
             }
             if (_States.CurrentQuestorState == QuestorState.DedicatedBookmarkSalvagerBehavior)
             {
                 _States.CurrentDedicatedBookmarkSalvagerBehaviorState =
                     (DedicatedBookmarkSalvagerBehaviorState)
-                    Enum.Parse(typeof (DedicatedBookmarkSalvagerBehaviorState), BehaviorComboBox.Text);
+                    Enum.Parse(typeof(DedicatedBookmarkSalvagerBehaviorState), BehaviorComboBox.Text);
             }
             if (_States.CurrentQuestorState == QuestorState.CombatHelperBehavior)
             {
                 _States.CurrentCombatHelperBehaviorState =
-                  (CombatHelperBehaviorState)
-                  Enum.Parse(typeof(CombatHelperBehaviorState), BehaviorComboBox.Text);  
+                    (CombatHelperBehaviorState)
+                    Enum.Parse(typeof(CombatHelperBehaviorState), BehaviorComboBox.Text);
             }
             if (_States.CurrentQuestorState == QuestorState.DirectionalScannerBehavior)
             {
                 _States.CurrentDirectionalScannerBehaviorState =
-                  (DirectionalScannerBehaviorState)
-                  Enum.Parse(typeof(DirectionalScannerBehaviorState), BehaviorComboBox.Text);
+                    (DirectionalScannerBehaviorState)
+                    Enum.Parse(typeof(DirectionalScannerBehaviorState), BehaviorComboBox.Text);
             }
-        } 
+
+            try
+            {
+                AgentNameData.Text = Cache.Instance.CurrentAgent_text;
+                AgentEffectiveStandingsData.Text = Cache.Instance.AgentEffectiveStandingtoMe_text;
+                //DeclinedTimeData.Text = Cache.Instance.CurrentAgent.DeclineTimer;
+                //
+                // greylist info
+                //
+                MinAgentGreyListStandingsData.Text = Math.Round(Settings.Instance.MinAgentGreyListStandings, 2).ToString(CultureInfo.InvariantCulture);
+                LastGreylistedMissionDeclinedData.Text = Cache.Instance.LastGreylistMissionDeclined;
+                greylistedmissionsdeclineddata.Text = Cache.Instance.GreyListedMissionsDeclined.ToString(CultureInfo.InvariantCulture);
+                //
+                // blacklist info
+                //
+                MinAgentBlackListStandingsData.Text = Math.Round(Settings.Instance.MinAgentBlackListStandings, 2).ToString(CultureInfo.InvariantCulture);
+                LastBlacklistedMissionDeclinedData.Text = Cache.Instance.LastBlacklistMissionDeclined;
+                blacklistedmissionsdeclineddata.Text = Cache.Instance.BlackListedMissionsDeclined.ToString(CultureInfo.InvariantCulture);
+            }
+            catch (Exception ex)
+            {
+                //if we get an exception here ignore it as it shouldnt effect anything, theu GUI is only displaying data collected and processed elsewhere
+            }
+        }
 
         private void PanicStateComboBoxSelectedIndexChanged(object sender, EventArgs e)
         {
@@ -1143,7 +1210,7 @@ namespace Questor
 
         private void TxtExtConsoleTextChanged(object sender, EventArgs e)
         {
-
+        
         }
 
         private void AutoStartCheckBoxCheckedChanged(object sender, EventArgs e)

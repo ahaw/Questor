@@ -260,7 +260,6 @@ namespace Questor.Modules.Actions
                             }                            
                         }
 
-                        
                         if (TryMissionShip)
                             UseMissionShip = true;
 

@@ -41,25 +41,6 @@ namespace Questor.Modules.Activities
             }
         }
 
-        public bool RouteIsAllHighSec(long solarSystemId, List<long> currentDestination)
-        {
-            // Find the first waypoint
-            for (int i = currentDestination.Count - 1; i >= 0; i--)
-            {
-                DirectSolarSystem solarSystemInRoute = Cache.Instance.DirectEve.SolarSystems[currentDestination[i]];
-                if (solarSystemInRoute.Security < 0.5)
-                {
-                    //Bad bad bad
-                    return false;
-                }
-                else
-                {
-                    //Good.
-                }
-            }
-            return true;
-        }
-
         /// <summary>
         ///   Navigate to a solar system
         /// </summary>
@@ -151,10 +132,10 @@ namespace Questor.Modules.Activities
                         if (Cache.Instance.InSpace && !Cache.Instance.TargetedBy.Any(t => t.IsWarpScramblingMe))
                         {
                             Logging.Log("Traveler",
-                                        "Warping to [" + Logging.yellow + locationName + Logging.green + "][" +
-                                        Math.Round((stargate.Distance/1000)/149598000, 2) + " AU away]", Logging.green);
+                                        "Warping to [" + Logging.yellow + locationName + Logging.green + "][" + Logging.yellow + 
+                                        Math.Round((stargate.Distance / 1000) / 149598000, 2) + Logging.green + " AU away]", Logging.green);
+                            if (!Combat.ReloadAll(Cache.Instance.EntitiesNotSelf.OrderBy(t => t.Distance).FirstOrDefault(t => t.Distance < (double)Distance.OnGridWithMe))) return;
                             stargate.WarpTo();
-                            Combat.ReloadAll();
                             Cache.Instance.NextWarpTo = DateTime.Now.AddSeconds(Time.Instance.WarptoDelay_seconds);
                         }
                     }

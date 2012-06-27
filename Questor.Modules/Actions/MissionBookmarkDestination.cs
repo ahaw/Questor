@@ -32,7 +32,7 @@ namespace Questor.Modules.Actions
                 return;
             }
 
-            Logging.Log("QuestorManager.MissionBookmarkDestination", "Destination set to mission bookmark [" + bookmark.Title + "]", Logging.white);
+            Logging.Log("QuestorManager.MissionBookmarkDestination", "Destination set to mission bookmark [" + Logging.yellow + bookmark.Title + Logging.green + "]", Logging.green);
             AgentId = bookmark.AgentId ?? -1;
             Title = bookmark.Title;
             SolarSystemId = bookmark.SolarSystemId ?? -1;

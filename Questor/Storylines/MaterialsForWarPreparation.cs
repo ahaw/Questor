@@ -76,7 +76,7 @@ namespace Questor.Storylines
 
             if (Cache.Instance.ItemHangar.Window == null)
             {
-                Logging.Log("MaterialsForWar","PreacceptMission: ItemHangar is nul!",Logging.orange);
+                Logging.Log("MaterialsForWar", "PreacceptMission: ItemHangar is nul!", Logging.orange);
                 if (!Cache.Instance.OpenItemsHangar("MaterialsForWarPreperation")) return StorylineState.PreAcceptMission;
                 return StorylineState.PreAcceptMission;
             }

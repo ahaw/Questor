@@ -124,6 +124,5 @@ namespace GridMon
             DirectEve.Dispose();
             DirectEve = null;
         }
-    
     }
 }

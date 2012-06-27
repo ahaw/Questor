@@ -11,11 +11,8 @@ using System.Windows.Forms;
 
 namespace Questor.Modules.Alerts
 {
-   
-
     public class Audio : System.Windows.Forms.Form
     {
-         
         private System.Windows.Forms.Label _label1;
         private System.Windows.Forms.TextBox _filepathTextbox;        
         private System.Windows.Forms.Button _playOnceSyncButton;
@@ -364,12 +361,12 @@ namespace Questor.Modules.Alerts
             this.Text = "Sound API Test Form";
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
-        #endregion
+
+        #endregion Windows Form Designer generated code
 
         [STAThread]
-        static void Main()
+        private static void Main()
         {
             Application.Run(new Audio());
         }

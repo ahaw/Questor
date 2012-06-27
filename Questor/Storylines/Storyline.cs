@@ -32,7 +32,7 @@ namespace Questor.Storylines
             _traveler = new Traveler();
             _agentInteraction = new AgentInteraction();
 
-           Cache.Instance.AgentBlacklist = new List<long>();
+            Cache.Instance.AgentBlacklist = new List<long>();
 
             _storylines = new Dictionary<string, IStoryline>
                             {
@@ -81,7 +81,7 @@ namespace Questor.Storylines
 
         public void Reset()
         {
-            Logging.Log("Storyline","Reset: Storyline.Reset() has been called - this clears the states involved with storyline missions",Logging.white);
+            //Logging.Log("Storyline", "Storyline.Reset", Logging.white);
             _States.CurrentStorylineState = StorylineState.Idle;
             Cache.Instance.CurrentStorylineAgentId = 0;
             _storyline = null;
@@ -290,7 +290,7 @@ namespace Questor.Storylines
 
                 case StorylineState.BlacklistAgent:
                     Cache.Instance.AgentBlacklist.Add(Cache.Instance.CurrentStorylineAgentId);
-                    Logging.Log("Storyline","BlacklistAgent: The agent that provided us with a storyline mission in lowsec has been added to the session blacklist",Logging.orange);
+                    Logging.Log("Storyline", "BlacklistAgent: The agent that provided us with a storyline mission in lowsec has been added to the session blacklist", Logging.orange);
                     Reset();
                     _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.GotoBase;
                     break;

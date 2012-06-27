@@ -72,19 +72,24 @@ namespace Questor.Modules.Lookup
         public bool DetailedCurrentTargetHealthLogging { get; set; }
 
         public bool DebugLootWrecks { get; set; }
-
         public bool DebugActivateWeapons { get; set; }
         public bool DebugReloadorChangeAmmo { get; set; }
         public bool DebugStatistics { get; set; }
-
         public bool DebugGotobase { get; set; }
-
         public bool DebugIdle { get; set; }
-
         public bool DebugAutoStart { get; set; }
+        public bool DebugDecline { get; set; }
         public bool DebugHangars { get; set; }
         public bool DebugLogging { get; set; }
         public bool DebugSalvage { get; set; }
+        public bool DebugUI { get; set; }
+        public bool DebugReloadAll { get; set; }
+        public bool DebugAttachVSDebugger { get; set; }
+
+        public bool DebugDroneHealth { get; set; }
+
+        public bool DebugNavigateOnGrid { get; set; }
+
         public bool UseInnerspace { get; set; }
 
         //
@@ -253,6 +258,8 @@ namespace Questor.Modules.Lookup
 
         public bool CloseQuestorCMDUplinkIsboxerCharacterSet { get; set; }
 
+        public bool CloseQuestorAllowRestart { get; set; }
+
         public bool CloseQuestorArbitraryOSCmd { get; set; }
 
         public string CloseQuestorOSCmdContents { get; set; }
@@ -335,6 +342,7 @@ namespace Questor.Modules.Lookup
 
         public bool PocketStatsUseIndividualFilesPerPocket = true;
 
+        public bool PocketObjectStatisticsLog { get; set; }
         //
         // Fitting Settings - if enabled
         //
@@ -437,6 +445,8 @@ namespace Questor.Modules.Lookup
 
         public int DroneRecallCapacitorPct { get; set; }
 
+        public int BelowThisHealthLevelRemoveFromDroneBay { get; set; }
+
         public int LongRangeDroneRecallShieldPct { get; set; }
 
         public int LongRangeDroneRecallArmorPct { get; set; }
@@ -521,9 +531,15 @@ namespace Questor.Modules.Lookup
                 DebugGotobase = false;
                 DebugIdle = false;
                 DebugAutoStart = false;
+                DebugDecline = false;
                 DebugHangars = false;
                 DebugLogging = false;
                 DebugSalvage = false;
+                DebugUI = false;
+                DebugAttachVSDebugger = false;
+                DebugDroneHealth = false;
+                DebugNavigateOnGrid = false;
+                DebugReloadAll = false;
                 UseInnerspace = true;
                 //
                 // Misc Settings
@@ -597,6 +613,7 @@ namespace Questor.Modules.Lookup
 
                 CloseQuestorCMDUplinkInnerspaceProfile = true;
                 CloseQuestorCMDUplinkIsboxerCharacterSet = false;
+                CloseQuestorAllowRestart = true;
 
                 CloseQuestorArbitraryOSCmd = false; //true or false
                 CloseQuestorOSCmdContents = string.Empty;
@@ -675,6 +692,7 @@ namespace Questor.Modules.Lookup
                 MissionStats3Log = false;
                 PocketStatistics = false;
                 PocketStatsUseIndividualFilesPerPocket = false;
+                PocketObjectStatisticsLog = false;
 
                 //
                 // Weapon and targeting Settings
@@ -727,6 +745,7 @@ namespace Questor.Modules.Lookup
                 LongRangeDroneRecallArmorPct = 0;
                 LongRangeDroneRecallCapacitorPct = 0;
                 DronesKillHighValueTargets = false;
+                BelowThisHealthLevelRemoveFromDroneBay = 150;
 
                 //
                 // Storage Location for Loot, Ammo, Bookmarks, default is local hangar
@@ -793,9 +812,15 @@ namespace Questor.Modules.Lookup
                     DebugGotobase = (bool?)xml.Element("debugGotobase") ?? false;
                     DebugIdle = (bool?)xml.Element("debugIdle") ?? false;
                     DebugAutoStart = (bool?)xml.Element("debugAutoStart") ?? false;
+                    DebugDecline = (bool?)xml.Element("debugDecline") ?? false;
                     DebugHangars = (bool?)xml.Element("debugHangars") ?? false;
                     DebugLogging = (bool?) xml.Element("debugLogging") ?? false;
                     DebugSalvage = (bool?) xml.Element("debugSalvage") ?? false;
+                    DebugUI = (bool?)xml.Element("debugUI") ?? false;
+                    DebugAttachVSDebugger = (bool?)xml.Element("debugAttachVSDebugger") ?? false;
+                    DebugDroneHealth = (bool?)xml.Element("debugDroneHealth") ?? false;
+                    DebugNavigateOnGrid = (bool?)xml.Element("debugNavigateOnGrid") ?? false;
+                    DebugReloadAll = (bool?)xml.Element("debugReloadAll") ?? false;
                     UseInnerspace = (bool?)xml.Element("useInnerspace") ?? true;
 
                     //
@@ -928,7 +953,7 @@ namespace Questor.Modules.Lookup
                         (bool?)xml.Element("CloseQuestorCMDUplinkInnerspaceProfile") ?? true;
                     CloseQuestorCMDUplinkIsboxerCharacterSet =
                         (bool?)xml.Element("CloseQuestorCMDUplinkIsboxerCharacterSet") ?? false;
-
+                    CloseQuestorAllowRestart = (bool?)xml.Element("CloseQuestorAllowRestart") ?? true;
                     CloseQuestorArbitraryOSCmd = (bool?)xml.Element("CloseQuestorArbitraryOSCmd") ?? false;
                     //true or false
                     CloseQuestorOSCmdContents = (string)xml.Element("CloseQuestorOSCmdContents") ??
@@ -973,6 +998,7 @@ namespace Questor.Modules.Lookup
                     PocketStatsUseIndividualFilesPerPocket =
                         (bool?)xml.Element("PocketStatsUseIndividualFilesPerPocket") ??
                                                         true;
+                    PocketObjectStatisticsLog = (bool?)xml.Element("PocketObjectStatisticsLog") ?? true;
 
                     //
                     // Weapon and targeting Settings
@@ -1026,6 +1052,7 @@ namespace Questor.Modules.Lookup
                     LongRangeDroneRecallArmorPct = (int?)xml.Element("longRangeDroneRecallArmorPct") ?? 0;
                     LongRangeDroneRecallCapacitorPct = (int?)xml.Element("longRangeDroneRecallCapacitorPct") ?? 0;
                     DronesKillHighValueTargets = (bool?)xml.Element("dronesKillHighValueTargets") ?? false;
+                    BelowThisHealthLevelRemoveFromDroneBay = (int?)xml.Element("belowThisHealthLevelRemoveFromDroneBay") ?? 150;
 
                     //
                     // Ammo settings

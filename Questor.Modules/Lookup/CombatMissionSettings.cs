@@ -109,7 +109,7 @@ namespace Questor.Modules.Lookup
                 }
                 catch (Exception ex)
                 {
-                  Logging.Log("CombatMissionSettings","ERROR! unable to find [" + factionsXML + "] ERROR! [" + ex.Message + "]",Logging.red);
+                    Logging.Log("CombatMissionSettings", "ERROR! unable to find [" + factionsXML + "] ERROR! [" + ex.Message + "]", Logging.red);
                 }
             }
 

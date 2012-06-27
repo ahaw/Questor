@@ -421,7 +421,7 @@ namespace Questor.Modules.Caching
         }
 
         /// <summary>
-        /// Frigate includes all elite-variants
+        /// Frigate includes all elite-variants - this does NOT need to be limited to players, as we check for players specifically everywhere this is used
         /// </summary>
         public bool IsFrigate
         {
@@ -443,7 +443,72 @@ namespace Questor.Modules.Caching
         }
 
         /// <summary>
-        /// Frigate includes all elite-variants
+        /// Frigate includes all elite-variants - this does NOT need to be limited to players, as we check for players specifically everywhere this is used
+        /// </summary>
+        public bool IsNPCFrigate
+        {
+            get
+            {
+                bool result = false;
+                result |= GroupId == (int)Group.Asteroid_Angel_Cartel_Destroyer;
+                result |= GroupId == (int)Group.Asteroid_Blood_Raiders_Destroyer;
+                result |= GroupId == (int)Group.Asteroid_Guristas_Destroyer;
+                result |= GroupId == (int)Group.Asteroid_Sanshas_Nation_Destroyer;
+                result |= GroupId == (int)Group.Asteroid_Serpentis_Destroyer;
+                result |= GroupId == (int)Group.Deadspace_Angel_Cartel_Destroyer;
+                result |= GroupId == (int)Group.Deadspace_Blood_Raiders_Destroyer;
+                result |= GroupId == (int)Group.Deadspace_Guristas_Destroyer;
+                result |= GroupId == (int)Group.Deadspace_Sanshas_Nation_Destroyer;
+                result |= GroupId == (int)Group.Deadspace_Serpentis_Destroyer;
+                result |= GroupId == (int)Group.Mission_Amarr_Empire_Destroyer;
+                result |= GroupId == (int)Group.Mission_Caldari_State_Destroyer;
+                result |= GroupId == (int)Group.Mission_Gallente_Federation_Destroyer;
+                result |= GroupId == (int)Group.Mission_Minmatar_Republic_Destroyer;
+                result |= GroupId == (int)Group.Mission_Khanid_Destroyer;
+                result |= GroupId == (int)Group.Mission_CONCORD_Destroyer;
+                result |= GroupId == (int)Group.Mission_Mordu_Destroyer;
+                result |= GroupId == (int)Group.Asteroid_Rogue_Drone_Destroyer;
+                result |= GroupId == (int)Group.Asteroid_Angel_Cartel_Commander_Destroyer;
+                result |= GroupId == (int)Group.Asteroid_Blood_Raiders_Commander_Destroyer;
+                result |= GroupId == (int)Group.Asteroid_Guristas_Commander_Destroyer;
+                result |= GroupId == (int)Group.Deadspace_Rogue_Drone_Destroyer;
+                result |= GroupId == (int)Group.Asteroid_Sanshas_Nation_Commander_Destroyer;
+                result |= GroupId == (int)Group.Asteroid_Serpentis_Commander_Destroyer;
+                result |= GroupId == (int)Group.Mission_Thukker_Destroyer;
+                result |= GroupId == (int)Group.Mission_Generic_Destroyers;
+                result |= GroupId == (int)Group.Asteroid_Rogue_Drone_Commander_Destroyer;
+                result |= GroupId == (int)Group.asteroid_angel_cartel_frigate;
+                result |= GroupId == (int)Group.asteroid_blood_raiders_frigate;
+                result |= GroupId == (int)Group.asteroid_guristas_frigate;
+                result |= GroupId == (int)Group.asteroid_sanshas_nation_frigate;
+                result |= GroupId == (int)Group.asteroid_serpentis_frigate;
+                result |= GroupId == (int)Group.deadspace_angel_cartel_frigate;
+                result |= GroupId == (int)Group.deadspace_blood_raiders_frigate;
+                result |= GroupId == (int)Group.deadspace_guristas_frigate;
+                result |= GroupId == (int)Group.deadspace_sanshas_nation_frigate;
+                result |= GroupId == (int)Group.deadspace_serpentis_frigate;
+                result |= GroupId == (int)Group.mission_amarr_empire_frigate;
+                result |= GroupId == (int)Group.mission_caldari_state_frigate;
+                result |= GroupId == (int)Group.mission_gallente_federation_frigate;
+                result |= GroupId == (int)Group.mission_minmatar_republic_frigate;
+                result |= GroupId == (int)Group.mission_khanid_frigate;
+                result |= GroupId == (int)Group.mission_concord_frigate;
+                result |= GroupId == (int)Group.mission_mordu_frigate;
+                result |= GroupId == (int)Group.asteroid_rouge_drone_frigate;
+                result |= GroupId == (int)Group.asteroid_rouge_drone_frigate2;
+                result |= GroupId == (int)Group.asteroid_angel_cartel_commander_frigate;
+                result |= GroupId == (int)Group.asteroid_blood_raiders_commander_frigate;
+                result |= GroupId == (int)Group.asteroid_guristas_commander_frigate;
+                result |= GroupId == (int)Group.asteroid_sanshas_nation_commander_frigate;
+                result |= GroupId == (int)Group.asteroid_serpentis_commander_frigate;
+                result |= GroupId == (int)Group.mission_generic_frigates;
+                result |= GroupId == (int)Group.mission_thukker_frigate;
+                result |= GroupId == (int)Group.asteroid_rouge_drone_commander_frigate;
+                return result;
+            }
+        }
+        /// <summary>
+        /// Cruiser includes all elite-variants
         /// </summary>
         public bool IsCruiser
         {
@@ -461,7 +526,50 @@ namespace Questor.Modules.Caching
         }
 
         /// <summary>
-        /// Frigate includes all elite-variants
+        /// Cruiser includes all elite-variants
+        /// </summary>
+        public bool IsNPCCruiser
+        {
+            get
+            {
+                 bool result = false;
+                 result |= GroupId == (int)Group.Storyline_Cruiser;
+                 result |= GroupId == (int)Group.Storyline_Mission_Cruiser;
+                 result |= GroupId == (int)Group.Asteroid_Angel_Cartel_Cruiser;
+                 result |= GroupId == (int)Group.Asteroid_Blood_Raiders_Cruiser;
+                 result |= GroupId == (int)Group.Asteroid_Guristas_Cruiser;
+                 result |= GroupId == (int)Group.Asteroid_Sanshas_Nation_Cruiser;
+                 result |= GroupId == (int)Group.Asteroid_Serpentis_Cruiser;
+                 result |= GroupId == (int)Group.Deadspace_Angel_Cartel_Cruiser;
+                 result |= GroupId == (int)Group.Deadspace_Blood_Raiders_Cruiser;
+                 result |= GroupId == (int)Group.Deadspace_Guristas_Cruiser;
+                 result |= GroupId == (int)Group.Deadspace_Sanshas_Nation_Cruiser;
+                 result |= GroupId == (int)Group.Deadspace_Serpentis_Cruiser;
+                 result |= GroupId == (int)Group.Mission_Amarr_Empire_Cruiser;
+                 result |= GroupId == (int)Group.Mission_Caldari_State_Cruiser;
+                 result |= GroupId == (int)Group.Mission_Gallente_Federation_Cruiser;
+                 result |= GroupId == (int)Group.Mission_Khanid_Cruiser;
+                 result |= GroupId == (int)Group.Mission_CONCORD_Cruiser;
+                 result |= GroupId == (int)Group.Mission_Mordu_Cruiser;
+                 result |= GroupId == (int)Group.Mission_Minmatar_Republic_Cruiser;
+                 result |= GroupId == (int)Group.Asteroid_Rogue_Drone_Cruiser;
+                 result |= GroupId == (int)Group.Asteroid_Angel_Cartel_Commander_Cruiser;
+                 result |= GroupId == (int)Group.Asteroid_Blood_Raiders_Commander_Cruiser;
+                 result |= GroupId == (int)Group.Asteroid_Guristas_Commander_Cruiser;
+                 result |= GroupId == (int)Group.Deadspace_Rogue_Drone_Cruiser;
+                 result |= GroupId == (int)Group.Asteroid_Sanshas_Nation_Commander_Cruiser;
+                 result |= GroupId == (int)Group.Asteroid_Serpentis_Commander_Cruiser;
+                 result |= GroupId == (int)Group.Mission_Generic_Cruisers;
+                 result |= GroupId == (int)Group.Deadspace_Overseer_Cruiser;
+                 result |= GroupId == (int)Group.Mission_Thukker_Cruiser;
+                 result |= GroupId == (int)Group.Mission_Generic_Battle_Cruisers;
+                 result |= GroupId == (int)Group.Asteroid_Rogue_Drone_Commander_Cruiser;
+                 result |= GroupId == (int)Group.Mission_Faction_Cruiser;
+                 return result;
+            }
+        }
+        /// <summary>
+        /// Battlecruiser includes all elite-variants
         /// </summary>
         public bool IsBattlecruiser
         {
@@ -476,7 +584,44 @@ namespace Questor.Modules.Caching
         }
 
         /// <summary>
-        /// Frigate includes all elite-variants
+        /// Battlecruiser includes all elite-variants
+        /// </summary>
+        public bool IsNPCBattlecruiser
+        {
+            get
+            {
+                bool result = false;
+                result |= GroupId == (int)Group.Asteroid_Angel_Cartel_BattleCruiser;
+                result |= GroupId == (int)Group.Asteroid_Blood_Raiders_BattleCruiser;
+                result |= GroupId == (int)Group.Asteroid_Guristas_BattleCruiser;
+                result |= GroupId == (int)Group.Asteroid_Sanshas_Nation_BattleCruiser;
+                result |= GroupId == (int)Group.Asteroid_Serpentis_BattleCruiser;
+                result |= GroupId == (int)Group.Deadspace_Angel_Cartel_BattleCruiser;
+                result |= GroupId == (int)Group.Deadspace_Blood_Raiders_BattleCruiser;
+                result |= GroupId == (int)Group.Deadspace_Guristas_BattleCruiser;
+                result |= GroupId == (int)Group.Deadspace_Sanshas_Nation_BattleCruiser;
+                result |= GroupId == (int)Group.Deadspace_Serpentis_BattleCruiser;
+                result |= GroupId == (int)Group.Mission_Amarr_Empire_Battlecruiser;
+                result |= GroupId == (int)Group.Mission_Caldari_State_Battlecruiser;
+                result |= GroupId == (int)Group.Mission_Gallente_Federation_Battlecruiser;
+                result |= GroupId == (int)Group.Mission_Minmatar_Republic_Battlecruiser;
+                result |= GroupId == (int)Group.Mission_Khanid_Battlecruiser;
+                result |= GroupId == (int)Group.Mission_CONCORD_Battlecruiser;
+                result |= GroupId == (int)Group.Mission_Mordu_Battlecruiser;
+                result |= GroupId == (int)Group.Asteroid_Rogue_Drone_BattleCruiser;
+                result |= GroupId == (int)Group.Asteroid_Angel_Cartel_Commander_BattleCruiser;
+                result |= GroupId == (int)Group.Asteroid_Blood_Raiders_Commander_BattleCruiser;
+                result |= GroupId == (int)Group.Asteroid_Guristas_Commander_BattleCruiser;
+                result |= GroupId == (int)Group.Deadspace_Rogue_Drone_BattleCruiser;
+                result |= GroupId == (int)Group.Asteroid_Sanshas_Nation_Commander_BattleCruiser;
+                result |= GroupId == (int)Group.Asteroid_Serpentis_Commander_BattleCruiser;
+                result |= GroupId == (int)Group.Mission_Thukker_Battlecruiser;
+                result |= GroupId == (int)Group.Asteroid_Rogue_Drone_Commander_BattleCruiser;
+                return result;
+            }
+        }
+        /// <summary>
+        /// Battleship includes all elite-variants
         /// </summary>
         public bool IsBattleship
         {
@@ -487,6 +632,49 @@ namespace Questor.Modules.Caching
                 result |= GroupId == (int)Group.EliteBattleship;
                 result |= GroupId == (int)Group.BlackOps;
                 result |= GroupId == (int)Group.Marauder;
+                return result;
+            }
+        }
+
+        /// <summary>
+        /// Battleship includes all elite-variants
+        /// </summary>
+        public bool IsNPCBattleship
+        {
+            get
+            {
+                bool result = false;
+                result |= GroupId == (int)Group.Storyline_Battleship;
+                result |= GroupId == (int)Group.Storyline_Mission_Battleship;
+                result |= GroupId == (int)Group.Asteroid_Angel_Cartel_Battleship;
+                result |= GroupId == (int)Group.Asteroid_Blood_Raiders_Battleship;
+                result |= GroupId == (int)Group.Asteroid_Guristas_Battleship;
+                result |= GroupId == (int)Group.Asteroid_Sanshas_Nation_Battleship;
+                result |= GroupId == (int)Group.Asteroid_Serpentis_Battleship;
+                result |= GroupId == (int)Group.Deadspace_Angel_Cartel_Battleship;
+                result |= GroupId == (int)Group.Deadspace_Blood_Raiders_Battleship;
+                result |= GroupId == (int)Group.Deadspace_Guristas_Battleship;
+                result |= GroupId == (int)Group.Deadspace_Sanshas_Nation_Battleship;
+                result |= GroupId == (int)Group.Deadspace_Serpentis_Battleship;
+                result |= GroupId == (int)Group.Mission_Amarr_Empire_Battleship;
+                result |= GroupId == (int)Group.Mission_Caldari_State_Battleship;
+                result |= GroupId == (int)Group.Mission_Gallente_Federation_Battleship;
+                result |= GroupId == (int)Group.Mission_Khanid_Battleship;
+                result |= GroupId == (int)Group.Mission_CONCORD_Battleship;
+                result |= GroupId == (int)Group.Mission_Mordu_Battleship;
+                result |= GroupId == (int)Group.Mission_Minmatar_Republic_Battleship;
+                result |= GroupId == (int)Group.Asteroid_Rogue_Drone_Battleship;
+                result |= GroupId == (int)Group.Deadspace_Rogue_Drone_Battleship;
+                result |= GroupId == (int)Group.Mission_Generic_Battleships;
+                result |= GroupId == (int)Group.Deadspace_Overseer_Battleship;
+                result |= GroupId == (int)Group.Mission_Thukker_Battleship;
+                result |= GroupId == (int)Group.Asteroid_Rogue_Drone_Commander_Battleship;
+                result |= GroupId == (int)Group.Asteroid_Angel_Cartel_Commander_Battleship;
+                result |= GroupId == (int)Group.Asteroid_Blood_Raiders_Commander_Battleship;
+                result |= GroupId == (int)Group.Asteroid_Guristas_Commander_Battleship;
+                result |= GroupId == (int)Group.Asteroid_Sanshas_Nation_Commander_Battleship;
+                result |= GroupId == (int)Group.Asteroid_Serpentis_Commander_Battleship;
+                result |= GroupId == (int)Group.Mission_Faction_Battleship;
                 return result;
             }
         }

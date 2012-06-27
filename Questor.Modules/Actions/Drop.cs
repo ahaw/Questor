@@ -12,7 +12,9 @@ namespace Questor.Modules.Actions
     public class Drop
     {
         public int Item { get; set; }
+
         public int Unit { get; set; }
+
         public string Hangar { get; set; }
 
         private DateTime _lastAction;
@@ -58,7 +60,6 @@ namespace Questor.Modules.Actions
                     if ("Local Hangar" == Hangar)
                     {
                         if (!Cache.Instance.OpenItemsHangar("Drop")) return;
-                        
                     }
                     else if ("Ship Hangar" == Hangar)
                     {

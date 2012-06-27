@@ -84,6 +84,16 @@
             this.label6 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.Schedule = new System.Windows.Forms.TabPage();
+            this.lastKnownGoodConnectedTimeData = new System.Windows.Forms.Label();
+            this.lastKnownGoodConnectedTimeLabel = new System.Windows.Forms.Label();
+            this.lastInStationData = new System.Windows.Forms.Label();
+            this.lastInSpaceData = new System.Windows.Forms.Label();
+            this.lastInStationLabel = new System.Windows.Forms.Label();
+            this.lastInSpaceLabel = new System.Windows.Forms.Label();
+            this.LastFrameData = new System.Windows.Forms.Label();
+            this.lastSessionisreadyData = new System.Windows.Forms.Label();
+            this.lastSessionIsreadylabel = new System.Windows.Forms.Label();
+            this.lastFrameLabel = new System.Windows.Forms.Label();
             this.label27 = new System.Windows.Forms.Label();
             this.ScheduleWarninglabel1 = new System.Windows.Forms.Label();
             this.ExitWhenIdleCheckBox = new System.Windows.Forms.CheckBox();
@@ -121,6 +131,28 @@
             this.lblJammingMe = new System.Windows.Forms.Label();
             this.dataEntitiesWarpDisruptingMe = new System.Windows.Forms.Label();
             this.lblWarpDisrupingMe = new System.Windows.Forms.Label();
+            this.MissionsTab = new System.Windows.Forms.TabPage();
+            this.blacklistedmissionsdeclineddata = new System.Windows.Forms.Label();
+            this.blacklistedmissionsdeclinedlbl = new System.Windows.Forms.Label();
+            this.greylistedmissionsdeclineddata = new System.Windows.Forms.Label();
+            this.greylistedmissionsdeclinedlbl = new System.Windows.Forms.Label();
+            this.LastBlacklistedMissionDeclinedData = new System.Windows.Forms.Label();
+            this.LastGreylistedMissionDeclinedData = new System.Windows.Forms.Label();
+            this.LastBlacklistedMissionDeclinedlbl = new System.Windows.Forms.Label();
+            this.LastGreylistedMissionDeclinedlbl = new System.Windows.Forms.Label();
+            this.MinAgentGreyListStandingsData = new System.Windows.Forms.Label();
+            this.MinAgentBlackListStandingsData = new System.Windows.Forms.Label();
+            this.AgentEffectiveStandingsData = new System.Windows.Forms.Label();
+            this.AgentNameData = new System.Windows.Forms.Label();
+            this.AgentInfolbl = new System.Windows.Forms.Label();
+            this.BlacklistStandingslbl = new System.Windows.Forms.Label();
+            this.GreyListStandingslbl = new System.Windows.Forms.Label();
+            this.CurrentEffectiveStandingslbl = new System.Windows.Forms.Label();
+            this.panel3 = new System.Windows.Forms.Panel();
+            this.BlackListedMissionslbl = new System.Windows.Forms.Label();
+            this.GreyListlbl = new System.Windows.Forms.Label();
+            this.BlacklistedMissionstextbox = new System.Windows.Forms.TextBox();
+            this.GreyListedMissionsTextBox = new System.Windows.Forms.TextBox();
             this.BehaviorComboBox = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
             this.QuestorStateComboBox = new System.Windows.Forms.ComboBox();
@@ -130,16 +162,6 @@
             this.buttonQuestormanager = new System.Windows.Forms.Button();
             this.label25 = new System.Windows.Forms.Label();
             this.label26 = new System.Windows.Forms.Label();
-            this.lastFrameLabel = new System.Windows.Forms.Label();
-            this.lastSessionIsreadylabel = new System.Windows.Forms.Label();
-            this.lastSessionisreadyData = new System.Windows.Forms.Label();
-            this.LastFrameData = new System.Windows.Forms.Label();
-            this.lastInSpaceLabel = new System.Windows.Forms.Label();
-            this.lastInStationLabel = new System.Windows.Forms.Label();
-            this.lastInSpaceData = new System.Windows.Forms.Label();
-            this.lastInStationData = new System.Windows.Forms.Label();
-            this.lastKnownGoodConnectedTimeLabel = new System.Windows.Forms.Label();
-            this.lastKnownGoodConnectedTimeData = new System.Windows.Forms.Label();
             this.Console.SuspendLayout();
             this.Tabs.SuspendLayout();
             this.States.SuspendLayout();
@@ -148,6 +170,8 @@
             this.Schedule.SuspendLayout();
             this.Targets.SuspendLayout();
             this.EWar.SuspendLayout();
+            this.MissionsTab.SuspendLayout();
+            this.panel3.SuspendLayout();
             this.SuspendLayout();
             // 
             // AutoStartCheckBox
@@ -326,13 +350,14 @@
             this.txtExtConsole.BackColor = System.Drawing.SystemColors.Control;
             this.txtExtConsole.Dock = System.Windows.Forms.DockStyle.Top;
             this.txtExtConsole.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtExtConsole.Location = new System.Drawing.Point(0, 3);
-            this.txtExtConsole.Multiline = true;
+            this.txtExtConsole.HideSelection = false;
+            this.txtExtConsole.Location = new System.Drawing.Point(3, 3);
             this.txtExtConsole.Name = "txtExtConsole";
             this.txtExtConsole.ReadOnly = true;
             this.txtExtConsole.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this.txtExtConsole.Size = new System.Drawing.Size(688, 234);
+            this.txtExtConsole.Size = new System.Drawing.Size(681, 234);
             this.txtExtConsole.TabIndex = 25;
+            this.txtExtConsole.Text = "";
             this.txtExtConsole.TextChanged += new System.EventHandler(this.TxtExtConsoleTextChanged);
             // 
             // Tabs
@@ -342,6 +367,7 @@
             this.Tabs.Controls.Add(this.Schedule);
             this.Tabs.Controls.Add(this.Targets);
             this.Tabs.Controls.Add(this.EWar);
+            this.Tabs.Controls.Add(this.MissionsTab);
             this.Tabs.Location = new System.Drawing.Point(4, 101);
             this.Tabs.Name = "Tabs";
             this.Tabs.SelectedIndex = 0;
@@ -691,6 +717,95 @@
             this.Schedule.Text = "Schedule";
             this.Schedule.UseVisualStyleBackColor = true;
             // 
+            // lastKnownGoodConnectedTimeData
+            // 
+            this.lastKnownGoodConnectedTimeData.AutoSize = true;
+            this.lastKnownGoodConnectedTimeData.Location = new System.Drawing.Point(573, 200);
+            this.lastKnownGoodConnectedTimeData.Name = "lastKnownGoodConnectedTimeData";
+            this.lastKnownGoodConnectedTimeData.Size = new System.Drawing.Size(27, 13);
+            this.lastKnownGoodConnectedTimeData.TabIndex = 183;
+            this.lastKnownGoodConnectedTimeData.Text = "N/A";
+            // 
+            // lastKnownGoodConnectedTimeLabel
+            // 
+            this.lastKnownGoodConnectedTimeLabel.AutoSize = true;
+            this.lastKnownGoodConnectedTimeLabel.Location = new System.Drawing.Point(411, 200);
+            this.lastKnownGoodConnectedTimeLabel.Name = "lastKnownGoodConnectedTimeLabel";
+            this.lastKnownGoodConnectedTimeLabel.Size = new System.Drawing.Size(157, 13);
+            this.lastKnownGoodConnectedTimeLabel.TabIndex = 182;
+            this.lastKnownGoodConnectedTimeLabel.Text = "lastKnownGoodConnectedTime";
+            // 
+            // lastInStationData
+            // 
+            this.lastInStationData.AutoSize = true;
+            this.lastInStationData.Location = new System.Drawing.Point(573, 150);
+            this.lastInStationData.Name = "lastInStationData";
+            this.lastInStationData.Size = new System.Drawing.Size(27, 13);
+            this.lastInStationData.TabIndex = 181;
+            this.lastInStationData.Text = "N/A";
+            // 
+            // lastInSpaceData
+            // 
+            this.lastInSpaceData.AutoSize = true;
+            this.lastInSpaceData.Location = new System.Drawing.Point(573, 124);
+            this.lastInSpaceData.Name = "lastInSpaceData";
+            this.lastInSpaceData.Size = new System.Drawing.Size(27, 13);
+            this.lastInSpaceData.TabIndex = 180;
+            this.lastInSpaceData.Text = "N/A";
+            // 
+            // lastInStationLabel
+            // 
+            this.lastInStationLabel.AutoSize = true;
+            this.lastInStationLabel.Location = new System.Drawing.Point(503, 150);
+            this.lastInStationLabel.Name = "lastInStationLabel";
+            this.lastInStationLabel.Size = new System.Drawing.Size(68, 13);
+            this.lastInStationLabel.TabIndex = 179;
+            this.lastInStationLabel.Text = "lastInStation:";
+            // 
+            // lastInSpaceLabel
+            // 
+            this.lastInSpaceLabel.AutoSize = true;
+            this.lastInSpaceLabel.Location = new System.Drawing.Point(505, 124);
+            this.lastInSpaceLabel.Name = "lastInSpaceLabel";
+            this.lastInSpaceLabel.Size = new System.Drawing.Size(66, 13);
+            this.lastInSpaceLabel.TabIndex = 178;
+            this.lastInSpaceLabel.Text = "lastInSpace:";
+            // 
+            // LastFrameData
+            // 
+            this.LastFrameData.AutoSize = true;
+            this.LastFrameData.Location = new System.Drawing.Point(573, 42);
+            this.LastFrameData.Name = "LastFrameData";
+            this.LastFrameData.Size = new System.Drawing.Size(27, 13);
+            this.LastFrameData.TabIndex = 177;
+            this.LastFrameData.Text = "N/A";
+            // 
+            // lastSessionisreadyData
+            // 
+            this.lastSessionisreadyData.AutoSize = true;
+            this.lastSessionisreadyData.Location = new System.Drawing.Point(573, 68);
+            this.lastSessionisreadyData.Name = "lastSessionisreadyData";
+            this.lastSessionisreadyData.Size = new System.Drawing.Size(27, 13);
+            this.lastSessionisreadyData.TabIndex = 176;
+            this.lastSessionisreadyData.Text = "N/A";
+            // 
+            // lastSessionIsreadylabel
+            // 
+            this.lastSessionIsreadylabel.AutoSize = true;
+            this.lastSessionIsreadylabel.Location = new System.Drawing.Point(469, 68);
+            this.lastSessionIsreadylabel.Name = "lastSessionIsreadylabel";
+            this.lastSessionIsreadylabel.Size = new System.Drawing.Size(102, 13);
+            this.lastSessionIsreadylabel.TabIndex = 175;
+            this.lastSessionIsreadylabel.Text = "lastSessionIsReady:";
+            // 
+            // lastFrameLabel
+            // 
+            this.lastFrameLabel.AutoSize = true;
+            this.lastFrameLabel.Location = new System.Drawing.Point(516, 42);
+            this.lastFrameLabel.Name = "lastFrameLabel";
+            this.lastFrameLabel.Size = new System.Drawing.Size(55, 13);
+            this.lastFrameLabel.TabIndex = 174;
+            this.lastFrameLabel.Text = "lastFrame:";
             // 
             // label27
             // 
@@ -1068,6 +1183,226 @@
             this.lblWarpDisrupingMe.TabIndex = 0;
             this.lblWarpDisrupingMe.Text = "WarpDisruptingMe:";
             // 
+            // MissionsTab
+            // 
+            this.MissionsTab.Controls.Add(this.blacklistedmissionsdeclineddata);
+            this.MissionsTab.Controls.Add(this.blacklistedmissionsdeclinedlbl);
+            this.MissionsTab.Controls.Add(this.greylistedmissionsdeclineddata);
+            this.MissionsTab.Controls.Add(this.greylistedmissionsdeclinedlbl);
+            this.MissionsTab.Controls.Add(this.LastBlacklistedMissionDeclinedData);
+            this.MissionsTab.Controls.Add(this.LastGreylistedMissionDeclinedData);
+            this.MissionsTab.Controls.Add(this.LastBlacklistedMissionDeclinedlbl);
+            this.MissionsTab.Controls.Add(this.LastGreylistedMissionDeclinedlbl);
+            this.MissionsTab.Controls.Add(this.MinAgentGreyListStandingsData);
+            this.MissionsTab.Controls.Add(this.MinAgentBlackListStandingsData);
+            this.MissionsTab.Controls.Add(this.AgentEffectiveStandingsData);
+            this.MissionsTab.Controls.Add(this.AgentNameData);
+            this.MissionsTab.Controls.Add(this.AgentInfolbl);
+            this.MissionsTab.Controls.Add(this.BlacklistStandingslbl);
+            this.MissionsTab.Controls.Add(this.GreyListStandingslbl);
+            this.MissionsTab.Controls.Add(this.CurrentEffectiveStandingslbl);
+            this.MissionsTab.Controls.Add(this.panel3);
+            this.MissionsTab.Location = new System.Drawing.Point(4, 22);
+            this.MissionsTab.Name = "MissionsTab";
+            this.MissionsTab.Padding = new System.Windows.Forms.Padding(3);
+            this.MissionsTab.Size = new System.Drawing.Size(687, 276);
+            this.MissionsTab.TabIndex = 5;
+            this.MissionsTab.Text = "Missions";
+            this.MissionsTab.UseVisualStyleBackColor = true;
+            // 
+            // blacklistedmissionsdeclineddata
+            // 
+            this.blacklistedmissionsdeclineddata.AutoSize = true;
+            this.blacklistedmissionsdeclineddata.Location = new System.Drawing.Point(582, 218);
+            this.blacklistedmissionsdeclineddata.Name = "blacklistedmissionsdeclineddata";
+            this.blacklistedmissionsdeclineddata.Size = new System.Drawing.Size(24, 13);
+            this.blacklistedmissionsdeclineddata.TabIndex = 16;
+            this.blacklistedmissionsdeclineddata.Text = "n/a";
+            // 
+            // blacklistedmissionsdeclinedlbl
+            // 
+            this.blacklistedmissionsdeclinedlbl.AutoSize = true;
+            this.blacklistedmissionsdeclinedlbl.Location = new System.Drawing.Point(463, 218);
+            this.blacklistedmissionsdeclinedlbl.Name = "blacklistedmissionsdeclinedlbl";
+            this.blacklistedmissionsdeclinedlbl.Size = new System.Drawing.Size(113, 13);
+            this.blacklistedmissionsdeclinedlbl.TabIndex = 15;
+            this.blacklistedmissionsdeclinedlbl.Text = "Blacklisted # Declined";
+            // 
+            // greylistedmissionsdeclineddata
+            // 
+            this.greylistedmissionsdeclineddata.AutoSize = true;
+            this.greylistedmissionsdeclineddata.Location = new System.Drawing.Point(581, 112);
+            this.greylistedmissionsdeclineddata.Name = "greylistedmissionsdeclineddata";
+            this.greylistedmissionsdeclineddata.Size = new System.Drawing.Size(24, 13);
+            this.greylistedmissionsdeclineddata.TabIndex = 14;
+            this.greylistedmissionsdeclineddata.Text = "n/a";
+            // 
+            // greylistedmissionsdeclinedlbl
+            // 
+            this.greylistedmissionsdeclinedlbl.AutoSize = true;
+            this.greylistedmissionsdeclinedlbl.Location = new System.Drawing.Point(467, 112);
+            this.greylistedmissionsdeclinedlbl.Name = "greylistedmissionsdeclinedlbl";
+            this.greylistedmissionsdeclinedlbl.Size = new System.Drawing.Size(108, 13);
+            this.greylistedmissionsdeclinedlbl.TabIndex = 13;
+            this.greylistedmissionsdeclinedlbl.Text = "Greylisted # Declined";
+            // 
+            // LastBlacklistedMissionDeclinedData
+            // 
+            this.LastBlacklistedMissionDeclinedData.AutoSize = true;
+            this.LastBlacklistedMissionDeclinedData.Location = new System.Drawing.Point(582, 231);
+            this.LastBlacklistedMissionDeclinedData.Name = "LastBlacklistedMissionDeclinedData";
+            this.LastBlacklistedMissionDeclinedData.Size = new System.Drawing.Size(24, 13);
+            this.LastBlacklistedMissionDeclinedData.TabIndex = 12;
+            this.LastBlacklistedMissionDeclinedData.Text = "n/a";
+            // 
+            // LastGreylistedMissionDeclinedData
+            // 
+            this.LastGreylistedMissionDeclinedData.AutoSize = true;
+            this.LastGreylistedMissionDeclinedData.Location = new System.Drawing.Point(581, 125);
+            this.LastGreylistedMissionDeclinedData.Name = "LastGreylistedMissionDeclinedData";
+            this.LastGreylistedMissionDeclinedData.Size = new System.Drawing.Size(24, 13);
+            this.LastGreylistedMissionDeclinedData.TabIndex = 11;
+            this.LastGreylistedMissionDeclinedData.Text = "n/a";
+            // 
+            // LastBlacklistedMissionDeclinedlbl
+            // 
+            this.LastBlacklistedMissionDeclinedlbl.AutoSize = true;
+            this.LastBlacklistedMissionDeclinedlbl.Location = new System.Drawing.Point(462, 231);
+            this.LastBlacklistedMissionDeclinedlbl.Name = "LastBlacklistedMissionDeclinedlbl";
+            this.LastBlacklistedMissionDeclinedlbl.Size = new System.Drawing.Size(114, 13);
+            this.LastBlacklistedMissionDeclinedlbl.TabIndex = 10;
+            this.LastBlacklistedMissionDeclinedlbl.Text = "Last Blacklist Declined";
+            // 
+            // LastGreylistedMissionDeclinedlbl
+            // 
+            this.LastGreylistedMissionDeclinedlbl.AutoSize = true;
+            this.LastGreylistedMissionDeclinedlbl.Location = new System.Drawing.Point(466, 125);
+            this.LastGreylistedMissionDeclinedlbl.Name = "LastGreylistedMissionDeclinedlbl";
+            this.LastGreylistedMissionDeclinedlbl.Size = new System.Drawing.Size(109, 13);
+            this.LastGreylistedMissionDeclinedlbl.TabIndex = 9;
+            this.LastGreylistedMissionDeclinedlbl.Text = "Last Greylist Declined";
+            // 
+            // MinAgentGreyListStandingsData
+            // 
+            this.MinAgentGreyListStandingsData.AutoSize = true;
+            this.MinAgentGreyListStandingsData.Location = new System.Drawing.Point(582, 99);
+            this.MinAgentGreyListStandingsData.Name = "MinAgentGreyListStandingsData";
+            this.MinAgentGreyListStandingsData.Size = new System.Drawing.Size(24, 13);
+            this.MinAgentGreyListStandingsData.TabIndex = 8;
+            this.MinAgentGreyListStandingsData.Text = "n/a";
+            // 
+            // MinAgentBlackListStandingsData
+            // 
+            this.MinAgentBlackListStandingsData.AutoSize = true;
+            this.MinAgentBlackListStandingsData.Location = new System.Drawing.Point(582, 205);
+            this.MinAgentBlackListStandingsData.Name = "MinAgentBlackListStandingsData";
+            this.MinAgentBlackListStandingsData.Size = new System.Drawing.Size(24, 13);
+            this.MinAgentBlackListStandingsData.TabIndex = 7;
+            this.MinAgentBlackListStandingsData.Text = "n/a";
+            // 
+            // AgentEffectiveStandingsData
+            // 
+            this.AgentEffectiveStandingsData.AutoSize = true;
+            this.AgentEffectiveStandingsData.Location = new System.Drawing.Point(581, 42);
+            this.AgentEffectiveStandingsData.Name = "AgentEffectiveStandingsData";
+            this.AgentEffectiveStandingsData.Size = new System.Drawing.Size(24, 13);
+            this.AgentEffectiveStandingsData.TabIndex = 6;
+            this.AgentEffectiveStandingsData.Text = "n/a";
+            // 
+            // AgentNameData
+            // 
+            this.AgentNameData.AutoSize = true;
+            this.AgentNameData.Location = new System.Drawing.Point(519, 12);
+            this.AgentNameData.Name = "AgentNameData";
+            this.AgentNameData.Size = new System.Drawing.Size(24, 13);
+            this.AgentNameData.TabIndex = 5;
+            this.AgentNameData.Text = "n/a";
+            // 
+            // AgentInfolbl
+            // 
+            this.AgentInfolbl.AutoSize = true;
+            this.AgentInfolbl.Location = new System.Drawing.Point(475, 12);
+            this.AgentInfolbl.Name = "AgentInfolbl";
+            this.AgentInfolbl.Size = new System.Drawing.Size(38, 13);
+            this.AgentInfolbl.TabIndex = 4;
+            this.AgentInfolbl.Text = "Agent:";
+            // 
+            // BlacklistStandingslbl
+            // 
+            this.BlacklistStandingslbl.AutoSize = true;
+            this.BlacklistStandingslbl.Location = new System.Drawing.Point(480, 205);
+            this.BlacklistStandingslbl.Name = "BlacklistStandingslbl";
+            this.BlacklistStandingslbl.Size = new System.Drawing.Size(96, 13);
+            this.BlacklistStandingslbl.TabIndex = 3;
+            this.BlacklistStandingslbl.Text = "Blacklist Standings";
+            // 
+            // GreyListStandingslbl
+            // 
+            this.GreyListStandingslbl.AutoSize = true;
+            this.GreyListStandingslbl.Location = new System.Drawing.Point(481, 99);
+            this.GreyListStandingslbl.Name = "GreyListStandingslbl";
+            this.GreyListStandingslbl.Size = new System.Drawing.Size(95, 13);
+            this.GreyListStandingslbl.TabIndex = 2;
+            this.GreyListStandingslbl.Text = "GreyList Standings";
+            // 
+            // CurrentEffectiveStandingslbl
+            // 
+            this.CurrentEffectiveStandingslbl.AutoSize = true;
+            this.CurrentEffectiveStandingslbl.Location = new System.Drawing.Point(471, 42);
+            this.CurrentEffectiveStandingslbl.Name = "CurrentEffectiveStandingslbl";
+            this.CurrentEffectiveStandingslbl.Size = new System.Drawing.Size(99, 13);
+            this.CurrentEffectiveStandingslbl.TabIndex = 1;
+            this.CurrentEffectiveStandingslbl.Text = "Effective Standings";
+            // 
+            // panel3
+            // 
+            this.panel3.Controls.Add(this.BlackListedMissionslbl);
+            this.panel3.Controls.Add(this.GreyListlbl);
+            this.panel3.Controls.Add(this.BlacklistedMissionstextbox);
+            this.panel3.Controls.Add(this.GreyListedMissionsTextBox);
+            this.panel3.Location = new System.Drawing.Point(6, 12);
+            this.panel3.Name = "panel3";
+            this.panel3.Size = new System.Drawing.Size(449, 258);
+            this.panel3.TabIndex = 0;
+            // 
+            // BlackListedMissionslbl
+            // 
+            this.BlackListedMissionslbl.AutoSize = true;
+            this.BlackListedMissionslbl.Location = new System.Drawing.Point(224, 5);
+            this.BlackListedMissionslbl.Name = "BlackListedMissionslbl";
+            this.BlackListedMissionslbl.Size = new System.Drawing.Size(105, 13);
+            this.BlackListedMissionslbl.TabIndex = 3;
+            this.BlackListedMissionslbl.Text = "BlackListed Missions";
+            // 
+            // GreyListlbl
+            // 
+            this.GreyListlbl.AutoSize = true;
+            this.GreyListlbl.Location = new System.Drawing.Point(12, 5);
+            this.GreyListlbl.Name = "GreyListlbl";
+            this.GreyListlbl.Size = new System.Drawing.Size(100, 13);
+            this.GreyListlbl.TabIndex = 2;
+            this.GreyListlbl.Text = "GreyListed Missions";
+            // 
+            // BlacklistedMissionstextbox
+            // 
+            this.BlacklistedMissionstextbox.Location = new System.Drawing.Point(227, 21);
+            this.BlacklistedMissionstextbox.Multiline = true;
+            this.BlacklistedMissionstextbox.Name = "BlacklistedMissionstextbox";
+            this.BlacklistedMissionstextbox.ReadOnly = true;
+            this.BlacklistedMissionstextbox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.BlacklistedMissionstextbox.Size = new System.Drawing.Size(206, 234);
+            this.BlacklistedMissionstextbox.TabIndex = 1;
+            // 
+            // GreyListedMissionsTextBox
+            // 
+            this.GreyListedMissionsTextBox.Location = new System.Drawing.Point(15, 21);
+            this.GreyListedMissionsTextBox.Multiline = true;
+            this.GreyListedMissionsTextBox.Name = "GreyListedMissionsTextBox";
+            this.GreyListedMissionsTextBox.ReadOnly = true;
+            this.GreyListedMissionsTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.GreyListedMissionsTextBox.Size = new System.Drawing.Size(206, 234);
+            this.GreyListedMissionsTextBox.TabIndex = 0;
+            // 
             // BehaviorComboBox
             // 
             this.BehaviorComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -1156,96 +1491,6 @@
             this.label26.Text = "State:";
             this.label26.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
-            // lastFrameLabel
-            // 
-            this.lastFrameLabel.AutoSize = true;
-            this.lastFrameLabel.Location = new System.Drawing.Point(516, 42);
-            this.lastFrameLabel.Name = "lastFrameLabel";
-            this.lastFrameLabel.Size = new System.Drawing.Size(55, 13);
-            this.lastFrameLabel.TabIndex = 174;
-            this.lastFrameLabel.Text = "lastFrame:";
-            // 
-            // lastSessionIsreadylabel
-            // 
-            this.lastSessionIsreadylabel.AutoSize = true;
-            this.lastSessionIsreadylabel.Location = new System.Drawing.Point(469, 68);
-            this.lastSessionIsreadylabel.Name = "lastSessionIsreadylabel";
-            this.lastSessionIsreadylabel.Size = new System.Drawing.Size(102, 13);
-            this.lastSessionIsreadylabel.TabIndex = 175;
-            this.lastSessionIsreadylabel.Text = "lastSessionIsReady:";
-            // 
-            // lastSessionisreadyData
-            // 
-            this.lastSessionisreadyData.AutoSize = true;
-            this.lastSessionisreadyData.Location = new System.Drawing.Point(573, 68);
-            this.lastSessionisreadyData.Name = "lastSessionisreadyData";
-            this.lastSessionisreadyData.Size = new System.Drawing.Size(27, 13);
-            this.lastSessionisreadyData.TabIndex = 176;
-            this.lastSessionisreadyData.Text = "N/A";
-            // 
-            // LastFrameData
-            // 
-            this.LastFrameData.AutoSize = true;
-            this.LastFrameData.Location = new System.Drawing.Point(573, 42);
-            this.LastFrameData.Name = "LastFrameData";
-            this.LastFrameData.Size = new System.Drawing.Size(27, 13);
-            this.LastFrameData.TabIndex = 177;
-            this.LastFrameData.Text = "N/A";
-            // 
-            // lastInSpaceLabel
-            // 
-            this.lastInSpaceLabel.AutoSize = true;
-            this.lastInSpaceLabel.Location = new System.Drawing.Point(505, 124);
-            this.lastInSpaceLabel.Name = "lastInSpaceLabel";
-            this.lastInSpaceLabel.Size = new System.Drawing.Size(66, 13);
-            this.lastInSpaceLabel.TabIndex = 178;
-            this.lastInSpaceLabel.Text = "lastInSpace:";
-            // 
-            // lastInStationLabel
-            // 
-            this.lastInStationLabel.AutoSize = true;
-            this.lastInStationLabel.Location = new System.Drawing.Point(503, 150);
-            this.lastInStationLabel.Name = "lastInStationLabel";
-            this.lastInStationLabel.Size = new System.Drawing.Size(68, 13);
-            this.lastInStationLabel.TabIndex = 179;
-            this.lastInStationLabel.Text = "lastInStation:";
-            // 
-            // lastInSpaceData
-            // 
-            this.lastInSpaceData.AutoSize = true;
-            this.lastInSpaceData.Location = new System.Drawing.Point(573, 124);
-            this.lastInSpaceData.Name = "lastInSpaceData";
-            this.lastInSpaceData.Size = new System.Drawing.Size(27, 13);
-            this.lastInSpaceData.TabIndex = 180;
-            this.lastInSpaceData.Text = "N/A";
-            // 
-            // lastInStationData
-            // 
-            this.lastInStationData.AutoSize = true;
-            this.lastInStationData.Location = new System.Drawing.Point(573, 150);
-            this.lastInStationData.Name = "lastInStationData";
-            this.lastInStationData.Size = new System.Drawing.Size(27, 13);
-            this.lastInStationData.TabIndex = 181;
-            this.lastInStationData.Text = "N/A";
-            // 
-            // lastKnownGoodConnectedTimeLabel
-            // 
-            this.lastKnownGoodConnectedTimeLabel.AutoSize = true;
-            this.lastKnownGoodConnectedTimeLabel.Location = new System.Drawing.Point(411, 200);
-            this.lastKnownGoodConnectedTimeLabel.Name = "lastKnownGoodConnectedTimeLabel";
-            this.lastKnownGoodConnectedTimeLabel.Size = new System.Drawing.Size(157, 13);
-            this.lastKnownGoodConnectedTimeLabel.TabIndex = 182;
-            this.lastKnownGoodConnectedTimeLabel.Text = "lastKnownGoodConnectedTime";
-            // 
-            // lastKnownGoodConnectedTimeData
-            // 
-            this.lastKnownGoodConnectedTimeData.AutoSize = true;
-            this.lastKnownGoodConnectedTimeData.Location = new System.Drawing.Point(573, 200);
-            this.lastKnownGoodConnectedTimeData.Name = "lastKnownGoodConnectedTimeData";
-            this.lastKnownGoodConnectedTimeData.Size = new System.Drawing.Size(27, 13);
-            this.lastKnownGoodConnectedTimeData.TabIndex = 183;
-            this.lastKnownGoodConnectedTimeData.Text = "N/A";
-            // 
             // QuestorfrmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1297,6 +1542,10 @@
             this.Targets.PerformLayout();
             this.EWar.ResumeLayout(false);
             this.EWar.PerformLayout();
+            this.MissionsTab.ResumeLayout(false);
+            this.MissionsTab.PerformLayout();
+            this.panel3.ResumeLayout(false);
+            this.panel3.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1419,6 +1668,28 @@
         private System.Windows.Forms.Label lastInSpaceLabel;
         private System.Windows.Forms.Label lastKnownGoodConnectedTimeData;
         private System.Windows.Forms.Label lastKnownGoodConnectedTimeLabel;
+        private System.Windows.Forms.TabPage MissionsTab;
+        private System.Windows.Forms.Panel panel3;
+        private System.Windows.Forms.Label BlackListedMissionslbl;
+        private System.Windows.Forms.Label GreyListlbl;
+        private System.Windows.Forms.TextBox BlacklistedMissionstextbox;
+        private System.Windows.Forms.TextBox GreyListedMissionsTextBox;
+        private System.Windows.Forms.Label CurrentEffectiveStandingslbl;
+        private System.Windows.Forms.Label AgentInfolbl;
+        private System.Windows.Forms.Label BlacklistStandingslbl;
+        private System.Windows.Forms.Label GreyListStandingslbl;
+        private System.Windows.Forms.Label AgentNameData;
+        private System.Windows.Forms.Label AgentEffectiveStandingsData;
+        private System.Windows.Forms.Label MinAgentBlackListStandingsData;
+        private System.Windows.Forms.Label MinAgentGreyListStandingsData;
+        private System.Windows.Forms.Label LastGreylistedMissionDeclinedlbl;
+        private System.Windows.Forms.Label LastGreylistedMissionDeclinedData;
+        private System.Windows.Forms.Label LastBlacklistedMissionDeclinedlbl;
+        private System.Windows.Forms.Label LastBlacklistedMissionDeclinedData;
+        private System.Windows.Forms.Label blacklistedmissionsdeclineddata;
+        private System.Windows.Forms.Label blacklistedmissionsdeclinedlbl;
+        private System.Windows.Forms.Label greylistedmissionsdeclineddata;
+        private System.Windows.Forms.Label greylistedmissionsdeclinedlbl;
     }
 }
 

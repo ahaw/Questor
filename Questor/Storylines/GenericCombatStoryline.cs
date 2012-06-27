@@ -1,5 +1,4 @@
 ﻿
-
 namespace Questor.Storylines
 {
     using System;
@@ -18,7 +17,6 @@ namespace Questor.Storylines
 
     public class GenericCombatStoryline : IStoryline
     {
-
         private long _agentId;
         private readonly List<Ammo> _neededAmmo;
 
@@ -95,7 +93,7 @@ namespace Questor.Storylines
                 _combatMissionCtrl.AgentId = _agentId;
                 _States.CurrentCombatMissionCtrlState = CombatMissionCtrlState.Start;
 
-                _States.CurrentCombatState = CombatState.CheckTargets;
+                //_States.CurrentCombatState = CombatState.CheckTargets;
 
                 _States.CurrentDroneState = DroneState.WaitingForTargets;
             }
@@ -268,7 +266,7 @@ namespace Questor.Storylines
                     if (_States.CurrentTravelerState == TravelerState.AtDestination)
                     {
                         _state = GenericCombatStorylineState.ExecuteMission;
-                        _States.CurrentCombatState = CombatState.CheckTargets;
+                        //_States.CurrentCombatState = CombatState.CheckTargets;
                         _traveler.Destination = null;
                     }
                     break;

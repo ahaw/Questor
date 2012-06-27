@@ -148,12 +148,12 @@ using NDesk.Options;
 #if NDESK_OPTIONS
 namespace NDesk.Options
 #else
+
 namespace Mono.Options
 #endif
 {
     static class StringCoda
     {
-
         public static IEnumerable<string> WrappedLines(string self, params int[] widths)
         {
             IEnumerable<int> w = widths;
@@ -242,7 +242,6 @@ namespace Mono.Options
 
     public class OptionValueCollection : IList, IList<string>
     {
-
         List<string> values = new List<string>();
         OptionContext c;
 

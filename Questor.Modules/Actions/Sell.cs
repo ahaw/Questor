@@ -11,6 +11,7 @@ namespace Questor.Modules.Actions
     public class Sell
     {
         public int Item { get; set; }
+
         public int Unit { get; set; }
 
         private DateTime _lastAction;

@@ -207,10 +207,11 @@ namespace Questor.Modules.Activities
                     if (DateTime.Now > Cache.Instance.NextReload)
                     {
                         //Logging.Log("CombatMissionCtrl", "Activate: Reload before moving to next pocket", Logging.teal);
-                        Combat.ReloadAll();
+                        if (!Combat.ReloadAll(closest)) return;
                     }
                     if (DateTime.Now > Cache.Instance.NextActivateAction)
                     {
+                        if (!Combat.ReloadAll(closest)) return;
                         Logging.Log("CombatMissionCtrl", "Activate: [" + closest.Name + "] Move to next pocket after reload command and change state to 'NextPocket'", Logging.green);
                         closest.Activate();
 
@@ -298,9 +299,9 @@ namespace Questor.Modules.Activities
             target = target ?? Cache.Instance.Entities.Where(t => !t.IsSentry && !t.IsEntityIShouldLeaveAlone && !t.IsContainer && t.IsNpc && t.CategoryId == (int)CategoryID.Entity && t.GroupId != (int)Group.LargeCollidableStructure && !Cache.Instance.IgnoreTargets.Contains(t.Name.Trim())).OrderBy(t => t.Distance).FirstOrDefault();
             if (Settings.Instance.KillSentries)
             {
-                target = target ?? Cache.Instance.Entities.Where(t => !t.IsEntityIShouldLeaveAlone && !t.IsContainer && t.IsNpc && t.CategoryId == (int)CategoryID.Entity && t.GroupId != (int)Group.LargeCollidableStructure && !Cache.Instance.IgnoreTargets.Contains(t.Name.Trim())).OrderBy(t => t.Distance).FirstOrDefault();    
+                target = target ?? Cache.Instance.Entities.Where(t => !t.IsEntityIShouldLeaveAlone && !t.IsContainer && t.IsNpc && t.CategoryId == (int)CategoryID.Entity && t.GroupId != (int)Group.LargeCollidableStructure && !Cache.Instance.IgnoreTargets.Contains(t.Name.Trim())).OrderBy(t => t.Distance).FirstOrDefault();
             }
-            
+
             int targetedby = Cache.Instance.TargetedBy.Count(t => !t.IsSentry && !t.IsEntityIShouldLeaveAlone && !t.IsContainer && t.IsNpc && t.CategoryId == (int)CategoryID.Entity && t.GroupId != (int)Group.LargeCollidableStructure && !Cache.Instance.IgnoreTargets.Contains(t.Name.Trim()));
 
             if (target != null)
@@ -314,14 +315,14 @@ namespace Questor.Modules.Activities
                     //panic handles adding any priority targets and combat will prefer to kill any priority targets
                     if (_targetNull && targetedby == 0 && DateTime.Now > Cache.Instance.NextReload)
                     {
-                        Combat.ReloadAll();
+                        if (!Combat.ReloadAll(target)) return;
                     }
 
                     if (Cache.Instance.DirectEve.ActiveShip.MaxLockedTargets > 0)
                     {
                         if (target.IsTarget || target.IsTargeting) //This target is already targeted no need to target it again
                         {
-                            return;
+                            //noop
                         }
                         else
                         {
@@ -335,7 +336,7 @@ namespace Questor.Modules.Activities
                     if (DateTime.Now > Cache.Instance.NextReload)
                     {
                         //Logging.Log("CombatMissionCtrl." + _pocketActions[_currentAction] ,"ReloadAll: Reload weapons",Logging.teal);
-                        Combat.ReloadAll();
+                        if (!Combat.ReloadAll(target)) return;
                     }
                 }
                 NavigateOnGrid.NavigateIntoRange(target, "CombatMissionCtrl." + _pocketActions[_currentAction]);
@@ -395,7 +396,7 @@ namespace Questor.Modules.Activities
                     {
                         if (target.IsTarget || target.IsTargeting) //This target is already targeted no need to target it again
                         {
-                            return;
+                            //noop
                         }
                         else
                         {
@@ -752,8 +753,6 @@ namespace Questor.Modules.Activities
                     Logging.Log("CombatMissionCtrl." + _pocketActions[_currentAction], "Unlocking [" + entity.Name + "][ID: " + entity.Id + "][" + Math.Round(entity.Distance / 1000, 0) + "k away] due to kill order being put on hold", Logging.teal);
                     entity.UnlockTarget();
                 }
-
-                return;
             }
 
             if (!ignoreAttackers || breakOnAttackers)
@@ -791,7 +790,7 @@ namespace Questor.Modules.Activities
                     if (_targetNull && targetedby == 0 && DateTime.Now > Cache.Instance.NextReload)
                     {
                         //Logging.Log("CombatMissionCtrl." + _pocketActions[_currentAction] ,"Reload if [" + _targetNull + "] && [" + targetedby + "] == 0 AND [" + Math.Round(target.Distance, 0) + "] < [" + Cache.Instance.MaxRange + "]", Logging.teal);
-                        Combat.ReloadAll();
+                        if (!Combat.ReloadAll(target)) return;
                     }
 
                     if (Cache.Instance.DirectEve.ActiveShip.MaxLockedTargets > 0)
@@ -808,7 +807,7 @@ namespace Questor.Modules.Activities
                     if (DateTime.Now > Cache.Instance.NextReload)
                     {
                         //Logging.Log("CombatMissionCtrl." + _pocketActions[_currentAction] ,"ReloadAll: Reload weapons", Logging.teal);
-                        Combat.ReloadAll();
+                        if (!Combat.ReloadAll(target)) return;
                     }
                 }
                 NavigateOnGrid.NavigateIntoRange(target, "CombatMissionCtrl." + _pocketActions[_currentAction]);
@@ -957,7 +956,7 @@ namespace Questor.Modules.Activities
                         }
                     }
                 }
-                NavigateOnGrid.NavigateIntoRange(target,"CombatMissionCtrl." + _pocketActions[_currentAction]);
+                NavigateOnGrid.NavigateIntoRange(target, "CombatMissionCtrl." + _pocketActions[_currentAction]);
             }
             else
             {
@@ -1094,8 +1093,7 @@ namespace Questor.Modules.Activities
             }
         }
 
-
-        private void DropItem(Actions.Action action)
+        private void DropItemAction(Actions.Action action)
         {
             Cache.Instance.DropMode = true;
             var items = action.GetParameterValues("item");
@@ -1107,10 +1105,10 @@ namespace Questor.Modules.Activities
 
             var done = items.Count == 0;
 
-            IEnumerable<EntityCache> targets = Cache.Instance.EntitiesByName(target);
-            if (targets == null || targets.Count() == 0)
+            IEnumerable<EntityCache> targets = Cache.Instance.EntitiesByName(target).ToList();
+            if (!targets.Any())
             {
-                Logging.Log("MissionController.DropItem","No target name: " + targets, Logging.orange);
+                Logging.Log("MissionController.DropItem", "No target name: " + targets, Logging.orange);
                 // now that we've completed this action revert OpenWrecks to false
                 Cache.Instance.DropMode = false;
                 Nextaction();
@@ -1124,7 +1122,7 @@ namespace Questor.Modules.Activities
                 {
                     if (DateTime.Now > Cache.Instance.NextApproachAction)
                     {
-                        Logging.Log("MissionController.DropItem","Approaching target [" + closest.Name + "][ID: " + closest.Id + "] which is at [" + Math.Round(closest.Distance / 1000, 0) + "k away]",Logging.white);
+                        Logging.Log("MissionController.DropItem", "Approaching target [" + closest.Name + "][ID: " + closest.Id + "] which is at [" + Math.Round(closest.Distance / 1000, 0) + "k away]", Logging.white);
                         closest.Approach(1000);
                         Cache.Instance.NextApproachAction = DateTime.Now.AddSeconds(Time.Instance.ApproachDelay_seconds);
                     }
@@ -1140,27 +1138,27 @@ namespace Questor.Modules.Activities
 
                         if (closest.CargoWindow == null)
                         {
-                            Logging.Log("MissionController.DropItem","Open Cargo",Logging.white);
+                            Logging.Log("MissionController.DropItem", "Open Cargo", Logging.white);
                             closest.OpenCargo();
-                            Cache.Instance.NextOpenContainerInSpaceAction = DateTime.Now.AddSeconds(Cache.Instance.RandomNumber(4,6));
+                            Cache.Instance.NextOpenContainerInSpaceAction = DateTime.Now.AddSeconds(Cache.Instance.RandomNumber(4, 6));
                             return;
                         }
 
                         // Get the container that is associated with the cargo container
                         var container = Cache.Instance.DirectEve.GetContainer(closest.Id);
 
-                        var ItemsToMove = cargo.Items.FirstOrDefault(i => i.TypeName.ToLower() == items.FirstOrDefault().ToLower());
-                        if (ItemsToMove != null)
+                        var itemsToMove = cargo.Items.FirstOrDefault(i => i.TypeName.ToLower() == items.FirstOrDefault().ToLower());
+                        if (itemsToMove != null)
                         {
-                            Logging.Log("MissionController.DropItem","Moving Items: " + items.FirstOrDefault() + " from cargo ship to " + container.TypeName,Logging.white);
-                            container.Add(ItemsToMove, quantity);
+                            Logging.Log("MissionController.DropItem", "Moving Items: " + items.FirstOrDefault() + " from cargo ship to " + container.TypeName, Logging.white);
+                            container.Add(itemsToMove, quantity);
 
                             done = container.Items.Any(i => i.TypeName.ToLower() == items.FirstOrDefault().ToLower() && (i.Quantity >= quantity));
                             Cache.Instance.NextOpenContainerInSpaceAction = DateTime.Now.AddSeconds(Cache.Instance.RandomNumber(4, 6));
                         }
                         else
                         {
-                            Logging.Log("MissionController.DropItem","Error not found Items",Logging.white);
+                            Logging.Log("MissionController.DropItem", "Error not found Items", Logging.white);
                             Cache.Instance.DropMode = false;
                             Nextaction();
                             return;
@@ -1169,7 +1167,7 @@ namespace Questor.Modules.Activities
                 }
                 else
                 {
-                    Logging.Log("MissionController.DropItem","We are done",Logging.white);
+                    Logging.Log("MissionController.DropItem", "We are done", Logging.white);
                     // now that we've completed this action revert OpenWrecks to false
                     Cache.Instance.DropMode = false;
                     Nextaction();
@@ -1459,6 +1457,10 @@ namespace Questor.Modules.Activities
                 //case ActionState.PutItem:
                 //    PutItemAction(action);
                 //    break;
+
+                case ActionState.DropItem:
+                    DropItemAction(action);
+                    break;
 
                 case ActionState.Ignore:
                     IgnoreAction(action);

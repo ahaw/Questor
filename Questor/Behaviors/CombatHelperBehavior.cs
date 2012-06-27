@@ -1,9 +1,9 @@
 ﻿// ------------------------------------------------------------------------------
 //   <copyright from='2010' to='2015' company='THEHACKERWITHIN.COM'>
 //     Copyright (c) TheHackerWithin.COM. All Rights Reserved.
-// 
-//     Please look in the accompanying license.htm file for the license that 
-//     applies to this source code. (a copy can also be found at: 
+//
+//     Please look in the accompanying license.htm file for the license that
+//     applies to this source code. (a copy can also be found at:
 //     http://www.thehackerwithin.com/license.htm)
 //   </copyright>
 // -------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ namespace Questor.Behaviors
         private bool ValidSettings { get; set; }
         public bool CloseQuestorflag = true;
         public string CharacterName { get; set; }
-        
+
         //DateTime _nextAction = DateTime.Now;
 
         public CombatHelperBehavior()
@@ -88,13 +88,13 @@ namespace Questor.Behaviors
         public void DebugCombatHelperBehaviorStates()
         {
             if (Settings.Instance.DebugStates)
-                Logging.Log("CombatHelperBehavior.State is", _States.CurrentCombatHelperBehaviorState.ToString(),Logging.white);
+                Logging.Log("CombatHelperBehavior.State is", _States.CurrentCombatHelperBehaviorState.ToString(), Logging.white);
         }
 
         public void DebugPanicstates()
         {
             if (Settings.Instance.DebugStates)
-                Logging.Log("Panic.State is ",_States.CurrentPanicState.ToString(),Logging.white);
+                Logging.Log("Panic.State is ", _States.CurrentPanicState.ToString(), Logging.white);
         }
 
         public void DebugPerformanceClearandStartTimer()
@@ -107,7 +107,7 @@ namespace Questor.Behaviors
         {
             _watch.Stop();
             if (Settings.Instance.DebugPerformance)
-                Logging.Log(whatWeAreTiming ," took " + _watch.ElapsedMilliseconds + "ms",Logging.white);
+                Logging.Log(whatWeAreTiming, " took " + _watch.ElapsedMilliseconds + "ms", Logging.white);
         }
 
         public void ValidateCombatMissionSettings()
@@ -141,7 +141,7 @@ namespace Questor.Behaviors
                 AgentID = agent.AgentId;
             }
         }
-        
+
         public void ApplyCombatHelperSettings()
         {
             _salvage.Ammo = Settings.Instance.Ammo;
@@ -160,8 +160,8 @@ namespace Questor.Behaviors
         {
             try
             {
-           var baseDestination = _traveler.Destination as StationDestination;
-           if (baseDestination == null || baseDestination.StationId != Cache.Instance.Agent.StationId)
+                var baseDestination = _traveler.Destination as StationDestination;
+                if (baseDestination == null || baseDestination.StationId != Cache.Instance.Agent.StationId)
                     _traveler.Destination = new StationDestination(Cache.Instance.Agent.SolarSystemId,
                                                                    Cache.Instance.Agent.StationId,
                                                                    Cache.Instance.DirectEve.GetLocationName(
@@ -169,15 +169,15 @@ namespace Questor.Behaviors
             }
             catch (Exception ex)
             {
-                Logging.Log("CombatHelper","TravelToAgentsStation: Exception caught: [" + ex.Message + "]",Logging.red);
+                Logging.Log("CombatHelper", "TravelToAgentsStation: Exception caught: [" + ex.Message + "]", Logging.red);
                 return;
             }
             if (Cache.Instance.InSpace)
             {
                 if (!Cache.Instance.DirectEve.ActiveShip.Entity.IsCloaked || (Cache.Instance.LastSessionChange.AddSeconds(60) > DateTime.Now))
                 {
-                   _combat.ProcessState();
-                   _drones.ProcessState(); //do we really want to use drones here? 
+                    _combat.ProcessState();
+                    _drones.ProcessState(); //do we really want to use drones here?
                 }
             }
             if (Cache.Instance.InSpace && !Cache.Instance.TargetedBy.Any(t => t.IsWarpScramblingMe))
@@ -188,7 +188,7 @@ namespace Questor.Behaviors
             _traveler.ProcessState();
             if (Settings.Instance.DebugStates)
             {
-               Logging.Log("Traveler.State", "is " + _States.CurrentTravelerState,Logging.white);
+                Logging.Log("Traveler.State", "is " + _States.CurrentTravelerState, Logging.white);
             }
         }
 
@@ -206,7 +206,7 @@ namespace Questor.Behaviors
             }
 
             //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            //this local is safe check is useless as their is no localwatch processstate running every tick... 
+            //this local is safe check is useless as their is no localwatch processstate running every tick...
             //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             //If local unsafe go to base and do not start mission again
             if (Settings.Instance.FinishWhenNotSafe && (_States.CurrentCombatHelperBehaviorState != CombatHelperBehaviorState.GotoNearestStation /*|| State!=QuestorState.GotoBase*/))
@@ -230,7 +230,7 @@ namespace Questor.Behaviors
                     Cache.Instance.StopBot = true;
                 }
             }
-            
+
             if (Cache.Instance.SessionState == "Quitting")
             {
                 BeginClosingQuestor();
@@ -255,7 +255,7 @@ namespace Questor.Behaviors
                     Statistics.WriteSessionLogStarting();
                 }
             }
-            
+
             //
             // Panic always runs, not just in space
             //
@@ -279,10 +279,10 @@ namespace Questor.Behaviors
                 // Reset panic state
                 _States.CurrentPanicState = PanicState.Normal;
 
-                // Sit Idle and wait for orders. 
+                // Sit Idle and wait for orders.
                 _States.CurrentTravelerState = TravelerState.Idle;
                 _States.CurrentCombatHelperBehaviorState = CombatHelperBehaviorState.Idle;
-                
+
                 DebugCombatHelperBehaviorStates();
             }
             DebugPanicstates();
@@ -298,14 +298,14 @@ namespace Questor.Behaviors
                         return;
                     }
 
-                    if (Settings.Instance.DebugIdle) Logging.Log("CombatHelperBehavior", "if (Cache.Instance.InSpace) else", Logging.white);    
+                    if (Settings.Instance.DebugIdle) Logging.Log("CombatHelperBehavior", "if (Cache.Instance.InSpace) else", Logging.white);
                     _States.CurrentArmState = ArmState.Idle;
                     _States.CurrentDroneState = DroneState.Idle;
                     _States.CurrentSalvageState = SalvageState.Idle;
-                    _States.CurrentTravelerState = TravelerState.Idle; 
+                    _States.CurrentTravelerState = TravelerState.Idle;
                     _States.CurrentUnloadLootState = UnloadLootState.Idle;
                     _States.CurrentTravelerState = TravelerState.Idle;
-                    
+
                     Logging.Log("CombatHelperBehavior", "Started questor in Combat Helper mode", Logging.white);
                     LastAction = DateTime.Now;
                     if (_States.CurrentCombatHelperBehaviorState == CombatHelperBehaviorState.Idle) _States.CurrentCombatHelperBehaviorState = CombatHelperBehaviorState.CombatHelper;
@@ -316,7 +316,7 @@ namespace Questor.Behaviors
                         break;
 
                     Logging.Log("CombatHelperBehavior", "Heading back to base", Logging.white);
-                    if (_States.CurrentCombatHelperBehaviorState == CombatHelperBehaviorState.DelayedGotoBase) _States.CurrentCombatHelperBehaviorState = CombatHelperBehaviorState.GotoBase;                    
+                    if (_States.CurrentCombatHelperBehaviorState == CombatHelperBehaviorState.DelayedGotoBase) _States.CurrentCombatHelperBehaviorState = CombatHelperBehaviorState.GotoBase;
                     break;
 
                 case CombatHelperBehaviorState.Arm:
@@ -324,13 +324,13 @@ namespace Questor.Behaviors
                     // only used when someone manually selects the arm state.
                     //
                     if (_States.CurrentArmState == ArmState.Idle)
-                    {   
+                    {
                         Logging.Log("Arm", "Begin", Logging.white);
                         _States.CurrentArmState = ArmState.Begin;
 
                         // Load right ammo based on mission
-                            _arm.AmmoToLoad.Clear();
-                            _arm.LoadSpecificAmmo(new[] { Cache.Instance.DamageType });
+                        _arm.AmmoToLoad.Clear();
+                        _arm.LoadSpecificAmmo(new[] { Cache.Instance.DamageType });
                     }
 
                     _arm.ProcessState();
@@ -345,7 +345,7 @@ namespace Questor.Behaviors
                         Cache.Instance.MyWalletBalance = Cache.Instance.DirectEve.Me.Wealth;
                         Logging.Log("Arm", "Armstate.NotEnoughAmmo", Logging.orange);
                         _States.CurrentArmState = ArmState.Idle;
-                        if (_States.CurrentCombatHelperBehaviorState == CombatHelperBehaviorState.Arm)  _States.CurrentCombatHelperBehaviorState = CombatHelperBehaviorState.Error;
+                        if (_States.CurrentCombatHelperBehaviorState == CombatHelperBehaviorState.Arm) _States.CurrentCombatHelperBehaviorState = CombatHelperBehaviorState.Error;
                     }
 
                     if (_States.CurrentArmState == ArmState.NotEnoughDrones)
@@ -385,7 +385,7 @@ namespace Questor.Behaviors
                         _drones.ProcessState();
                         DebugPerformanceStopandDisplayTimer("Drones.ProcessState");
 
-                       if (Settings.Instance.DebugStates)
+                        if (Settings.Instance.DebugStates)
                             Logging.Log("Drones.State is", _States.CurrentDroneState.ToString(), Logging.white);
 
                         DebugPerformanceClearandStartTimer();
@@ -398,9 +398,9 @@ namespace Questor.Behaviors
                         // If we are out of ammo, return to base (do we want to do this with combat helper?!)
                         if (_States.CurrentCombatState == CombatState.OutOfAmmo)
                         {
-                            Logging.Log("Combat","Out of Ammo!",Logging.orange);
-                                if (_States.CurrentCombatHelperBehaviorState == CombatHelperBehaviorState.CombatHelper)
-                                    _States.CurrentCombatHelperBehaviorState = CombatHelperBehaviorState.GotoBase;
+                            Logging.Log("Combat", "Out of Ammo!", Logging.orange);
+                            if (_States.CurrentCombatHelperBehaviorState == CombatHelperBehaviorState.CombatHelper)
+                                _States.CurrentCombatHelperBehaviorState = CombatHelperBehaviorState.GotoBase;
                             // Clear looted containers
                             Cache.Instance.LootedContainers.Clear();
                         }
@@ -410,11 +410,10 @@ namespace Questor.Behaviors
                 case CombatHelperBehaviorState.Salvage:
                     if (!Cache.Instance.InSpace)
                         return;
-                    
-                    if (!Cache.Instance.OpenCargoHold("CombatMissionsBehavior: Salvage")) break;    
+
+                    if (!Cache.Instance.OpenCargoHold("CombatMissionsBehavior: Salvage")) break;
                     Cache.Instance.SalvageAll = true;
                     Cache.Instance.OpenWrecks = true;
-                    
 
                     if (Settings.Instance.UnloadLootAtStation && Cache.Instance.CargoHold.Window.IsReady && (Cache.Instance.CargoHold.Capacity - Cache.Instance.CargoHold.UsedCapacity) < 100)
                     {
@@ -450,12 +449,12 @@ namespace Questor.Behaviors
                     break;
 
                 case CombatHelperBehaviorState.GotoBase:
-                    if (Settings.Instance.DebugGotobase) Logging.Log("CombatHelperBehavior", "GotoBase: AvoidBumpingThings()",Logging.white);
+                    if (Settings.Instance.DebugGotobase) Logging.Log("CombatHelperBehavior", "GotoBase: AvoidBumpingThings()", Logging.white);
 
                     NavigateOnGrid.AvoidBumpingThings(Cache.Instance.BigObjects.FirstOrDefault(), "CombatHelperBehaviorState.GotoBase");
 
                     if (Settings.Instance.DebugGotobase) Logging.Log("CombatHelperBehavior", "GotoBase: TravelToAgentsStation()", Logging.white);
-                    
+
                     TravelToAgentsStation();
 
                     if (_States.CurrentTravelerState == TravelerState.AtDestination) // || DateTime.Now.Subtract(Cache.Instance.EnteredCloseQuestor_DateTime).TotalMinutes > 10)
@@ -465,7 +464,7 @@ namespace Questor.Behaviors
                         Cache.Instance.Mission = Cache.Instance.GetAgentMission(AgentID);
 
                         if (_States.CurrentCombatHelperBehaviorState == CombatHelperBehaviorState.GotoBase) _States.CurrentCombatHelperBehaviorState = CombatHelperBehaviorState.UnloadLoot;
-                        
+
                         _traveler.Destination = null;
                     }
                     break;
@@ -489,18 +488,18 @@ namespace Questor.Behaviors
                         Cache.Instance.Mission = Cache.Instance.GetAgentMission(AgentID);
                         if (_States.CurrentCombatState == CombatState.OutOfAmmo) // on mission
                         {
-                            Logging.Log("CombatHelperBehavior.UnloadLoot", "We are out of ammo",Logging.orange);
+                            Logging.Log("CombatHelperBehavior.UnloadLoot", "We are out of ammo", Logging.orange);
                             _States.CurrentCombatHelperBehaviorState = CombatHelperBehaviorState.Idle;
                             return;
                         }
-                        
+
                         _States.CurrentCombatHelperBehaviorState = CombatHelperBehaviorState.Idle;
                         Logging.Log("CombatHelperBehavior.Unloadloot", "CharacterMode: [" + Settings.Instance.CharacterMode + "], AfterMissionSalvaging: [" + Settings.Instance.AfterMissionSalvaging + "], CombatHelperBehaviorState: [" + _States.CurrentCombatHelperBehaviorState + "]", Logging.white);
                         Statistics.Instance.FinishedMission = DateTime.Now;
                         return;
                     }
                     break;
-                
+
                 case CombatHelperBehaviorState.Traveler:
                     Cache.Instance.OpenWrecks = false;
                     List<long> destination = Cache.Instance.DirectEve.Navigation.GetDestinationPath();
@@ -603,7 +602,7 @@ namespace Questor.Behaviors
                 case CombatHelperBehaviorState.LogCombatTargets:
                     //combat targets
                     //List<EntityCache> combatentitiesInList =  Cache.Instance.Entities.Where(t => t.IsNpc && !t.IsBadIdea && t.CategoryId == (int)CategoryID.Entity && !t.IsContainer && t.Distance < Cache.Instance.MaxRange && !Cache.Instance.IgnoreTargets.Contains(t.Name.Trim())).ToList();
-                    List<EntityCache> combatentitiesInList =  Cache.Instance.Entities.Where(t => t.IsNpc && !t.IsBadIdea && t.CategoryId == (int)CategoryID.Entity && !t.IsContainer).ToList();
+                    List<EntityCache> combatentitiesInList = Cache.Instance.Entities.Where(t => t.IsNpc && !t.IsBadIdea && t.CategoryId == (int)CategoryID.Entity && !t.IsContainer).ToList();
                     Statistics.EntityStatistics(combatentitiesInList);
                     Cache.Instance.Paused = true;
                     break;

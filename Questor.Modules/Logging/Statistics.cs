@@ -96,57 +96,67 @@ namespace Questor.Modules.Logging
 
         public static bool PocketObjectStatistics(List<EntityCache> things)
         {
-            string currentPocketName = Cache.Instance.FilterPath("randomgrid");
-            try
+            if (Settings.Instance.PocketObjectStatisticsLog)
             {
-                if (!String.IsNullOrEmpty(Cache.Instance.Mission.Name))
+                string currentPocketName = Cache.Instance.FilterPath("randomgrid");
+                try
                 {
-                    currentPocketName = Cache.Instance.FilterPath(Cache.Instance.Mission.Name);
+                    if (!String.IsNullOrEmpty(Cache.Instance.Mission.Name))
+                    {
+                        currentPocketName = Cache.Instance.FilterPath(Cache.Instance.Mission.Name);
+                    }
                 }
-            }
-            catch (Exception)
-            {
-                Logging.Log("Statistics","PocketObjectStatistics: cache.Instance.Mission.Name is null?",Logging.white);
-            }
-            
-            
-            Settings.Instance.PocketObjectStatisticsFile = Path.Combine(Settings.Instance.PocketObjectStatisticsPath, Cache.Instance.FilterPath(Cache.Instance.DirectEve.Me.Name) + " - " + currentPocketName + " - " + Cache.Instance.PocketNumber + " - ObjectStatistics.csv");
-            Logging.Log("Statistics.ObjectStatistics", "Logging info on the [" + things.Count + "] objects in this pocket to [" + Settings.Instance.PocketObjectStatisticsFile + "]", Logging.white);
+                catch (Exception)
+                {
+                    Logging.Log("Statistics", "PocketObjectStatistics: cache.Instance.Mission.Name is null?",
+                                Logging.white);
+                }
 
-            if (File.Exists(Settings.Instance.PocketObjectStatisticsFile))
-            {
-                File.Delete(Settings.Instance.PocketObjectStatisticsFile);
-            }
-            //
-            // build header
-            //
-            string objectline = "Name;Distance;TypeId;GroupId;CategoryId;IsNPC;IsPlayer;TargetValue;Velocity;ID;\r\n";
-            //Logging.Log("Statistics",";PocketObjectStatistics;" + objectline,Logging.white);
-            File.AppendAllText(Settings.Instance.PocketObjectStatisticsFile, objectline);
 
-            //
-            // iterate through entities
-            //
-            foreach (EntityCache thing in things.OrderBy(i => i.Distance))
-            {
-                
-                objectline = thing.Name + ";";
-                objectline += Math.Round(thing.Distance/1000,0) + ";";
-                objectline += thing.TypeId + ";";
-                objectline += thing.GroupId + ";";
-                objectline += thing.CategoryId + ";";
-                objectline += thing.IsNpc + ";";
-                objectline += thing.IsPlayer + ";";
-                objectline += thing.TargetValue + ";";
-                objectline += Math.Round(thing.Velocity,0) + ";";
-                objectline += thing.Id + ";\r\n";
+                Settings.Instance.PocketObjectStatisticsFile = Path.Combine(
+                    Settings.Instance.PocketObjectStatisticsPath,
+                    Cache.Instance.FilterPath(Cache.Instance.DirectEve.Me.Name) + " - " + currentPocketName + " - " +
+                    Cache.Instance.PocketNumber + " - ObjectStatistics.csv");
+                Logging.Log("Statistics.ObjectStatistics",
+                            "Logging info on the [" + things.Count + "] objects in this pocket to [" +
+                            Settings.Instance.PocketObjectStatisticsFile + "]", Logging.white);
+
+                if (File.Exists(Settings.Instance.PocketObjectStatisticsFile))
+                {
+                    File.Delete(Settings.Instance.PocketObjectStatisticsFile);
+                }
                 //
-                // can we somehow get the X,Y,Z coord? If we could we could use this info to build some kind of grid layout... 
-                // or at least know the distances between all the NPCs... thus be able to infer which NPCs were in which 'groups'
-                // 
-
-                //Logging.Log("Statistics", ";PocketObjectStatistics;" + objectline, Logging.white);
+                // build header
+                //
+                string objectline =
+                    "Name;Distance;TypeId;GroupId;CategoryId;IsNPC;IsPlayer;TargetValue;Velocity;ID;\r\n";
+                //Logging.Log("Statistics",";PocketObjectStatistics;" + objectline,Logging.white);
                 File.AppendAllText(Settings.Instance.PocketObjectStatisticsFile, objectline);
+
+                //
+                // iterate through entities
+                //
+                foreach (EntityCache thing in things.OrderBy(i => i.Distance))
+                {
+
+                    objectline = thing.Name + ";";
+                    objectline += Math.Round(thing.Distance/1000, 0) + ";";
+                    objectline += thing.TypeId + ";";
+                    objectline += thing.GroupId + ";";
+                    objectline += thing.CategoryId + ";";
+                    objectline += thing.IsNpc + ";";
+                    objectline += thing.IsPlayer + ";";
+                    objectline += thing.TargetValue + ";";
+                    objectline += Math.Round(thing.Velocity, 0) + ";";
+                    objectline += thing.Id + ";\r\n";
+                    //
+                    // can we somehow get the X,Y,Z coord? If we could we could use this info to build some kind of grid layout... 
+                    // or at least know the distances between all the NPCs... thus be able to infer which NPCs were in which 'groups'
+                    // 
+
+                    //Logging.Log("Statistics", ";PocketObjectStatistics;" + objectline, Logging.white);
+                    File.AppendAllText(Settings.Instance.PocketObjectStatisticsFile, objectline);
+                }
             }
             return true; 
         }

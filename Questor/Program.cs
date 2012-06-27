@@ -416,6 +416,7 @@ namespace Questor
                             //
                             close |= window.Html.Contains("client update is available and will now be installed");
                             close |= window.Html.Contains("You are on a <b>14 day trial</b>.");
+                            close |= window.Html.Contains("At any time you can log in to the account management page and change your trial account to a paying account");
                             //
                             // these windows require a quit of eve all together
                             //

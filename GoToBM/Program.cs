@@ -11,7 +11,7 @@ namespace GoToBM
     using Questor.Modules.States;
     using Questor.Modules.BackgroundTasks;
     
-    static class Program
+    internal static class Program
     {
         private static DirectEve _directEve;
         private static Traveler _traveler;
@@ -24,7 +24,7 @@ namespace GoToBM
         private static bool _started = false;
 
         [STAThread]
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             Logging.Log("GoToBM","Started",Logging.white);
             if (args.Length == 0 || args[0].Length < 1)
@@ -53,7 +53,7 @@ namespace GoToBM
             return;
         }
 
-        static void OnFrame(object sender, EventArgs e)
+        private static void OnFrame(object sender, EventArgs e)
         {
             if (DateTime.Now.Subtract(_lastPulse).TotalMilliseconds < 1500)
                 return;

@@ -2,7 +2,6 @@
 namespace Questor.Modules.BackgroundTasks
 {
     using System;
-    //using System.Linq;
     using Questor.Modules.Caching;
     using Questor.Modules.Lookup;
     using Questor.Modules.States;

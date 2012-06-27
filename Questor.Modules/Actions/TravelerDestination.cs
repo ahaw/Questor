@@ -170,6 +170,7 @@ namespace Questor.Modules.Actions
                 else
                 {
                     Logging.Log("TravelerDestination.BookmarkDestination", "Warping to undock bookmark [" + Logging.yellow + localundockBookmark.Title + Logging.green + "][" + Math.Round((distance / 1000) / 149598000, 2) + " AU away]", Logging.white);
+                    if (!Combat.ReloadAll(Cache.Instance.EntitiesNotSelf.OrderBy(t => t.Distance).FirstOrDefault(t => t.Distance < (double)Distance.OnGridWithMe))) return false;
                     localundockBookmark.WarpTo();
                     nextAction = DateTime.Now.AddSeconds(10);
                     return false;
@@ -208,7 +209,6 @@ namespace Questor.Modules.Actions
                 {
                     Logging.Log("TravelerDestination.StationDestination", "Warp to and dock at [" + Logging.yellow + entity.Name + Logging.green + "][" + Math.Round((entity.Distance / 1000) / 149598000, 2) + " AU away]", Logging.green);
                     entity.WarpTo();
-                    Combat.ReloadAll();
                     Cache.Instance.NextDockAction = DateTime.Now.AddSeconds(Time.Instance.WarptoDelay_seconds);
                 }
             }
@@ -327,12 +327,13 @@ namespace Questor.Modules.Actions
                 double distancetoundockbookmark = Cache.Instance.DistanceFromMe(bookmark.X ?? 0, bookmark.Y ?? 0, bookmark.Z ?? 0);
                 if (distancetoundockbookmark < (int)Distance.WarptoDistance)
                 {
-                    Logging.Log("TravelerDestination.BookmarkDestination", "Arrived at undock bookmark [" + undockBookmark.Title + "]", Logging.green);
+                    Logging.Log("TravelerDestination.BookmarkDestination", "Arrived at undock bookmark [" + Logging.yellow + undockBookmark.Title + Logging.green + "]", Logging.green);
                     undockBookmark = null;
                 }
                 else
                 {
-                    Logging.Log("TravelerDestination.BookmarkDestination", "Warping to undock bookmark [" + undockBookmark.Title + "][" + Math.Round((distancetoundockbookmark / 1000) / 149598000, 2) + " AU away]", Logging.green);
+                    Logging.Log("TravelerDestination.BookmarkDestination", "Warping to undock bookmark [" + Logging.yellow + undockBookmark.Title + Logging.green + "][" + Logging.yellow + Math.Round((distancetoundockbookmark / 1000) / 149598000, 2) + Logging.green + " AU away]", Logging.green);
+                    if (!Combat.ReloadAll(Cache.Instance.EntitiesNotSelf.OrderBy(t => t.Distance).FirstOrDefault(t => t.Distance < (double)Distance.OnGridWithMe))) return false; 
                     undockBookmark.WarpTo();
                     nextAction = DateTime.Now.AddSeconds(Time.Instance.TravelerInWarpedNextCommandDelay_seconds);
                     return false;
@@ -342,14 +343,14 @@ namespace Questor.Modules.Actions
             // This bookmark has no x / y / z, assume we are there.
             if (bookmark.X == -1 || bookmark.Y == -1 || bookmark.Z == -1)
             {
-                Logging.Log("TravelerDestination.BookmarkDestination", "Arrived at the bookmark [" + bookmark.Title + "][No XYZ]", Logging.green);
+                Logging.Log("TravelerDestination.BookmarkDestination", "Arrived at the bookmark [" + Logging.yellow + bookmark.Title + Logging.green + "][No XYZ]", Logging.green);
                 return true;
             }
 
             double distance = Cache.Instance.DistanceFromMe(bookmark.X ?? 0, bookmark.Y ?? 0, bookmark.Z ?? 0);
             if (distance < warpDistance)
             {
-                Logging.Log("TravelerDestination.BookmarkDestination", "Arrived at the bookmark [" + bookmark.Title + "]", Logging.green);
+                Logging.Log("TravelerDestination.BookmarkDestination", "Arrived at the bookmark [" + Logging.yellow + bookmark.Title + Logging.green + "]", Logging.green);
                 return true;
             }
 
@@ -365,10 +366,10 @@ namespace Questor.Modules.Actions
                 , Logging.white);
                 return true;
             }
-            Logging.Log("TravelerDestination.BookmarkDestination", "Warping to bookmark [" + bookmark.Title + "][" + Math.Round((distance / 1000) / 149598000, 2) + "] AU away. Which is ["+ Math.Round((distance / 1000),2)+"]", Logging.green);
+            Logging.Log("TravelerDestination.BookmarkDestination", "Warping to bookmark [" + Logging.yellow + bookmark.Title + Logging.green + "][" + Logging.yellow + Math.Round((distance / 1000) / 149598000, 2) +  Logging.green + " AU away]", Logging.green);         
             Cache.Instance.DoNotBreakInvul = false;
+            if (!Combat.ReloadAll(Cache.Instance.EntitiesNotSelf.OrderBy(t => t.Distance).FirstOrDefault(t => t.Distance < (double)Distance.OnGridWithMe))) return false; 
             bookmark.WarpTo();
-            Combat.ReloadAll();
             nextAction = DateTime.Now.AddSeconds(Time.Instance.TravelerInWarpedNextCommandDelay_seconds);
             return false;
         }
@@ -410,7 +411,7 @@ namespace Questor.Modules.Actions
 
             if (bookmark != null)
             {
-                Logging.Log("TravelerDestination.MissionBookmarkDestination", "Destination set to mission bookmark [" + bookmark.Title + "]", Logging.green);
+                Logging.Log("TravelerDestination.MissionBookmarkDestination", "Destination set to mission bookmark [" + Logging.yellow + bookmark.Title + Logging.green + "]", Logging.green);
                 AgentId = bookmark.AgentId ?? -1;
                 Title = bookmark.Title;
                 SolarSystemId = bookmark.SolarSystemId ?? -1;

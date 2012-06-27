@@ -322,7 +322,7 @@ namespace Questor.Modules.BackgroundTasks
                 wrecksProcessedThisTick++;
                 if (Settings.Instance.DebugSalvage) 
                     Logging.Log("Salvage", "wrecksProcessedThisTick [" + wrecksProcessedThisTick + "]", Logging.teal);
-                        
+
                 if (Cache.Instance.MissionLoot)
                 {
                     if (wreckTargets.Count >= Math.Min(Cache.Instance.DirectEve.ActiveShip.MaxLockedTargets, Cache.Instance.DirectEve.Me.MaxLockedTargets))
@@ -492,31 +492,20 @@ namespace Questor.Modules.BackgroundTasks
 
                         if (moveTheseItems.Count > 0)
                         {
-                            // If this is not a cargo container, then jettison loot
-                            if (containerEntity.GroupId != (int)Group.CargoContainer || isMissionItem)
-                            {
+                            // jettison loot
                                 if (DateTime.Now.Subtract(Cache.Instance.LastJettison).TotalSeconds < Time.Instance.DelayBetweenJetcans_seconds)
-                                    return;
-
-                                Logging.Log("Salvage", "Jettisoning [" + moveTheseItems.Count + "] items to make room for the more valuable loot", Logging.white);
-
-                                // Note: This could (in theory) fuck up with the bot jettison an item and
-                                // then picking it up again :/ (granted it should never happen unless
-                                // mission item volume > reserved volume
-                                Cache.Instance.CargoHold.Jettison(moveTheseItems.Select(i => i.ItemId));
-                                Cache.Instance.LastJettison = DateTime.Now;
                                 return;
-                            }
 
-                            // Move items to the cargo container
-                            container.Add(moveTheseItems);
-                            Cache.Instance.NextLootAction = DateTime.Now.AddMilliseconds(Time.Instance.LootingDelay_milliseconds);
-
-                            // Remove it from the ships cargo list
-                            shipsCargo.RemoveAll(i => moveTheseItems.Any(wl => wl.ItemId == i.Id));
-                            Logging.Log("Salvage", "Moving [" + moveTheseItems.Count + "] items into the cargo container to make room for the more valuable loot", Logging.white);
+                            Logging.Log("Salvage", "Jettisoning [" + moveTheseItems.Count + "] items to make room for the more valuable loot", Logging.white);
+                            // Note: This could (in theory) fuck up with the bot jettison an item and
+                            // then picking it up again :/ (granted it should never happen unless
+                            // mission item volume > reserved volume
+                            Cache.Instance.CargoHold.Jettison(moveTheseItems.Select(i => i.ItemId));
+                            Cache.Instance.NextLootAction = DateTime.Now.AddMilliseconds((int)Time.LootingDelay_milliseconds);
+                            Cache.Instance.LastJettison = DateTime.Now;
                             return;
                         }
+                        return;    
                     }
 
                     // Update free space

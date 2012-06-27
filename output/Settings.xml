@@ -17,9 +17,13 @@
   <debugGotobase>false</debugGotobase>
   <debugIdle>false</debugIdle>
   <debugAutoStart>false</debugAutoStart>
+  <debugDecline>false</debugDecline>
   <debugHangars>false</debugHangars>
   <debugLogging>false</debugLogging>
   <debugSalvage>false</debugSalvage>
+  <debugUI>false</debugUI>
+  <debugReloadAll>false</debugReloadAll>
+  <debugAttachVSDebugger>false</debugAttachVSDebugger>
   <useInnerspace>true</useInnerspace>
   
   
@@ -197,9 +201,9 @@
   <!-- it needs to know if you want to launch the session using the innerspace profile or the ISBoxer Character Set or just execute an arbitrary OS command-->
   <CloseQuestorCMDUplinkInnerspaceProfile>true</CloseQuestorCMDUplinkInnerspaceProfile>  <!-- default is: true -->
   <CloseQuestorCMDUplinkIsboxerCharacterSet>false</CloseQuestorCMDUplinkIsboxerCharacterSet>  <!-- default is: false -->
+  <CloseQuestorAllowRestart>true</CloseQuestorAllowRestart> <!-- default is: true -->
   <CloseQuestorArbitraryOSCmd>false</CloseQuestorArbitraryOSCmd> <!-- default is: false -->
   <CloseQuestorOSCmdContents></CloseQuestorOSCmdContents> <!-- contains the command to be executed, must be valid in a cmd shell executed in the IS directory -->
-
 
   <!--                                                -->
   <!--        WRECKS SETTINGS        -->
@@ -231,6 +235,8 @@
   <MissionStats3Log>true</MissionStats3Log><!-- default is: true -->
   <!-- Enable of Disable the PocketStatistics logs: each and every pocket of missions will generate a seperate log with completion times and other statistics for your XML tuning pleasure -->
   <PocketStatistics>true</PocketStatistics><!-- default is: true -->
+  <!-- Enable of Disable the PocketObjectsStatistics logs: each and every pocket of missions will generate a seperate log with the Entity information for the 1st spawn and other static objects on grid for your XML tuning pleasure -->
+  <PocketObjectStatisticsLog>true</PocketObjectStatisticsLog>
 
   <!--                                                -->
   <!--       FITTING SETTINGS        -->
@@ -345,7 +351,8 @@
   <longRangeDroneRecallCapacitorPct>30</longRangeDroneRecallCapacitorPct>
   <!-- Drones normally kill low value targets (frigates) first. If you would prefer your drones to kill high value targets first set this to true -->
   <dronesKillHighValueTargets>false</dronesKillHighValueTargets>
-
+  <!-- When docked drones below this number of hitpoints will be removed from your drone bay and put in the loothangar - so they can be manually repaired (we cannot auto repair them) -->
+  <belowThisHealthLevelRemoveFromDroneBay>150</belowThisHealthLevelRemoveFromDroneBay> <!-- light drones have a total of about 300 HP -->
   <!--                                                        -->
   <!-- MISSION BLACKLIST SETTINGS -->
   <!--                                                        -->

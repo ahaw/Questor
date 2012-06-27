@@ -8,8 +8,6 @@
 //   </copyright>
 // -------------------------------------------------------------------------------
 
-using System.Globalization;
-
 namespace Questor.Modules.Actions
 {
     using System;
@@ -27,6 +25,7 @@ namespace Questor.Modules.Actions
 
         private static DateTime _nextUnloadAction = DateTime.MinValue;
         private static DateTime _lastUnloadAction = DateTime.MinValue;
+        private static int _lootToMoveWillStillNotFitCount = 0;
 
         //public double LootValue { get; set; }
 
@@ -99,7 +98,44 @@ namespace Questor.Modules.Actions
                     }
 
                     // Move loot to the loot hangar
-                    Cache.Instance.LootHangar.Add(lootToMove);
+                    int roominHangar = (999 - Cache.Instance.LootHangar.Items.Count);
+                    if (roominHangar > lootToMove.Count())
+                    {
+                        Cache.Instance.LootHangar.Add(lootToMove);
+                        _lootToMoveWillStillNotFitCount = 0;
+                    }
+                    else
+                    {
+                        lootToMove = null;
+                        Logging.Log("Unloadloot", "Loothangar is almost full and contains [" + Cache.Instance.LootHangar.Items.Count + "] of 999 total possible stacks", Logging.orange);
+                        if (roominHangar > 50)
+                        {
+                            lootToMove = Cache.Instance.CargoHold.Items.Where(i => (i.TypeName ?? string.Empty).ToLower() != Cache.Instance.BringMissionItem && !Settings.Instance.Ammo.Any(a => a.TypeId == i.TypeId)).ToList().GetRange(1, 50);
+                        }
+                        else if (roominHangar > 20)
+                        {
+                                lootToMove = Cache.Instance.CargoHold.Items.Where(i => (i.TypeName ?? string.Empty).ToLower() != Cache.Instance.BringMissionItem && !Settings.Instance.Ammo.Any(a => a.TypeId == i.TypeId)).ToList().GetRange(1, 20);
+                        }
+                        if (lootToMove != null)
+                        {
+                            Cache.Instance.LootHangar.Add(lootToMove);
+                        }
+                        else
+                        {
+                            if (_lootToMoveWillStillNotFitCount < 7)
+                            {
+                                _lootToMoveWillStillNotFitCount++;
+                                Cache.Instance.StackLootHangar("Unloadloot");
+                            }
+                            else
+                            {
+                                Logging.Log("Unloadloot","We tried to stack the loothangar 7 times and we still could not fit all the LootToMove [" + Cache.Instance.CargoHold.Items.Where(i => (i.TypeName ?? string.Empty).ToLower() != Cache.Instance.BringMissionItem && !Settings.Instance.Ammo.Any(a => a.TypeId == i.TypeId)).ToList() + "] into the LootHangar [" + Cache.Instance.LootHangar.Items.Count +"]",Logging.red);
+                                _States.CurrentQuestorState = QuestorState.Error;
+                            }
+                            return;
+                        }
+                    }
+                    
                     Logging.Log("UnloadLoot", "Loot was worth an estimated [" + Statistics.Instance.LootValue.ToString("#,##0") + "] isk in buy-orders", Logging.teal);
 
                     //Move bookmarks to the bookmarks hangar

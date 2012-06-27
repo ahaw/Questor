@@ -29,6 +29,7 @@ namespace Questor.Modules.States
         Salvage,
         Analyze,
         PutItem,
+        DropItem,
         Done,
         SalvageBookmark,
         DebuggingWait,
