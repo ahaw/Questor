@@ -355,7 +355,7 @@ namespace Questor.Modules.Actions
 
             if (nextAction > DateTime.Now)
                 return false;
-            var gates = Cache.Instance.EntitiesByName("Acceleration Gate");
+            var gates = Cache.Instance.EntitiesByNamePart("Acceleration Gate");
 
             if (Math.Round((distance / 1000)) < (int)Distance.MaxPocketsDistance && gates.Count()!=0)
             {
