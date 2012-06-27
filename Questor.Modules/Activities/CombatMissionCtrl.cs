@@ -1561,18 +1561,6 @@ namespace Questor.Modules.Activities
                     Logging.Log("-", "-----------------------------------------------------------------", Logging.teal);
                     Logging.Log("-", "-----------------------------------------------------------------", Logging.teal);
                     Logging.Log("CombatMissionCtrl", "Mission Timer Currently At: [" + Math.Round(DateTime.Now.Subtract(Statistics.Instance.StartedMission).TotalMinutes, 0) + "]", Logging.teal);
-                    if (Cache.Instance.OrbitDistance != Settings.Instance.OrbitDistance) //this should be done elsewhere
-                    {
-                        if (Cache.Instance.OrbitDistance == 0)
-                        {
-                            Cache.Instance.OrbitDistance = Settings.Instance.OrbitDistance;
-                            Logging.Log("CombatMissionCtrl", "Using default orbit distance: " + Cache.Instance.OrbitDistance + " (as the custom one was 0)", Logging.teal);
-                        }
-                        else
-                            Logging.Log("CombatMissionCtrl", "Using custom orbit distance: " + Cache.Instance.OrbitDistance, Logging.teal);
-                    }
-                    if (Cache.Instance.OrbitDistance != 0)
-                        Logging.Log("CombatMissionCtrl", "Orbit Distance is set to: " + (Cache.Instance.OrbitDistance / 1000).ToString(CultureInfo.InvariantCulture) + "k", Logging.teal);
                     //if (Cache.Instance.OptimalRange != 0)
                     //    Logging.Log("Optimal Range is set to: " + (Cache.Instance.OrbitDistance / 1000).ToString(CultureInfo.InvariantCulture) + "k");
                     Logging.Log("CombatMissionCtrl", "Max Range is currently: " + (Cache.Instance.MaxRange / 1000).ToString(CultureInfo.InvariantCulture) + "k", Logging.teal);
