@@ -18,6 +18,7 @@ namespace Questor.Modules.Actions
     using global::Questor.Modules.Logging;
     using global::Questor.Modules.Lookup;
     using global::Questor.Modules.States;
+    //using Questor.Modules.BackgroundTasks;
 
     public class UnloadLoot
     {
@@ -56,16 +57,6 @@ namespace Questor.Modules.Actions
                     if (Cache.Instance.CargoHold.Items.Count == 0 && Cache.Instance.CargoHold.IsValid)
                         _States.CurrentUnloadLootState = UnloadLootState.Done;
                     else
-                        _States.CurrentUnloadLootState = UnloadLootState.OpenHangars;
-                    break;
-
-                case UnloadLootState.OpenHangars:
-                    // Is the hangar open?
-                    if (!Cache.Instance.OpenCargoHold("UnloadLoot")) return;
-                    if (!Cache.Instance.OpenLootHangar("UnloadLoot")) return;
-                    if (!Cache.Instance.OpenAmmoHangar("UnloadLoot")) return;
-
-                    Logging.Log("UnloadLoot", "Moving Common Mission Completion items to Corporate Ammo Hangar", Logging.white);
                     _States.CurrentUnloadLootState = UnloadLootState.MoveCommonMissionCompletionItemsToAmmoHangar;
                     break;
 
@@ -76,11 +67,12 @@ namespace Questor.Modules.Actions
                     // how do we get IsMissionItem to work for us here? (see ItemCache)
                     // Zbikoki's Hacker Card 28260, Reports 3814, Gate Key 2076, Militants 25373, Marines 3810, i.groupid == 314 (Misc Mission Items, mainly for storylines) and i.GroupId == 283 (Misc Mission Items, mainly for storylines)
                     //
-                    IEnumerable<DirectItem> itemsToMove = Cache.Instance.CargoHold.Items.Where(i => i.TypeId == 17192 || i.TypeId == 2076 || i.TypeId == 3814 || i.TypeId == 17206 || i.TypeId == 28260 || i.GroupId == 283 || i.GroupId == 314);
+                    IEnumerable<DirectItem> itemsToMove = Cache.Instance.CargoHold.Items.Where(i => (i.TypeName ?? string.Empty).ToLower() == Cache.Instance.BringMissionItem || i.TypeId == 17192 || i.TypeId == 17206 || i.GroupId == 283 || i.GroupId == 314);
 
-                    if (Cache.Instance.AmmoHangar != null) Cache.Instance.AmmoHangar.Add(itemsToMove);
-                    //_nextUnloadAction = DateTime.Now.AddSeconds((int)Settings.Instance.random_number3_5());
-                    _States.CurrentUnloadLootState = UnloadLootState.MoveLoot;
+                    if (Cache.Instance.AmmoHangar != null)
+                        Cache.Instance.AmmoHangar.Add(itemsToMove);
+ 
+                    _States.CurrentUnloadLootState = UnloadLootState.MoveAmmo;
                     break;
 
                 case UnloadLootState.MoveLoot:
@@ -88,6 +80,7 @@ namespace Questor.Modules.Actions
                     if (!Cache.Instance.OpenLootHangar("UnloadLoot")) return;
 
                     IEnumerable<DirectItem> lootToMove = Cache.Instance.CargoHold.Items.Where(i => (i.TypeName ?? string.Empty).ToLower() != Cache.Instance.BringMissionItem && !Settings.Instance.Ammo.Any(a => a.TypeId == i.TypeId)).ToList();
+                    //IEnumerable<DirectItem> lootToMove = Cache.Instance.CargoHold.Items.Where(i => !Settings.Instance.Ammo.Any(a => a.TypeId == i.TypeId)).ToList();
                     foreach (DirectItem item in lootToMove)
                     {
                         if (!Cache.Instance.InvTypesById.ContainsKey(item.TypeId))
@@ -96,7 +89,6 @@ namespace Questor.Modules.Actions
                         InvType invType = Cache.Instance.InvTypesById[item.TypeId];
                         Statistics.Instance.LootValue += (int)(invType.MedianBuy ?? 0) * Math.Max(item.Quantity, 1);
                     }
-
                     // Move loot to the loot hangar
                     int roominHangar = (999 - Cache.Instance.LootHangar.Items.Count);
                     if (roominHangar > lootToMove.Count())
@@ -162,10 +154,11 @@ namespace Questor.Modules.Actions
                             }
                         }
                     }
-                    _States.CurrentUnloadLootState = UnloadLootState.MoveAmmo;
+                    _States.CurrentUnloadLootState = UnloadLootState.WaitForMove;
                     break;
 
                 case UnloadLootState.MoveAmmo:
+                    if (!Cache.Instance.OpenCargoHold("UnloadLoot")) return;
                     if (!Cache.Instance.OpenAmmoHangar("UnloadLoot")) return;
                     //
                     // if items in the hangar + items to move is greater than 1000 then we need to do something else (what?)
@@ -177,10 +170,11 @@ namespace Questor.Modules.Actions
                     Logging.Log("UnloadLoot", "Moving Ammo to AmmoHangar [" + Cache.Instance.AmmoHangar.Window.Name + "]", Logging.white);
                     // Move the mission item & ammo to the ammo hangar
                     Cache.Instance.AmmoHangar.Add(Cache.Instance.CargoHold.Items.Where(i => ((i.TypeName ?? string.Empty).ToLower() == Cache.Instance.BringMissionItem || Settings.Instance.Ammo.Any(a => a.TypeId == i.TypeId))));
+                    //Cache.Instance.AmmoHangar.Add(Cache.Instance.CargoHold.Items.Where(i => Settings.Instance.Ammo.Any(a => a.TypeId == i.TypeId)));
                     Logging.Log("UnloadLoot", "Waiting for items to move", Logging.white);
-                    _States.CurrentUnloadLootState = UnloadLootState.WaitForMove;
                     _nextUnloadAction = DateTime.Now.AddSeconds(Cache.Instance.RandomNumber(3, 5));
                     _lastUnloadAction = DateTime.Now;
+                    _States.CurrentUnloadLootState = UnloadLootState.StackAmmoHangar;
                     break;
 
                 case UnloadLootState.WaitForMove:
@@ -207,7 +201,7 @@ namespace Questor.Modules.Actions
                         }
                         _nextUnloadAction = DateTime.Now.AddSeconds(Cache.Instance.RandomNumber(3, 5));
                         Logging.Log("UnloadLoot", "Stacking items in Ammo Hangar: resuming in [ " + Math.Round(_nextUnloadAction.Subtract(DateTime.Now).TotalSeconds, 0) + " sec ]", Logging.white);
-                        _States.CurrentUnloadLootState = UnloadLootState.StackAmmoHangar;
+                        _States.CurrentUnloadLootState = UnloadLootState.StackLootHangar;
                         break;
                     }
 
@@ -215,7 +209,7 @@ namespace Questor.Modules.Actions
                     {
                         Logging.Log("UnloadLoot", "Moving items timed out, clearing item locks", Logging.orange);
                         Cache.Instance.DirectEve.UnlockItems();
-                        _nextUnloadAction = DateTime.Now.AddSeconds(Cache.Instance.RandomNumber(2, 4));
+                        _nextUnloadAction = DateTime.Now.AddSeconds(Cache.Instance.RandomNumber(3, 5));
                         _States.CurrentUnloadLootState = UnloadLootState.StackAmmoHangar;
                         break;
                     }
@@ -227,7 +221,9 @@ namespace Questor.Modules.Actions
                         break;
 
                     if (!Cache.Instance.StackAmmoHangar("UnloadLoot.StackHangars")) return;
-                    _States.CurrentUnloadLootState = UnloadLootState.StackLootHangar;
+                    Cache.Instance.CloseCorpHangar("UnloadLoot.StackHangars", Settings.Instance.AmmoHangar);
+ 
+                    _States.CurrentUnloadLootState = UnloadLootState.MoveLoot;
                     break;
 
                 case UnloadLootState.StackLootHangar:
@@ -236,6 +232,8 @@ namespace Questor.Modules.Actions
                         break;
 
                     if (!Cache.Instance.StackLootHangar("UnloadLoot.StackHangars")) return;
+                    Cache.Instance.CloseCorpHangar("UnloadLoot.StackHangars", Settings.Instance.LootHangar);
+ 
                     _States.CurrentUnloadLootState = UnloadLootState.WaitForStacking;
                     break;
 

@@ -374,7 +374,7 @@ namespace Questor.Modules.Combat
             //
             // Do we really want a non-mission action moving the ship around at all!! (other than speed tanking)?
             // If you are not in a mission by all means let combat actions move you around as needed
-            if (!Cache.Instance.InMission || target.IsNPCFrigate)
+            if (!Cache.Instance.InMission || target.IsNPCFrigate || Settings.Instance.SpeedTank)
             {
                 if (Settings.Instance.DebugActivateWeapons) Logging.Log("Combat", "ActivateWeapons: deactivate: we are NOT in a mission: navigateintorange", Logging.teal);
                 if (Settings.Instance.DebugNavigateOnGrid) Logging.Log("Combat", "ActivateWeapons: NavigateIntoRange: target is NPC Frigate", Logging.white);

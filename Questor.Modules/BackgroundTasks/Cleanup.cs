@@ -540,6 +540,7 @@ namespace Questor.Modules.BackgroundTasks
                                 close |= window.Html.Contains("cargo units would be required to complete this operation.");
                                 close |= window.Html.Contains("You are too far away from the acceleration gate to activate it!");
                                 close |= window.Html.Contains("maximum distance is 2500 meters");
+                                close |= window.Html.Contains("you can decline a mission every"); //4 hours without penalty
                                 // Stupid warning, lets see if we can find it
                                 close |= window.Html.Contains("Do you wish to proceed with this dangerous action?");
                                 // Yes we know the mission is not complete, Questor will just redo the mission

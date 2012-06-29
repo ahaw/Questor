@@ -6,8 +6,8 @@ namespace Questor.Modules.BackgroundTasks
     using global::Questor.Modules.Caching;
     using global::Questor.Modules.Logging;
     using global::Questor.Modules.Lookup;
-    using global::Questor.Modules.States;
-    using System.Globalization;
+    //using global::Questor.Modules.States;
+    //using System.Globalization;
     using System.Linq;
     using DirectEve;
 
@@ -79,22 +79,25 @@ namespace Questor.Modules.BackgroundTasks
         }
 
         public static void OrbitGateorTarget(EntityCache target, string module)
-                {
-                if (DateTime.Now > Cache.Instance.NextOrbit)
-                {
+        {
+            if (DateTime.Now > Cache.Instance.NextOrbit)
+            {
+                if (Settings.Instance.DebugNavigateOnGrid) Logging.Log("NavigateOnGrid", "OrbitGateorTarget Started", Logging.white);
                 if (Cache.Instance.OrbitDistance == 0)
                 {
                     Cache.Instance.OrbitDistance = 2000;
                 }
-                    if (target.Distance + (int)Cache.Instance.OrbitDistance < Cache.Instance.MaxRange)
+                
+                if (target.Distance + (int)Cache.Instance.OrbitDistance < Cache.Instance.MaxRange)
+                {
+                    if (Settings.Instance.DebugNavigateOnGrid) Logging.Log("NavigateOnGrid", "OrbitGateorTarget Started", Logging.white);
+                    //Logging.Log("CombatMissionCtrl." + _pocketActions[_currentAction] ,"StartOrbiting: Target in range");
+                    if (!Cache.Instance.IsApproachingOrOrbiting)
                     {
-                        //Logging.Log("CombatMissionCtrl." + _pocketActions[_currentAction] ,"StartOrbiting: Target in range");
-                        if (!Cache.Instance.IsApproachingOrOrbiting)
-                        {
-                            Logging.Log(module, "We are not approaching nor orbiting and orbit structure enabled", Logging.teal);
+                        Logging.Log("CombatMissionCtrl.NavigateIntoRange", "We are not approaching nor orbiting", Logging.teal);
                             if (Settings.Instance.OrbitStructure)
                             {
-                                EntityCache structure = Cache.Instance.Entities.Where(i => i.Name.Contains("Gate")).OrderBy(t => t.Distance).OrderBy(t => t.Distance).FirstOrDefault();
+                        EntityCache structure = Cache.Instance.Entities.Where(i => i.Name.Contains("Gate")).OrderBy(t => t.Distance).OrderBy(t => t.Distance).FirstOrDefault();
                                 if (structure != null)
                                 {
                                     structure.Orbit((int)Cache.Instance.OrbitDistance);
@@ -126,31 +129,32 @@ namespace Questor.Modules.BackgroundTasks
                             else
                             {
                                 Logging.Log("CombatMissionCtrl.NavigateIntoRange", "OrbitStructure disabled", Logging.teal);
-                                target.Orbit(Cache.Instance.OrbitDistance);
-                                Logging.Log(module, "Initiating Orbit [" + target.Name + "][ID: " + target.Id + "]", Logging.teal);
-                            }
-                            Cache.Instance.NextOrbit = DateTime.Now.AddSeconds(Time.Instance.OrbitDelay_seconds);
+                            target.Orbit(Cache.Instance.OrbitDistance);
+                            Logging.Log(module, "Initiating Orbit [" + target.Name + "][ID: " + target.Id + "]", Logging.teal);
                         }
-                    }
-                    else
-                    {
-                        Logging.Log(module, "Possible out of range[" + target.Distance + (int)Cache.Instance.OrbitDistance + "]. ignoring orbit around structure", Logging.teal);
-                        target.Orbit(Cache.Instance.OrbitDistance);
-                        Logging.Log(module, "Initiating Orbit [" + target.Name + "][ID: " + target.Id + "]", Logging.teal);
-                        Cache.Instance.NextOrbit = DateTime.Now.AddSeconds(Time.Instance.OrbitDelay_seconds);
+                        Cache.Instance.NextOrbit = DateTime.Now.AddSeconds((int)Time.OrbitDelay_seconds);
                         return;
                     }
+                }
+                else
+                {
+                    Logging.Log(module, "Possible out of range. ignoring orbit around structure", Logging.teal);
+                    target.Orbit(Cache.Instance.OrbitDistance);
+                    Logging.Log(module, "Initiating Orbit [" + target.Name + "][ID: " + target.Id + "]", Logging.teal);
+                    Cache.Instance.NextOrbit = DateTime.Now.AddSeconds((int)Time.OrbitDelay_seconds);
                     return;
                 }
-
+                    return;
             }
+
+        }
 
         public static void NavigateIntoRange(EntityCache target, string module)
         {
             if (Cache.Instance.InWarp || Cache.Instance.InStation)
                 return;
 
-            if (Settings.Instance.DebugNavigateOnGrid) Logging.Log("NavigateOnGrid", "NavigateIntoRange", Logging.white);
+            if (Settings.Instance.DebugNavigateOnGrid) Logging.Log("NavigateOnGrid", "NavigateIntoRange Started", Logging.white);
                 
             if (Cache.Instance.OrbitDistance != Settings.Instance.OrbitDistance)
             {
@@ -168,7 +172,7 @@ namespace Questor.Modules.BackgroundTasks
             NavigateOnGrid.AvoidBumpingThings(Cache.Instance.BigObjectsandGates.FirstOrDefault(), "NavigateOnGrid: NavigateIntoRange");
 
             if (Settings.Instance.SpeedTank)
-            {   //this should be only executed when no specific actions
+            {   
                 if (Settings.Instance.DebugNavigateOnGrid) Logging.Log("NavigateOnGrid", "NavigateIntoRange: speedtank: orbitdistance is [" + Cache.Instance.OrbitDistance + "]", Logging.white);
                 OrbitGateorTarget(target, module);
             }
