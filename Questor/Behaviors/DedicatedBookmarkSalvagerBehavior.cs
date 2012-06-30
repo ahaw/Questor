@@ -632,6 +632,7 @@ namespace Questor.Behaviors
                     }
                     else
                     {
+                        if (Settings.Instance.UnloadLootAtStation && Cache.Instance.CargoHold.Window.IsReady && (Cache.Instance.CargoHold.Capacity - Cache.Instance.CargoHold.UsedCapacity) < 100)
                         {
                             Logging.Log("DedicatedBookmarkSalvagerBehavior.Salvage", "Cargo hold is full, go to base to unload", Logging.white);
                             _States.CurrentDedicatedBookmarkSalvagerBehaviorState = DedicatedBookmarkSalvagerBehaviorState.GotoBase;

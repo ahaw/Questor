@@ -132,7 +132,7 @@ namespace Questor.Modules.BackgroundTasks
                             target.Orbit(Cache.Instance.OrbitDistance);
                             Logging.Log(module, "Initiating Orbit [" + target.Name + "][ID: " + target.Id + "]", Logging.teal);
                         }
-                        Cache.Instance.NextOrbit = DateTime.Now.AddSeconds((int)Time.OrbitDelay_seconds);
+                        Cache.Instance.NextOrbit = DateTime.Now.AddSeconds((int)Time.Instance.OrbitDelay_seconds);
                         return;
                     }
                 }
@@ -141,7 +141,7 @@ namespace Questor.Modules.BackgroundTasks
                     Logging.Log(module, "Possible out of range. ignoring orbit around structure", Logging.teal);
                     target.Orbit(Cache.Instance.OrbitDistance);
                     Logging.Log(module, "Initiating Orbit [" + target.Name + "][ID: " + target.Id + "]", Logging.teal);
-                    Cache.Instance.NextOrbit = DateTime.Now.AddSeconds((int)Time.OrbitDelay_seconds);
+                    Cache.Instance.NextOrbit = DateTime.Now.AddSeconds((int)Time.Instance.OrbitDelay_seconds);
                     return;
                 }
                     return;
