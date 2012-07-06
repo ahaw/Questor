@@ -3286,5 +3286,12 @@ namespace Questor.Modules.Caching
 
             }
         }
+        public bool GateInGrid()
+        {
+            var gates = Cache.Instance.Entities.Where(a => a.GroupId == (int)Group.AccellerationGate);
+            if (gates == null || !gates.Any())
+                return false;
+            else return true;
+        }
     }
 }
