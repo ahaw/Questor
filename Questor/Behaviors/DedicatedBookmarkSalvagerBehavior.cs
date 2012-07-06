@@ -632,6 +632,7 @@ namespace Questor.Behaviors
                         {
                             Logging.Log("DedicatedBookmarkSalvagerBehavior.Salvage", "Cargo hold is full, go to base to unload", Logging.white);
                             _States.CurrentDedicatedBookmarkSalvagerBehaviorState = DedicatedBookmarkSalvagerBehaviorState.GotoBase;
+                            _nextSalvageTrip = DateTime.Now;
                             break;
                         }
 
