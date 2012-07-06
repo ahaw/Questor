@@ -547,20 +547,16 @@ namespace Questor.Behaviors
 
                 case DedicatedBookmarkSalvagerBehaviorState.GotoSalvageBookmark:
                     _traveler.ProcessState();
-                    string target = "Acceleration Gate";
-                    Cache.Instance.EntitiesByName(target);
 
                     if (_States.CurrentTravelerState == TravelerState.AtDestination)
                     {
-                    if (GateInSalvage())
+                    if (Cache.Instance.GateInGrid())
                         {
                             Logging.Log("DedicatedBookmarkSalvagerBehavior", "GotoSalvageBookmark: We found gate in salvage bookmark. Going back to Base", Logging.white);
                             //we know we are connected here
                             Cache.Instance.LastKnownGoodConnectedTime = DateTime.Now;
                             Cache.Instance.MyWalletBalance = Cache.Instance.DirectEve.Me.Wealth;
-
-                        _States.CurrentDedicatedBookmarkSalvagerBehaviorState = DedicatedBookmarkSalvagerBehaviorState.GotoBase;
-
+                            _States.CurrentDedicatedBookmarkSalvagerBehaviorState = DedicatedBookmarkSalvagerBehaviorState.GotoBase;
                             _traveler.Destination = null;
                             _nextSalvageTrip = DateTime.Now.AddMinutes(Time.Instance.DelayBetweenSalvagingSessions_minutes);
                             return;
@@ -636,7 +632,6 @@ namespace Questor.Behaviors
                         {
                             Logging.Log("DedicatedBookmarkSalvagerBehavior.Salvage", "Cargo hold is full, go to base to unload", Logging.white);
                             _States.CurrentDedicatedBookmarkSalvagerBehaviorState = DedicatedBookmarkSalvagerBehaviorState.GotoBase;
-
                             break;
                         }
 
@@ -700,16 +695,6 @@ namespace Questor.Behaviors
                     _States.CurrentDedicatedBookmarkSalvagerBehaviorState = DedicatedBookmarkSalvagerBehaviorState.Idle;
                     break;
             }
-        }
-
-        private bool GateInSalvage()
-        {
-            const string target = "Acceleration Gate";
-
-            var targets = Cache.Instance.EntitiesByName(target);
-            if (targets == null || !targets.Any())
-                return false;
-            return true;
         }
     }
 }
