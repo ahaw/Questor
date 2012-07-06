@@ -8,6 +8,8 @@
 //   </copyright>
 // -------------------------------------------------------------------------------
 
+using System.Drawing;
+using System.Windows.Forms;
 using Questor.Modules.Caching;
 using Questor.Modules.Lookup;
 
@@ -98,7 +100,9 @@ namespace Questor.Modules.Logging
                 return string.Empty;
             if (!string.IsNullOrEmpty(Settings.Instance.CharacterName))
             {
-                line = line.Replace(" " + Settings.Instance.CharacterName + " ", " _MyEVECharacterNameRedacted_ ");
+                line = line.Replace(Settings.Instance.CharacterName, "_MyEVECharacterNameRedacted_");
+                line = line.Replace("/" + Settings.Instance.CharacterName, "/_MyEVECharacterNameRedacted_");
+                line = line.Replace("\\" + Settings.Instance.CharacterName, "\\_MyEVECharacterNameRedacted_");
                 line = line.Replace("[" + Settings.Instance.CharacterName + "]", "[_MyEVECharacterNameRedacted_]");
                 line = line.Replace(Settings.Instance.CharacterName + ".xml", "_MyEVECharacterNameRedacted_.xml");
             }
@@ -117,28 +121,38 @@ namespace Questor.Modules.Logging
             if (!string.IsNullOrEmpty(Settings.Instance.LoginCharacter))
             {
                 if (Settings.Instance.DebugLogging) InnerSpace.Echo("Logging.Log: FilterSensitiveInfo: LoginCharacter is [" + Settings.Instance.LoginCharacter + "]");
-                line = line.Replace(" " + Settings.Instance.LoginCharacter + " ", " _MyEVECharacterNameRedacted_ ");
-                line = line.Replace("[" + Settings.Instance.LoginCharacter + "]", "[_MyEVECharacterNameRedacted_]");
-                }
+                line = line.Replace(Settings.Instance.LoginCharacter, "_MyEVECharacterNameRedacted_");
+            }
             if (!string.IsNullOrEmpty(Settings.Instance.LoginUsername))
             {
                 if (Settings.Instance.DebugLogging) InnerSpace.Echo("Logging.Log: FilterSensitiveInfo: LoginUsername is [" + Settings.Instance.LoginUsername + "]");
-                line = line.Replace(" " + Settings.Instance.LoginUsername + " ", "_MyLoginUserNameRedacted_");
-                line = line.Replace(" " + Settings.Instance.LoginUsername + " ", " _MyLoginUserNameRedacted_ ");
+                line = line.Replace(Settings.Instance.LoginUsername, "_MyLoginUserNameRedacted_");
             }
             if (!string.IsNullOrEmpty(Environment.UserName))
             {
                 if (Settings.Instance.DebugLogging) InnerSpace.Echo("Logging.Log: FilterSensitiveInfo: Environment.Username is [" + Environment.UserName + "]");
                 line = line.Replace("\\" + Environment.UserName + "\\", "\\_MyWindowsLoginNameRedacted_\\");
-                line = line.Replace("//" + Environment.UserName + "//", "//_MyWindowsLoginNameRedacted_//");
+                line = line.Replace("/" + Environment.UserName + "/", "/_MyWindowsLoginNameRedacted_/");
             }
             if (!string.IsNullOrEmpty(Environment.UserDomainName))
             {
                 if (Settings.Instance.DebugLogging) InnerSpace.Echo("Logging.Log: FilterSensitiveInfo: Environment.UserDomainName is [" + Environment.UserDomainName + "]");
-                line = line.Replace(" " + Environment.UserDomainName + " ", " _MyWindowsDomainNameRedacted_ ");
-                line = line.Replace("[" + Environment.UserDomainName + "]", "[_MyWindowsDomainNameRedacted_]");
+                line = line.Replace(Environment.UserDomainName, "_MyWindowsDomainNameRedacted_");
             }
             return line;
+        }
+
+        public static class RichTextBoxExtensions
+        {
+            public static void AppendText(RichTextBox box, string text, Color color)
+            {
+                box.SelectionStart = box.TextLength;
+                box.SelectionLength = 0;
+
+                box.SelectionColor = color;
+                box.AppendText(text);
+                box.SelectionColor = box.ForeColor;
+            }
         }
 
         public static string FilterColorsFromLogs(string line)

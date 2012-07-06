@@ -101,6 +101,9 @@ if not exist "%innerspacedotnetdirectory%ShipTargetValues.xml" copy /y ".\output
 @Echo.
 @Echo *** only copy invtypes.xml if one does not already exist (it contains pricing data)
 if not exist "%innerspacedotnetdirectory%invtypes.xml" copy /y ".\output\invtypes.xml" "%innerspacedotnetdirectory%"
+@Echo.
+@Echo *** only copy InvIgnore.xml if one does not already exist (it contains invtypes that will not be sold by valuedump)
+if not exist "%innerspacedotnetdirectory%InvIgnore.xml" copy /y ".\output\InvIgnore.xml" "%innerspacedotnetdirectory%"
 @Echo off
 
 goto :done

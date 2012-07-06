@@ -59,12 +59,16 @@ namespace Questor.Modules.Activities
             List<long> destination = Cache.Instance.DirectEve.Navigation.GetDestinationPath();
             if (destination.Count == 0 || !destination.Any(d => d == solarSystemId))
             {
+                if (Settings.Instance.DebugTraveler) if (destination.Count == 0) Logging.Log("Traveler", "We have no destination", Logging.teal);
+                if (Settings.Instance.DebugTraveler) if (!destination.Any(d => d == solarSystemId)) Logging.Log("Traveler", "the destination is set to the wrong solarsystem", Logging.teal);
                 // We do not have the destination set
                 DirectLocation location = Cache.Instance.DirectEve.Navigation.GetLocation(solarSystemId);
                 if (location.IsValid)
                 {
                     Logging.Log("Traveler", "Setting destination to [" + Logging.yellow + location.Name + Logging.green + "]", Logging.green);
+                    if (Settings.Instance.DebugTraveler) Logging.Log("Traveler", "Setting destination to [" + Logging.yellow + location.Name + Logging.green + "]", Logging.teal);
                     location.SetDestination();
+                    Cache.Instance.NextTravelerAction = DateTime.Now.AddSeconds(3);
                 }
                 else
                 {
@@ -91,6 +95,8 @@ namespace Questor.Modules.Activities
                 if (Cache.Instance.DirectEve.ActiveShip.Entity == null)
                     return;
 
+                if (Settings.Instance.DebugTraveler) Logging.Log("Traveler", "Destination is set: processing...", Logging.teal);
+                
                 // Find the first waypoint
                 long waypoint = destination.First();
 

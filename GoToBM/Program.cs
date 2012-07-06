@@ -64,11 +64,6 @@ namespace GoToBM
 
             Cache.Instance.LastFrame = DateTime.Now;
 
-            // Only pulse state changes every 1.5s
-            if (DateTime.Now.Subtract(_lastPulse).TotalMilliseconds < 300)
-                return;
-            _lastPulse = DateTime.Now;
-
             // Session is not ready yet, do not continue
             if (!Cache.Instance.DirectEve.Session.IsReady)
                 return;

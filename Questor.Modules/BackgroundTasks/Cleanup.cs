@@ -167,9 +167,9 @@ namespace Questor.Modules.BackgroundTasks
                                                                     Settings.Instance.CharacterName +
                                                                     "'s Questor is starting a timedcommand to restart itself in a moment");
                                         LavishScript.ExecuteCommand(
-                                            "uplink exec Echo [${Time}] timedcommand " + secRestart + " runscript isboxer -launch \\\"${ISBoxerCharacterSet}\\\"");
+                                            "uplink exec Echo [${Time}] timedcommand " + secRestart + " runscript isboxer -launchslot \\\"${ISBoxerCharacterSet}\\\" \\\"${ISBoxerSlot}\\\"");
                                         LavishScript.ExecuteCommand(
-                                            "uplink timedcommand " + secRestart + " runscript isboxer -launch \\\"${ISBoxerCharacterSet}\\\"");
+                                            "uplink timedcommand " + secRestart + " runscript isboxer -launchslot \\\"${ISBoxerCharacterSet}\\\" \\\"${ISBoxerSlot}\\\"");
                                         Logging.Log(
                                             "Questor", "Done: quitting this session so the new isboxer session can take over", Logging.white);
                                         Logging.Log("Questor", "Exiting eve.", Logging.white);

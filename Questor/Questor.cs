@@ -552,11 +552,42 @@ namespace Questor
                         {
                             Logging.Log("Questor", "Debug_Window.Name: [" + window.Name + "]", Logging.white);
                             Logging.Log("Questor", "Debug_Window.Type: [" + window.Type + "]", Logging.white);
+                            Logging.Log("Questor", "Debug_Window.Caption: [" + window.Caption + "]", Logging.white);
                             //Logging.Log("Questor", "Debug_Window.Type: [" + window. + "]", Logging.white);
                         }
                     }
                     _States.CurrentQuestorState = QuestorState.Error;
                     return;
+
+                case QuestorState.DebugInventoryTree:
+                    
+                    if (Cache.Instance.InventoryWindow.ExpandCorpHangarView())
+                    {
+                        Logging.Log("DebugInventoryTree", "ExpandCorpHangar executed", Logging.teal);
+                    }
+                    Logging.Log("DebugInventoryTree", "--------------------------------------------------", Logging.orange);
+                    Logging.Log("DebugInventoryTree", "InventoryWindow.Name: [" + Cache.Instance.InventoryWindow.Name + "]", Logging.white);
+                    Logging.Log("DebugInventoryTree", "InventoryWindow.Caption: [" + Cache.Instance.InventoryWindow.Caption + "]", Logging.white);
+                    Logging.Log("DebugInventoryTree", "InventoryWindow.Type: [" + Cache.Instance.InventoryWindow.Type + "]", Logging.white);
+                    Logging.Log("DebugInventoryTree", "InventoryWindow.IsModal: [" + Cache.Instance.InventoryWindow.IsModal + "]", Logging.white);
+                    Logging.Log("DebugInventoryTree", "InventoryWindow.IsDialog: [" + Cache.Instance.InventoryWindow.IsDialog + "]", Logging.white);
+                    Logging.Log("DebugInventoryTree", "InventoryWindow.Id: [" + Cache.Instance.InventoryWindow.Id + "]", Logging.white);
+                    Logging.Log("DebugInventoryTree", "InventoryWindow.IsKillable: [" + Cache.Instance.InventoryWindow.IsKillable + "]", Logging.white);
+                    Logging.Log("DebugInventoryTree", "InventoryWindow.IsReady: [" + Cache.Instance.InventoryWindow.IsReady + "]", Logging.white);
+                    Logging.Log("DebugInventoryTree", "InventoryWindow.LocationFlag: [" + Cache.Instance.InventoryWindow.LocationFlag + "]", Logging.white);
+                    Logging.Log("DebugInventoryTree", "InventoryWindow.currInvIdName: " + Cache.Instance.InventoryWindow.currInvIdName, Logging.red);
+                    Logging.Log("DebugInventoryTree", "InventoryWindow.currInvIdName: " + Cache.Instance.InventoryWindow.currInvIdItem, Logging.red);
+
+                    foreach (Int64 itemintree in Cache.Instance.IDsinInventoryTree)
+                    {
+                        if (Cache.Instance.InventoryWindow.GetIdsFromTree(false).Contains(itemintree))
+                        {
+                            Cache.Instance.InventoryWindow.SelectTreeEntryByID(itemintree);
+                            Cache.Instance.IDsinInventoryTree.Remove(itemintree);
+                            break;
+                        }
+                    }
+                    break;
             }
         }
     }

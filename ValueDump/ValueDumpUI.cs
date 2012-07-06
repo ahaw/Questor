@@ -342,7 +342,7 @@ namespace ValueDump
                     else
                         State = ValueDumpState.Idle;
 
-                    if (cbxSell.Checked)
+                    if (cbxSell.Checked || RefineCheckBox.Checked)
                     {
                         // Copy the items to sell list
                         ItemsToSell.Clear();
@@ -400,9 +400,6 @@ namespace ValueDump
                         break;
                     }
 
-                    // Update Quantity
-                    _currentItem.QuantitySold = _currentItem.Quantity - directItem.Quantity;
-
                     Logging.Log("ValueDumpUI", "Starting QuickSell for " + _currentItem.Name, Logging.white);
                     if (!directItem.QuickSell())
                     {
@@ -411,7 +408,9 @@ namespace ValueDump
                         Logging.Log("ValueDumpUI", "QuickSell failed for " + _currentItem.Name + ", retrying in 5 seconds", Logging.white);
                         break;
                     }
-
+                    
+                    // Update Quantity
+                    if (cbxSell.Checked) _currentItem.QuantitySold = _currentItem.Quantity - directItem.Quantity;
                     State = ValueDumpState.WaitForSellWindow;
                     break;
 
@@ -509,28 +508,31 @@ namespace ValueDump
                             }
                         }
 
-                        // Update quantity sold
-                        _currentItem.QuantitySold += quantity;
-
                         // Update station price
                         if (!_currentItem.StationBuy.HasValue)
                             _currentItem.StationBuy = price;
                         _currentItem.StationBuy = (_currentItem.StationBuy + price) / 2;
 
-                        Logging.Log("ValueDumpUI", "Selling " + quantity + " of " + _currentItem.Name +
-                            Logging.orange + " [" + Logging.white +
-                            "Sell price: " + (price * quantity).ToString("#,##0.00") + 
-                            Logging.orange + "]" + Logging.white + 
-                            otherPrices, Logging.white);
+                        if (cbxSell.Checked)
+                        {
+                            Logging.Log("ValueDumpUI", "Selling " + quantity + " of " + _currentItem.Name +
+                                        Logging.orange + " [" + Logging.white +
+                                        "Sell price: " + (price * quantity).ToString("#,##0.00") +
+                            Logging.orange + "]" + Logging.white +
+                                        otherPrices, Logging.white);
+                            sellWindow.Accept();
+                            // Update quantity sold
+                            _currentItem.QuantitySold += quantity;
+                            // Re-queue to check again
+                            if (_currentItem.QuantitySold < _currentItem.Quantity)
+                                ItemsToSell.Add(_currentItem);
+                            _lastExecute = DateTime.Now;
+                            State = ValueDumpState.WaitingToFinishQuickSell;
+                            break;
+                        }
                     }
-                    sellWindow.Accept();
-
-                    // Re-queue to check again
-                    if (_currentItem.QuantitySold < _currentItem.Quantity)
-                        ItemsToSell.Add(_currentItem);
-
-                    _lastExecute = DateTime.Now;
-                    State = ValueDumpState.WaitingToFinishQuickSell;
+                    
+                    State = ValueDumpState.NextItem;
                     break;
 
                 case ValueDumpState.WaitingToFinishQuickSell:

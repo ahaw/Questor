@@ -560,13 +560,13 @@ namespace Questor.Modules.Actions
                     {
                         AmmoToLoad = new List<Ammo>(Cache.Instance.MissionAmmo);
                     }
-                    foreach (DirectItem item in Cache.Instance.AmmoHangar.Items.OrderBy(i => i.Quantity))
+                    foreach (DirectItem item in Cache.Instance.AmmoHangar.Items.OrderByDescending(i => i.Quantity))
                     {
-                        if (item.ItemId <= 0)
+                        if (item.ItemId <= 0 || item.IsSingleton || item.Volume == 0.00 || item.Quantity == 0)
                             continue;
 
                         Ammo ammo = AmmoToLoad.FirstOrDefault(a => a.TypeId == item.TypeId);
-                        if (ammo == null)
+                        if (ammo == null || ammo.Quantity == 0)
                             continue;
 
                         int moveQuantity = Math.Min(item.Quantity, ammo.Quantity);
