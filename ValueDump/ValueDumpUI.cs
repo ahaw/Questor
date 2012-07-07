@@ -654,7 +654,7 @@ namespace ValueDump
                         }
                         else
                         {
-                            State = ValueDumpState.Idle;
+                            _States.CurrentValueDumpState = ValueDumpState.Idle;
                         }
 
                     }

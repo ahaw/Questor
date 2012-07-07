@@ -396,13 +396,17 @@ namespace Questor.Modules.BackgroundTasks
                     lootWindows.CloseTreeEntry(ContainerID);
                     return;
                 }
-
-                if (Settings.Instance.UnloadLootAtStation && Cache.Instance.CargoHold.Window.IsReady && Cache.Instance.CargoHold.Capacity > 150 && (Cache.Instance.CargoHold.Capacity - Cache.Instance.CargoHold.UsedCapacity) < 50)
+                if (Settings.Instance.UnloadLootAtStation && Cache.Instance.CargoHold.Window.IsReady && (Cache.Instance.CargoHold.Capacity - Cache.Instance.CargoHold.UsedCapacity) < 100)
                 {
-                    if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.ExecuteMission)
+                    Logging.Log("Questor.Modules.BackgroundTasks.Salvage", "Cargo hold is full, go to base to unload", Logging.white);
+                    if (_States.CurrentCombatHelperBehaviorState == States.CombatHelperBehaviorState.Salvage)
                     {
-                        Logging.Log("Salvage", "We are full, going to base to unload because: UnloadLootAtStation == true", Logging.white);
-                        _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.GotoBase;
+                        _States.CurrentCombatHelperBehaviorState = States.CombatHelperBehaviorState.GotoBase;
+                    }
+                    else if (_States.CurrentDedicatedBookmarkSalvagerBehaviorState == States.DedicatedBookmarkSalvagerBehaviorState.Salvage)
+                    {
+                        _States.CurrentDedicatedBookmarkSalvagerBehaviorState = DedicatedBookmarkSalvagerBehaviorState.GotoBase;
+                        Cache.Instance.NextSalvageTrip = DateTime.Now;
                     }
                     break;
                 }

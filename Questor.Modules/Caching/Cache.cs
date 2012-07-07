@@ -276,6 +276,8 @@ namespace Questor.Modules.Caching
 
         public DateTime QuestorStarted_DateTime = DateTime.Now;
 
+        public DateTime NextSalvageTrip = DateTime.MinValue;
+
         public bool MissionXMLIsAvailable { get; set; }
 
         public string missionXmlPath { get; set; }
