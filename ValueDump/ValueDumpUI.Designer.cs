@@ -177,10 +177,11 @@
             this.RefineCheckBox.AutoSize = true;
             this.RefineCheckBox.Location = new System.Drawing.Point(164, 41);
             this.RefineCheckBox.Name = "RefineCheckBox";
-            this.RefineCheckBox.Size = new System.Drawing.Size(117, 17);
+            this.RefineCheckBox.Size = new System.Drawing.Size(111, 17);
             this.RefineCheckBox.TabIndex = 10;
-            this.RefineCheckBox.Text = "Check refine prices";
+            this.RefineCheckBox.Text = "Refine if profitable";
             this.RefineCheckBox.UseVisualStyleBackColor = true;
+            this.RefineCheckBox.CheckedChanged += new System.EventHandler(this.RefineCheckBox_CheckedChanged);
             // 
             // RefineEfficiencyInput
             // 
@@ -218,7 +219,7 @@
             this.UpdateMineralPricesButton.UseVisualStyleBackColor = true;
             this.UpdateMineralPricesButton.Click += new System.EventHandler(this.UpdateMineralPricesButton_Click);
             // 
-            // frmMain
+            // ValueDumpUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -236,7 +237,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.lvItems);
             this.Controls.Add(this.btnHangar);
-            this.Name = "frmMain";
+            this.Name = "ValueDumpUI";
             this.Text = "Value Dump";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.ValueDumpUIFormClosed);
             this.Load += new System.EventHandler(this.ValueDumpUI_Load);

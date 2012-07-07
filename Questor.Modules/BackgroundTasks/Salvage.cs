@@ -397,6 +397,15 @@ namespace Questor.Modules.BackgroundTasks
                     return;
                 }
 
+                if (Settings.Instance.UnloadLootAtStation && Cache.Instance.CargoHold.Window.IsReady && Cache.Instance.CargoHold.Capacity > 150 && (Cache.Instance.CargoHold.Capacity - Cache.Instance.CargoHold.UsedCapacity) < 50)
+                {
+                    if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.ExecuteMission)
+                    {
+                        Logging.Log("Salvage", "We are full, going to base to unload because: UnloadLootAtStation == true", Logging.white);
+                        _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.GotoBase;
+                    }
+                    break;
+                }
                 //if (freeCargoCapacity < 1000) //this should allow BSs to dump scrapmetal but haulers and noctus' to hold onto it
                 //{
                 //	// Dump scrap metal if we have any
