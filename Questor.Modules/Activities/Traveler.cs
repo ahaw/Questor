@@ -143,7 +143,7 @@ namespace Questor.Modules.Activities
                 if (!stargates.Any())
                 {
                     // not found, that cant be true?!?!?!?!
-                    Logging.Log("Traveler", "Error [" + Logging.yellow + locationName + Logging.green + "] not found, most likely lag waiting [" + (int)Time.TravelerNoStargatesFoundRetryDelay_seconds + "] seconds.", Logging.red);
+                    Logging.Log("Traveler", "Error [" + Logging.yellow + locationName + Logging.green + "] not found, most likely lag waiting [" + (int)Time.Instance.TravelerNoStargatesFoundRetryDelay_seconds + "] seconds.", Logging.red);
                     _nextTravelerAction = DateTime.Now.AddSeconds(Time.Instance.TravelerNoStargatesFoundRetryDelay_seconds);
                     return;
                 }
@@ -195,7 +195,7 @@ namespace Questor.Modules.Activities
         public void ProcessState()
         {
             // Only pulse state changes every 1.5s
-            if (DateTime.Now.Subtract(_lastPulse).TotalMilliseconds < (int)Time.QuestorPulse_milliseconds) //default: 1500ms
+            if (DateTime.Now.Subtract(_lastPulse).TotalMilliseconds < (int)Time.Instance.QuestorPulse_milliseconds) //default: 1500ms
                 return;
 
             _lastPulse = DateTime.Now;

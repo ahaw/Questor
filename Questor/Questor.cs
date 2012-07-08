@@ -422,7 +422,7 @@ namespace Questor
         private void OnFrame(object sender, EventArgs e)
         {
             if (!OnframeProcessEveryPulse()) return;
-            if (Settings.Instance.DebugOnframe) Logging.Log("Questor", "Onframe: this is Questor.cs [" + DateTime.Now + "] by default the next pulse will be in [" + (int)Time.QuestorPulse_milliseconds + "]milliseconds", Logging.teal);
+            if (Settings.Instance.DebugOnframe) Logging.Log("Questor", "Onframe: this is Questor.cs [" + DateTime.Now + "] by default the next pulse will be in [" + (int)Time.Instance.QuestorPulse_milliseconds + "]milliseconds", Logging.teal);
 
             if (!Cache.Instance.Paused)
             {
