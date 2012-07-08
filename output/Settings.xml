@@ -283,6 +283,8 @@
   <!--      MOVEMENT SETTINGS    -->
   <!--                                                -->
 
+  <!-- in missions while moving and when traveling attempt to avoid being too close to certain objects by orbiting those objects to get way from them if needed -->
+  <avoidBumpingThings>true</avoidBumpingThings>
   <!-- When SpeedTank is enabled, Combat-module will try to orbit ships at orbitDistance -->
   <speedTank>false</speedTank>
   <!-- The range used by SpeedTank -->

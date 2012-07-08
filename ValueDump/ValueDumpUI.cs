@@ -573,6 +573,13 @@ namespace ValueDump
                             // Add it to the refine list
                             ItemsToRefine.Add(_currentItem);
                         }
+                        else
+                        {
+                            if (Settings.Instance.DebugValuedump)
+                            {
+                                Logging.Log("ValueDump.InspectRefinery","[" + _currentItem.Name + "[" + quantityR + "units] is worth more to sell [Refine each: " + (refinePrice/portions).ToString("#,##0.00") + "][Sell each: " + priceR.ToString("#,##0.00") + "][Refine total: " + refinePrice.ToString("#,##0.00") + "][Sell total: " + totalPriceR.ToString("#,##0.00") + "]", Logging.white);
+                            }
+                        }
                     }
                     /*else
                     {

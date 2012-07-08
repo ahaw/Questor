@@ -88,6 +88,7 @@ namespace Questor.Modules.Lookup
         public bool DebugDroneHealth { get; set; }
         public bool DebugNavigateOnGrid { get; set; }
         public bool DebugTraveler { get; set; }
+        public bool DebugValuedump { get; set; }
         public bool UseInnerspace { get; set; }
 
         //
@@ -372,6 +373,8 @@ namespace Questor.Modules.Lookup
         //
         // Speed and Movement Settings
         //
+        public bool AvoidBumpingThings { get; set; }
+
         public bool SpeedTank { get; set; }
 
         public int OrbitDistance { get; set; }
@@ -541,6 +544,7 @@ namespace Questor.Modules.Lookup
                 DebugNavigateOnGrid = false;
                 DebugReloadAll = false;
                 DebugTraveler = false;
+                DebugValuedump = false;
                 UseInnerspace = true;
                 //
                 // Misc Settings
@@ -706,6 +710,7 @@ namespace Questor.Modules.Lookup
                 //
                 // Speed and Movement Settings
                 //
+                AvoidBumpingThings = true;
                 SpeedTank = false;
                 OrbitDistance = 0;
                 OrbitStructure = false;
@@ -823,6 +828,7 @@ namespace Questor.Modules.Lookup
                     DebugNavigateOnGrid = (bool?)xml.Element("debugNavigateOnGrid") ?? false;
                     DebugReloadAll = (bool?)xml.Element("debugReloadAll") ?? false;
                     DebugTraveler = (bool?)xml.Element("debugTraveler") ?? false;
+                    DebugValuedump = (bool?)xml.Element("debugValuedump") ?? false;
                     UseInnerspace = (bool?)xml.Element("useInnerspace") ?? true;
 
                     //
@@ -1014,6 +1020,7 @@ namespace Questor.Modules.Lookup
                     //
                     // Speed and Movement Settings
                     //
+                    AvoidBumpingThings = (bool?)xml.Element("avoidBumpingThings") ?? true;
                     SpeedTank = (bool?)xml.Element("speedTank") ?? false;
                     OrbitDistance = (int?)xml.Element("orbitDistance") ?? 0;
                     OrbitStructure = (bool?) xml.Element("orbitStructure") ?? false;

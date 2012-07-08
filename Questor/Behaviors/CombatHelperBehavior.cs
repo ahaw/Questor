@@ -451,7 +451,7 @@ namespace Questor.Behaviors
                 case CombatHelperBehaviorState.GotoBase:
                     if (Settings.Instance.DebugGotobase) Logging.Log("CombatHelperBehavior", "GotoBase: AvoidBumpingThings()", Logging.white);
 
-                    NavigateOnGrid.AvoidBumpingThings(Cache.Instance.BigObjects.FirstOrDefault(), "CombatHelperBehaviorState.GotoBase");
+                    if (Settings.Instance.AvoidBumpingThings) NavigateOnGrid.AvoidBumpingThings(Cache.Instance.BigObjects.FirstOrDefault(), "CombatHelperBehaviorState.GotoBase");
 
                     if (Settings.Instance.DebugGotobase) Logging.Log("CombatHelperBehavior", "GotoBase: TravelToAgentsStation()", Logging.white);
 
