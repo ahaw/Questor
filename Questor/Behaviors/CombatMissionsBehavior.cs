@@ -51,8 +51,7 @@ namespace Questor.Behaviors
         private int _randomDelay;
         public static long AgentID;
         private readonly Stopwatch _watch;
-        private int _bookmarkdeletionattempt = 0;
-        private DateTime _nextBookmarkDeletionAttempt = DateTime.MinValue;
+        
 
         private double _lastX;
         private double _lastY;
@@ -951,7 +950,7 @@ namespace Questor.Behaviors
                     {
                         DirectBookmark bookmark;
                         _States.CurrentArmState = ArmState.Idle;
-                        bookmark = Cache.Instance.GetSalvagingBookmark();
+                        bookmark = Cache.Instance.GetSalvagingBookmark;
                         if (bookmark == null)
                         {
                             bookmark = Cache.Instance.BookmarksByLabel(Settings.Instance.BookmarkPrefix + " ").OrderBy(b => b.CreatedOn).FirstOrDefault();
@@ -971,9 +970,9 @@ namespace Questor.Behaviors
 
                 case CombatMissionsBehaviorState.GotoSalvageBookmark:
                     _traveler.ProcessState();
-                    string target = "Acceleration Gate";
-                    Cache.Instance.EntitiesByName(target);
-                    if (_States.CurrentTravelerState == TravelerState.AtDestination || GateInSalvage())
+                    
+                    
+                    if (_States.CurrentTravelerState == TravelerState.AtDestination || Cache.Instance.GateInGrid()) 
                     {
                         //we know we are connected if we were able to arm the ship - update the lastknownGoodConnectedTime
                         Cache.Instance.LastKnownGoodConnectedTime = DateTime.Now;
@@ -1008,25 +1007,11 @@ namespace Questor.Behaviors
                         if (bookmark != null)
                         if (Settings.Instance.DeleteBookmarksWithNPC)
                         {
-                            _bookmarkdeletionattempt++;
-                            if (_bookmarkdeletionattempt <= Settings.Instance.NoOfBookmarksDeletedAtOnce && DateTime.Now > _nextBookmarkDeletionAttempt)
-                            {
-                                Logging.Log("CombatMissionsBehavior.Salvage", "could not be completed because of NPCs left in the mission: deleting salvage bookmark", Logging.white);
-                                bookmark.Delete();
-                                _nextBookmarkDeletionAttempt = DateTime.Now.AddSeconds(10);
-                                return;
-                            }
-                            else if (DateTime.Now > _nextBookmarkDeletionAttempt)
-                            {
-                                Logging.Log("CombatMissionsBehavior", "You are unable to delete the bookmark named: [" + bookmark.Title + "] if it is a corp bookmark you may need a role", Logging.red);
-                                _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.Error;
-                                    return;
-                                }
+                            Cache.Instance.DeleteBookmarksOnGrid("CombatMissionsBehavior.Salvage");
                             return;
                             }
                         else
                         {
-                            _bookmarkdeletionattempt = 0;
                             Logging.Log("CombatMissionsBehavior.Salvage", "could not be completed because of NPCs left in the mission: salvage bookmarks deleted", Logging.orange);
                             Cache.Instance.SalvageAll = false;
                             Statistics.Instance.FinishedSalvaging = DateTime.Now;
@@ -1060,35 +1045,20 @@ namespace Questor.Behaviors
                         {
                             Logging.Log("CombatMissionsBehavior.Salvage", "Finished salvaging the room", Logging.white);
 
-                            bool gatesInRoom = GateInSalvage();
-                            List<DirectBookmark> afterMissionSalvageBookmarks = Cache.Instance.BookmarksByLabel(Settings.Instance.BookmarkPrefix + " ");
-                            DirectBookmark onGridBookmark = afterMissionSalvageBookmarks.FirstOrDefault(b => Cache.Instance.DistanceFromMe(b.X ?? 0, b.Y ?? 0, b.Z ?? 0) < (int)Distance.OnGridWithMe);
+                            DirectBookmark onGridBookmark = Cache.Instance.AfterMissionSalvageBookmarks.FirstOrDefault(b => Cache.Instance.DistanceFromMe(b.X ?? 0, b.Y ?? 0, b.Z ?? 0) < (int)Distance.OnGridWithMe);
 
                             if (onGridBookmark != null)
                             {
-                                _bookmarkdeletionattempt++;
-                                if (_bookmarkdeletionattempt <= Settings.Instance.NoOfBookmarksDeletedAtOnce && DateTime.Now > _nextBookmarkDeletionAttempt)
-                                {
-                                    Logging.Log("CombatMissionsBehavior.Salvage", "Finished salvaging the room: removing salvage bookmark:" + onGridBookmark.Title, Logging.white);
-                                    onGridBookmark.Delete();
-                                    _nextBookmarkDeletionAttempt = DateTime.Now.AddSeconds(10);
-                                    return;
-                                }
-                                else if (DateTime.Now > _nextBookmarkDeletionAttempt)
-                                {
-                                    Logging.Log("CombatMissionsBehavior", "You are unable to delete the bookmark named: [" + onGridBookmark.Title + "] if it is a corp bookmark you may need a role", Logging.red);
-                                    _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.Error;
-                                    return;
-                                }
+                                
+                                Cache.Instance.DeleteBookmarksOnGrid("CombatMissionsBehavior.Salvage");
                                 return;
                             }
                             else
                             {
-                                _bookmarkdeletionattempt = 0;
                                 Statistics.Instance.FinishedSalvaging = DateTime.Now;
                             }
 
-                            if (afterMissionSalvageBookmarks.Count == 0 && !gatesInRoom)
+                            if (Cache.Instance.AfterMissionSalvageBookmarks.Count() == 0 && !Cache.Instance.GateInGrid())
                             {
                                 Logging.Log("CombatMissionsBehavior.Salvage", "We have salvaged all bookmarks, go to base", Logging.white);
                                 Cache.Instance.SalvageAll = false;
@@ -1099,17 +1069,17 @@ namespace Questor.Behaviors
                             else
                             {
 
-                                if (!gatesInRoom)
+                                if (Cache.Instance.GateInGrid())
                                 {
                                     Logging.Log("CombatMissionsBehavior.Salvage", "Go to the next salvage bookmark", Logging.white);
                                     DirectBookmark bookmark;
                                     if (Settings.Instance.FirstSalvageBookmarksInSystem)
                                     {
-                                        bookmark = afterMissionSalvageBookmarks.FirstOrDefault(c => c.LocationId == Cache.Instance.DirectEve.Session.SolarSystemId) ?? afterMissionSalvageBookmarks.FirstOrDefault();
+                                        bookmark = Cache.Instance.AfterMissionSalvageBookmarks.FirstOrDefault(c => c.LocationId == Cache.Instance.DirectEve.Session.SolarSystemId) ?? Cache.Instance.AfterMissionSalvageBookmarks.FirstOrDefault();
                                     }
                                     else
                                     {
-                                        bookmark = afterMissionSalvageBookmarks.OrderBy(i => i.CreatedOn).FirstOrDefault() ?? afterMissionSalvageBookmarks.FirstOrDefault();
+                                        bookmark = Cache.Instance.AfterMissionSalvageBookmarks.OrderBy(i => i.CreatedOn).FirstOrDefault() ?? Cache.Instance.AfterMissionSalvageBookmarks.FirstOrDefault();
                                     }
                                     _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.GotoSalvageBookmark;
                                     _traveler.Destination = new BookmarkDestination(bookmark);
@@ -1151,10 +1121,9 @@ namespace Questor.Behaviors
 
                 case CombatMissionsBehaviorState.SalvageUseGate:
                     Cache.Instance.OpenWrecks = true;
+                    var gates = Cache.Instance.Entities.Where(a => a.GroupId == (int)Group.AccellerationGate);
 
-                    target = "Acceleration Gate";
-                    IEnumerable<EntityCache> targets = Cache.Instance.EntitiesByName(target).ToList();
-                    if (targets == null || !targets.Any())
+                    if (gates == null || !gates.Any())
                     {
                         if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.SalvageUseGate)
                         {
@@ -1167,7 +1136,7 @@ namespace Questor.Behaviors
                     _lastY = Cache.Instance.DirectEve.ActiveShip.Entity.Y;
                     _lastZ = Cache.Instance.DirectEve.ActiveShip.Entity.Z;
 
-                    EntityCache closest = targets.OrderBy(t => t.Distance).First();
+                    EntityCache closest = gates.OrderBy(t => t.Distance).First();
                     if (closest.Distance < (int)Distance.DecloakRange)
                     {
                         Logging.Log("CombatMissionsBehavior.Salvage", "Acceleration gate found - GroupID=" + closest.GroupId, Logging.white);
@@ -1363,16 +1332,6 @@ namespace Questor.Behaviors
                     if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.Default) _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.Idle;
                     break;
             }
-        }
-
-        private bool GateInSalvage()
-        {
-            const string target = "Acceleration Gate";
-
-            var targets = Cache.Instance.EntitiesByName(target);
-            if (targets == null || !targets.Any())
-                return false;
-            return true;
         }
     }
 }
