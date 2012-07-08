@@ -25,9 +25,14 @@ namespace Questor.Modules.Activities
     {
         private TravelerDestination _destination;
         private DateTime _nextTravelerAction;
-
-        //private DateTime _lastDock;
-        private DateTime _lastTravelerProcessState;
+        private DateTime _lastPulse;
+        private DateTime _nextGetDestinationPath;
+        private DateTime _nextGetLocation;
+        private DateTime _nextGetLocationName;
+        private List<long> destination = null;
+        private DirectLocation location;
+        private string locationName;
+        private int locationErrors;
 
         public DirectBookmark UndockBookmark { get; set; }
 
@@ -52,33 +57,56 @@ namespace Questor.Modules.Activities
                 //Logging.Log("Traveler: will continue in [ " + Math.Round(_nextTravelerAction.Subtract(DateTime.Now).TotalSeconds, 0) + " ]sec");
                 return;
             }
+            Cache.Instance.NextTravelerAction = DateTime.Now.AddSeconds(1);
+            if (Settings.Instance.DebugTraveler) Logging.Log("Traveler", "NavigateToBookmarkSystem - Iterating- next iteration should be in no less than [1] second ", Logging.teal);
 
-            //DirectBookmark undockBookmark = UndockBookmark;
-            //UndockBookmark = undockBookmark;
-
-            List<long> destination = Cache.Instance.DirectEve.Navigation.GetDestinationPath();
+            if (DateTime.Now > _nextGetDestinationPath || destination == null)
+            {
+                if (Settings.Instance.DebugTraveler) Logging.Log("Traveler", "NavigateToBookmarkSystem: getting destination path", Logging.teal);
+                _nextGetDestinationPath = DateTime.Now.AddSeconds(30);
+                destination = Cache.Instance.DirectEve.Navigation.GetDestinationPath();
+                Cache.Instance.NextTravelerAction = DateTime.Now.AddSeconds(4);
+                return;
+            }
             if (destination.Count == 0 || !destination.Any(d => d == solarSystemId))
             {
                 if (Settings.Instance.DebugTraveler) if (destination.Count == 0) Logging.Log("Traveler", "We have no destination", Logging.teal);
-                if (Settings.Instance.DebugTraveler) if (!destination.Any(d => d == solarSystemId)) Logging.Log("Traveler", "the destination is set to the wrong solarsystem", Logging.teal);
+                if (Settings.Instance.DebugTraveler) if (!destination.Any(d => d == solarSystemId)) Logging.Log("Traveler", "the destination is not currently set to solarsystemId [" + solarSystemId + "]", Logging.teal);
+                _nextGetDestinationPath = DateTime.Now;
                 // We do not have the destination set
-                DirectLocation location = Cache.Instance.DirectEve.Navigation.GetLocation(solarSystemId);
+                if (DateTime.Now > _nextGetLocation || location == null)
+                {
+                    if (Settings.Instance.DebugTraveler) Logging.Log("Traveler", "NavigateToBookmarkSystem: getting Location of solarSystemId [" + solarSystemId + "]", Logging.teal);
+                    _nextGetLocation = DateTime.Now.AddSeconds(10);
+                    location = Cache.Instance.DirectEve.Navigation.GetLocation(solarSystemId);
+                    Cache.Instance.NextTravelerAction = DateTime.Now.AddSeconds(2);
+                    return;
+                }
+                
                 if (location.IsValid)
                 {
+                    locationErrors = 0;
                     Logging.Log("Traveler", "Setting destination to [" + Logging.yellow + location.Name + Logging.green + "]", Logging.green);
                     if (Settings.Instance.DebugTraveler) Logging.Log("Traveler", "Setting destination to [" + Logging.yellow + location.Name + Logging.green + "]", Logging.teal);
                     location.SetDestination();
                     Cache.Instance.NextTravelerAction = DateTime.Now.AddSeconds(3);
+                    return;
                 }
                 else
                 {
                     Logging.Log("Traveler", "Error setting solar system destination [" + Logging.yellow + solarSystemId + Logging.green + "]", Logging.green);
-                    _States.CurrentTravelerState = TravelerState.Error;
+                    locationErrors++;
+                    if (locationErrors > 100)
+                    {
+                        _States.CurrentTravelerState = TravelerState.Error;
+                        return;
+                    }
+                    return;
                 }
-                return;
             }
             else
             {
+                locationErrors = 0;
                 if (!Cache.Instance.InSpace)
                 {
                     if (Cache.Instance.InStation)
@@ -101,14 +129,21 @@ namespace Questor.Modules.Activities
                 long waypoint = destination.First();
 
                 // Get the name of the next system
-                string locationName = Cache.Instance.DirectEve.Navigation.GetLocationName(waypoint);
+                if (DateTime.Now > _nextGetLocationName || String.IsNullOrEmpty(locationName))
+                {
+                    if (Settings.Instance.DebugTraveler) Logging.Log("Traveler", "NavigateToBookmarkSystem: getting next waypoints locationname", Logging.teal);
+                    _nextGetLocationName = DateTime.Now.AddSeconds(20);
+                    locationName = Cache.Instance.DirectEve.Navigation.GetLocationName(waypoint);
+                    Cache.Instance.NextTravelerAction = DateTime.Now.AddSeconds(1);
+                    return;
+                }
 
                 // Find the stargate associated with it
                 IEnumerable<EntityCache> stargates = Cache.Instance.EntitiesByName(locationName).Where(e => e.GroupId == (int)Group.Stargate).ToList();
                 if (!stargates.Any())
                 {
                     // not found, that cant be true?!?!?!?!
-                    Logging.Log("Traveler", "Error [" + Logging.yellow + locationName + Logging.green + "] not found, most likely lag waiting 15 seconds.", Logging.red);
+                    Logging.Log("Traveler", "Error [" + Logging.yellow + locationName + Logging.green + "] not found, most likely lag waiting [" + (int)Time.TravelerNoStargatesFoundRetryDelay_seconds + "] seconds.", Logging.red);
                     _nextTravelerAction = DateTime.Now.AddSeconds(Time.Instance.TravelerNoStargatesFoundRetryDelay_seconds);
                     return;
                 }
@@ -122,14 +157,19 @@ namespace Questor.Modules.Activities
                     Cache.Instance.NextInSpaceorInStation = DateTime.Now;
                     _nextTravelerAction = DateTime.Now.AddSeconds(Time.Instance.TravelerJumpedGateNextCommandDelay_seconds);
                     Cache.Instance.NextActivateSupportModules = DateTime.Now.AddSeconds(Time.Instance.TravelerJumpedGateNextCommandDelay_seconds);
+                    return;
                 }
                 else if (stargate.Distance < (int)Distance.WarptoDistance)
                 {
                     if (DateTime.Now > Cache.Instance.NextApproachAction && !Cache.Instance.IsApproaching)
                     {
+                        if (Settings.Instance.DebugTraveler) Logging.Log("Traveler", "NavigateToBookmarkSystem: approaching stargate", Logging.teal);
                         stargate.Approach(); //you could use a negative approach distance here but ultimately that is a bad idea.. Id like to go toward the entity without approaching it so we would end up inside the docking ring (eventually)
                         Cache.Instance.NextApproachAction = DateTime.Now.AddSeconds(Time.Instance.ApproachDelay_seconds);
+                        return;
                     }
+                    if (Settings.Instance.DebugTraveler) Logging.Log("Traveler", "NavigateToBookmarkSystem: we are already approaching the stargate", Logging.teal);
+                    return;
                 }
                 else
                 {
@@ -143,18 +183,22 @@ namespace Questor.Modules.Activities
                             if (!Combat.ReloadAll(Cache.Instance.EntitiesNotSelf.OrderBy(t => t.Distance).FirstOrDefault(t => t.Distance < (double)Distance.OnGridWithMe))) return;
                             stargate.WarpTo();
                             Cache.Instance.NextWarpTo = DateTime.Now.AddSeconds(Time.Instance.WarptoDelay_seconds);
+                            return;
                         }
+                        return;
                     }
+                    return;
                 }
             }
         }
 
         public void ProcessState()
         {
-            if (DateTime.Now < _lastTravelerProcessState.AddMilliseconds(100)) //if it has not been 100ms since the last time we ran this ProcessState return. We can't do anything that close together anyway
+            // Only pulse state changes every 1.5s
+            if (DateTime.Now.Subtract(_lastPulse).TotalMilliseconds < (int)Time.QuestorPulse_milliseconds) //default: 1500ms
                 return;
 
-            _lastTravelerProcessState = DateTime.Now;
+            _lastPulse = DateTime.Now;
 
             switch (_States.CurrentTravelerState)
             {
@@ -179,6 +223,10 @@ namespace Questor.Modules.Activities
                     }
                     else if (Destination.PerformFinalDestinationTask())
                     {
+                        destination = null;
+                        location = null;
+                        locationName = string.Empty;
+                        locationErrors = 0;
                         //Logging.Log("traveler: _States.CurrentTravelerState = TravelerState.AtDestination;");
                         _States.CurrentTravelerState = TravelerState.AtDestination;
                     }

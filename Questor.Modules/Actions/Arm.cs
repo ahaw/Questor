@@ -27,6 +27,7 @@ namespace Questor.Modules.Actions
     {
         private bool _missionItemMoved;
         private bool _optionalMissionItemMoved;
+        private DateTime _lastPulse;
 
         public Arm()
         {
@@ -51,6 +52,11 @@ namespace Questor.Modules.Actions
 
         public void ProcessState()
         {
+            // Only pulse state changes every 1.5s
+            if (DateTime.Now.Subtract(_lastPulse).TotalMilliseconds < (int)Time.QuestorPulse_milliseconds) //default: 1500ms
+                return;
+            _lastPulse = DateTime.Now;
+
             if (!Cache.Instance.InStation)
                 return;
 

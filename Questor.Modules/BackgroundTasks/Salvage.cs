@@ -396,10 +396,9 @@ namespace Questor.Modules.BackgroundTasks
                     lootWindows.CloseTreeEntry(ContainerID);
                     return;
                 }
-                if (Settings.Instance.UnloadLootAtStation && Cache.Instance.CargoHold.Window.IsReady && (Cache.Instance.CargoHold.Capacity - Cache.Instance.CargoHold.UsedCapacity) < 100)
+                if (Settings.Instance.UnloadLootAtStation && Cache.Instance.CargoHold.Window.IsReady && Cache.Instance.CargoHold.Capacity > 150 && (Cache.Instance.CargoHold.Capacity - Cache.Instance.CargoHold.UsedCapacity) < 50)
                 {
-                    Logging.Log("Questor.Modules.BackgroundTasks.Salvage", "Cargo hold is full, go to base to unload", Logging.white);
-                    if (_States.CurrentCombatHelperBehaviorState == States.CombatHelperBehaviorState.Salvage)
+                    if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.ExecuteMission)
                     {
                         _States.CurrentCombatHelperBehaviorState = States.CombatHelperBehaviorState.GotoBase;
                     }
@@ -618,7 +617,7 @@ namespace Questor.Modules.BackgroundTasks
 
         public void ProcessState()
         {
-            if (DateTime.Now < _lastSalvageProcessState.AddMilliseconds(100)) //if it has not been 100ms since the last time we ran this ProcessState return. We can't do anything that close together anyway
+            if (DateTime.Now < _lastSalvageProcessState.AddMilliseconds(500)) //if it has not been 100ms since the last time we ran this ProcessState return. We can't do anything that close together anyway
                 return;
 
             _lastSalvageProcessState = DateTime.Now;

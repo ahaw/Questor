@@ -27,6 +27,7 @@ namespace Questor.Modules.BackgroundTasks
 
         private DateTime _resumeTime;
         private DateTime _nextWrapScrambledWarning = DateTime.MinValue;
+        private DateTime _lastPulse;
 
         //private DateTime _lastDockedorJumping;
         private DateTime _lastWarpScrambled = DateTime.MinValue;
@@ -37,6 +38,11 @@ namespace Questor.Modules.BackgroundTasks
 
         public void ProcessState()
         {
+            // Only pulse state changes every 1.5s
+            if (DateTime.Now.Subtract(_lastPulse).TotalMilliseconds < 500) //default: 500ms
+                return;
+            _lastPulse = DateTime.Now;
+            
             switch (_States.CurrentPanicState)
             {
                 case PanicState.Idle:

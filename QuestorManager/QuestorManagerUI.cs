@@ -121,6 +121,13 @@ namespace QuestorManager
 
             RefreshJobs();
             _directEve.OnFrame += OnFrame;
+
+            //if (Settings.Instance.UseInnerspace)
+            //{
+            LavishScript.Commands.AddCommand("QMStart", StartProcessing);
+            //LavishScript.Commands.AddCommand("SetQuestorManagertoIdle", SetQuestorManagertoIdle);
+            LavishScript.Commands.AddCommand("QMLoadSavedTaskList", LoadSavedTaskList);
+            //}
         }
 
         private void InitializeTraveler()
@@ -1068,6 +1075,75 @@ namespace QuestorManager
                     LstTask.Items.Add(listItem);
                 }
             }
+        }
+
+        private int LoadSavedTaskList(string[] args)
+        {
+            if (State == QuestormanagerState.Idle) // if we are not in the idle state then we are already processing a job!
+            {
+                //Logging.Log("QuestorManager", "LoadSavedTaskList: Args [" + args.Length + "][" + args[0] + "][" + args[1] + "]", Logging.white);
+                if (args.Length != 2)
+                {
+                    Logging.Log("QuestorManager",
+                                "LoadSavedTaskList [SavedJobFile] - Reads the Saved Task List specified and processes the jobs",
+                                Logging.white);
+                    return -1;
+                }
+                else
+                {
+                    string savedjobtoload = Path.Combine(Settings.Instance.Path, args[1] + ".jobs");
+                    if (File.Exists(savedjobtoload))
+                    {
+                        try
+                        {
+                            ReadXML(savedjobtoload);
+                        }
+                        //catch
+                        //{
+                        //
+                        //}
+                        finally
+                        {
+                        }
+                        return 0;
+                    }
+                    else
+                    {
+                        Logging.Log("QuestorManager", "LoadSavedTaskList: File Job file [" + savedjobtoload + "] does not exist", Logging.orange);
+                    }
+                    return -1;
+                }
+            }
+            return -1;
+        }
+
+        private int StartProcessing(string[] args)
+        {
+            if (State == QuestormanagerState.Idle) // if we are not in the idle state then we are already processing a job!
+            {
+                if (args.Length != 1)
+                {
+                    Logging.Log("QuestorManager",
+                                "StartProcessing - Starts Processing any already loaded task items",
+                                Logging.white);
+                    return -1;
+                }
+                try
+                {
+                    _start = true;
+                    State = QuestormanagerState.Idle;
+                }
+                //catch
+                //{
+                //
+                //}
+                finally
+                {
+                }
+            }
+
+            Logging.Log("QuestorUI", "QuestorState is now: CloseQuestor ", Logging.white);
+            return 0;
         }
 
         private void CmbXMLSelectedIndexChanged(object sender, EventArgs e)

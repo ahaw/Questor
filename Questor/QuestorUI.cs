@@ -25,7 +25,10 @@ namespace Questor
     {
         private readonly Questor _questor;
         //private DateTime _lastlogmessage
-        private DateTime NextConsoleLogRefresh = DateTime.MinValue;
+        private DateTime _nextConsoleLogRefresh = DateTime.MinValue;
+        private DateTime _nextUIDataRefresh = DateTime.Now;
+        private DateTime _nextScheduleUpdate = DateTime.Now;
+        private DateTime _nextWreckUpdate = DateTime.Now;
 
         public QuestorfrmMain()
         {
@@ -148,6 +151,137 @@ namespace Questor
             foreach (string greylistedmission in Settings.Instance.MissionGreylist)
             {
                 GreyListedMissionsTextBox.AppendText(greylistedmission + "\r\n");
+            }
+        }
+
+        private void RefreshInfoDisplayedInUI()
+        {
+            if (DateTime.Now > _nextUIDataRefresh && DateTime.Now > Cache.Instance.QuestorStarted_DateTime.AddSeconds(30) && (Cache.Instance.LastInSpace.AddSeconds(2) > DateTime.Now || Cache.Instance.LastInSpace.AddSeconds(2) > DateTime.Now))
+            {
+                _nextUIDataRefresh = DateTime.Now.AddMilliseconds(1000);
+                try
+                {
+                    NextOpenContainerInSpaceActionData.Text = Cache.Instance.NextOpenContainerInSpaceAction.ToLongTimeString();
+                    NextOpenJournalWindowActionData.Text = Cache.Instance.NextOpenJournalWindowAction.ToLongTimeString();
+                    NextOpenLootContainerActionData.Text = Cache.Instance.NextOpenLootContainerAction.ToLongTimeString();
+                    NextDroneBayActionData.Text = Cache.Instance.NextDroneBayAction.ToLongTimeString();
+                    NextOpenHangarActionData.Text = Cache.Instance.NextOpenHangarAction.ToLongTimeString();
+                    NextOpenCargoActionData.Text = Cache.Instance.NextOpenCargoAction.ToLongTimeString();
+                    LastActionData.Text = Cache.Instance.LastAction.ToLongTimeString();
+                    NextArmActionData.Text = Cache.Instance.NextArmAction.ToLongTimeString();
+                    NextSalvageActionData.Text = Cache.Instance.NextSalvageAction.ToLongTimeString();
+                    NextLootActionData.Text = Cache.Instance.NextLootAction.ToLongTimeString();
+                    LastJettisonData.Text = Cache.Instance.LastJettison.ToLongTimeString();
+                    NextDefenceModuleActionData.Text = Cache.Instance.NextDefenceModuleAction.ToLongTimeString();
+                    NextAfterburnerActionlbl.Text = Cache.Instance.NextAfterburnerAction.ToLongTimeString();
+                    NextRepModuleActionData.Text = Cache.Instance.NextRepModuleAction.ToLongTimeString();
+                    NextActivateSupportModulesData.Text = Cache.Instance.NextActivateSupportModules.ToLongTimeString();
+                    NextApproachActionData.Text = Cache.Instance.NextApproachAction.ToLongTimeString();
+                    NextOrbitData.Text = Cache.Instance.NextOrbit.ToLongTimeString();
+                    NextWarpToData.Text = Cache.Instance.NextWarpTo.ToLongTimeString();
+                    NextTravelerActionData.Text = Cache.Instance.NextTravelerAction.ToLongTimeString();
+                    NextTargetActionData.Text = Cache.Instance.NextTargetAction.ToLongTimeString();
+                    NextReloadData.Text = Cache.Instance.NextReload.ToLongTimeString();
+                    NextWeaponActionData.Text = Cache.Instance.NextWeaponAction.ToLongTimeString();
+                    NextWebActionData.Text = Cache.Instance.NextWebAction.ToLongTimeString();
+                    NextNosActionData.Text = Cache.Instance.NextNosAction.ToLongTimeString();
+                    NextPainterActionData.Text = Cache.Instance.NextPainterAction.ToLongTimeString();
+                    NextActivateActionData.Text = Cache.Instance.NextActivateAction.ToLongTimeString();
+                    NextAlignData.Text = Cache.Instance.NextAlign.ToLongTimeString();
+                    NextUndockActionData.Text = Cache.Instance.NextUndockAction.ToLongTimeString();
+                    NextDockActionData.Text = Cache.Instance.NextDockAction.ToLongTimeString();
+                    NextDroneRecallData.Text = Cache.Instance.NextDroneRecall.ToLongTimeString();
+                    NextStartupActionData.Text = Cache.Instance.NextStartupAction.ToLongTimeString();
+                    LastSessionChangeData.Text = Cache.Instance.LastSessionChange.ToLongTimeString();
+
+                    DamageTypeData.Text = Cache.Instance.DamageType.ToString();
+                    //OrbitDistanceData.Text = Cache.Instance.OrbitDistance.ToString(CultureInfo.InvariantCulture);
+                    //AgentStationIDData.Text = Cache.Instance.AgentStationID.ToString(CultureInfo.InvariantCulture);
+                    //AgentIdData.Text = Cache.Instance.AgentId.ToString(CultureInfo.InvariantCulture);
+                    //AgentData.Text = Cache.Instance.CurrentAgent.ToString(CultureInfo.InvariantCulture);
+                    AgentInteractionPurposeData.Text = AgentInteraction.Purpose.ToString();
+                    MissionsThisSessionData.Text = Cache.Instance.MissionsThisSession.ToString(CultureInfo.InvariantCulture);
+                    if (Cache.Instance.LastInSpace.AddSeconds(2) > DateTime.Now)
+                    {
+                        //MaxRangeData.Text = Cache.Instance.MaxRange.ToString(CultureInfo.InvariantCulture);       //causes problems / crashes
+                        //WeaponRangeData.Text = Cache.Instance.WeaponRange.ToString(CultureInfo.InvariantCulture); //causes problems / crashes
+                        //ActiveDronesData.Text = Cache.Instance.ActiveDrones.Count().ToString();                   //causes problems / crashes
+                        //if (!Cache.Instance.InWarp && DateTime.Now > _nextWreckUpdate)                            //this was causing exceptions we cant check inarp from the UI?
+                        //{
+                        //    _nextWreckUpdate = DateTime.Now.AddSeconds(10);
+                            //WrecksData.Text = Cache.Instance.Wrecks.Count().ToString(CultureInfo.InvariantCulture);
+                            //UnlootedContainersData.Text = Cache.Instance.UnlootedContainers.Count().ToString(CultureInfo.InvariantCulture); 
+                            //ApproachingData.Text = Cache.Instance.IsApproaching.ToString(CultureInfo.InvariantCulture);
+                        //}
+                        //DamagedDronesData.Text = Cache.Instance.DamagedDrones.Count().ToString(CultureInfo.InvariantCulture);
+                        //PriorityTargetsData.Text = Cache.Instance.PriorityTargets.Count().ToString(CultureInfo.InvariantCulture);
+                        //if (Cache.Instance.IsMissionPocketDone) IsMissionPocketDoneData.Text = "true";
+                        //else if (!Cache.Instance.IsMissionPocketDone) IsMissionPocketDoneData.Text = "false";
+                        
+                    }
+                    if (Cache.Instance.LastInStation.AddSeconds(2) > DateTime.Now)
+                    {
+                        MaxRangeData.Text = "n/a";
+                        ActiveDronesData.Text = "n/a";
+                        ApproachingData.Text = "n/a";
+                        DamagedDronesData.Text = "n/a";
+                        PriorityTargetsData.Text = "n/a";
+                        WeaponRangeData.Text = "n/a";
+                        IsMissionPocketDoneData.Text = "n/a";
+                        WrecksData.Text = "n/a";
+                        UnlootedContainersData.Text = "n/a";
+                    }
+                }
+                catch (Exception)
+                {
+                    if (Settings.Instance.DebugUI) Logging.Log("QuestorUI", "RefreshInfoDisplayedInUI: unable to update all UI labels", Logging.teal);
+                }
+            }
+            if (DateTime.Now > _nextScheduleUpdate)
+            {
+                _nextScheduleUpdate = DateTime.Now.AddSeconds(90);
+                if (Cache.Instance.StopTimeSpecified)
+                {
+                    ScheduledStopTimeData.Text = Cache.Instance.StopTime.ToShortTimeString();
+                }
+                //
+                // if control is enabled (checked) then update ManualStopTime so that on next idle questor will check to see if it needs to stop
+                //
+                if (dateTimePicker1.Checked)
+                {
+                    Cache.Instance.ManualStopTime = dateTimePicker1.Value;
+                    if (Cache.Instance.ManualStopTime > Cache.Instance.StopTime)
+                        Cache.Instance.StopTimeSpecified = false;
+                    if (Cache.Instance.ManualStopTime < Cache.Instance.StopTime)
+                        Cache.Instance.StopTimeSpecified = true;
+                }
+                else 
+                {
+                    dateTimePicker1.Value = DateTime.Now.AddHours(1);
+                    if (!dateTimePicker2.Checked)
+                    {
+                        Cache.Instance.StopTimeSpecified = true;
+                    }
+                }
+                //
+                // if control is enabled (checked) then update ManualRestartTime so that on next idle questor will check to see if it needs to stop/restart
+                //
+                if (dateTimePicker2.Checked)
+                {
+                    Cache.Instance.ManualRestartTime = dateTimePicker2.Value;
+                    if (Cache.Instance.ManualRestartTime > Cache.Instance.StopTime)
+                        Cache.Instance.StopTimeSpecified = false;
+                    if (Cache.Instance.ManualRestartTime < Cache.Instance.StopTime)
+                        Cache.Instance.StopTimeSpecified = true;
+                }
+                else
+                {
+                    dateTimePicker1.Value = DateTime.Now.AddHours(1);
+                    if (!dateTimePicker1.Checked)
+                    {
+                        Cache.Instance.StopTimeSpecified = true;
+                    }
+                }
             }
         }
 
@@ -493,6 +627,8 @@ namespace Questor
                 }
             }
 
+            RefreshInfoDisplayedInUI();
+
             //
             // Left Group
             //
@@ -741,13 +877,13 @@ namespace Questor
 
             if (!String.IsNullOrEmpty(Cache.Instance.ExtConsole))
             {
-                if (DateTime.Now > NextConsoleLogRefresh)
+                if (DateTime.Now > _nextConsoleLogRefresh)
                 {
                     if (txtExtConsole.Lines.Count() >= Settings.Instance.MaxLineConsole)
                         txtExtConsole.Text = "";
                     txtExtConsole.AppendText(Cache.Instance.ExtConsole);
                     Cache.Instance.ExtConsole = null;
-                    NextConsoleLogRefresh = DateTime.Now.AddSeconds(1);
+                    _nextConsoleLogRefresh = DateTime.Now.AddSeconds(1);
                 }
             }
 
@@ -1145,7 +1281,7 @@ namespace Questor
                 LastBlacklistedMissionDeclinedData.Text = Cache.Instance.LastBlacklistMissionDeclined;
                 blacklistedmissionsdeclineddata.Text = Cache.Instance.BlackListedMissionsDeclined.ToString(CultureInfo.InvariantCulture);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //if we get an exception here ignore it as it shouldnt effect anything, theu GUI is only displaying data collected and processed elsewhere
             }
@@ -1282,16 +1418,28 @@ namespace Questor
             }
         }
 
-        private void QuestorStatelbl_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void ExitWhenIdleCheckBoxCheckedChanged(object sender, EventArgs e)
         {
             Cache.Instance.ExitWhenIdle = ExitWhenIdleCheckBox.Checked;
             AutoStartCheckBox.Checked = false;
             Settings.Instance.AutoStart = false;
+        }
+
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        {
+            Cache.Instance.StopSessionAfterMissionNumber = (int)numericUpDown1.Value;
+        }
+
+        private void ReloadAll_Click(object sender, EventArgs e)
+        {
+            Logging.Log("QuestorUI","ReloadAll botton was pressed: changing QuestorState to ReloadAll- when done reloading it shoud return to the configured behavior",Logging.teal);
+            _States.CurrentQuestorState = QuestorState.DebugReloadAll;
+        }
+
+        private void OutOfAmmo_Click(object sender, EventArgs e)
+        {
+            Logging.Log("QuestorUI", "OutOfAmmo botton was pressed: changing CombatState to OutOfAmmo", Logging.teal);
+            _States.CurrentCombatState = CombatState.OutOfAmmo;
         }
 
         //private void comboBoxQuestorMode_SelectedIndexChanged(object sender, EventArgs e)

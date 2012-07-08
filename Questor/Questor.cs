@@ -9,6 +9,7 @@
 // -------------------------------------------------------------------------------
 
 using Questor.Behaviors;
+using Questor.Modules.Combat;
 
 namespace Questor
 {
@@ -69,7 +70,16 @@ namespace Questor
 
             Cache.Instance.StopTimeSpecified = Program.StopTimeSpecified;
             Cache.Instance.MaxRuntime = Program.MaxRuntime;
-            Cache.Instance.StopTime = Program.StopTime;
+            if (Program.StartTime.AddMinutes(10) < Program.StopTime)
+            {
+                Cache.Instance.StopTime = Program.StopTime;
+                Logging.Log("Questor", "Schedule: setup correctly: stoptime is [" + Cache.Instance.StopTime.ToShortTimeString() + "]", Logging.orange);
+            }
+            else
+            {
+                Cache.Instance.StopTime = DateTime.Now.AddHours(10);
+                Logging.Log("Questor", "Schedule: NOT setup correctly: stoptime is [" + Cache.Instance.StopTime.ToShortTimeString() + "]", Logging.orange);
+            }
             Cache.Instance.StartTime = Program.StartTime;
             Cache.Instance.QuestorStarted_DateTime = DateTime.Now;
 
@@ -165,7 +175,7 @@ namespace Questor
             {
                 if (DateTime.Now >= Cache.Instance.StopTime)
                 {
-                    Logging.Log("Questor", "Time to stop.  Quitting game.", Logging.white);
+                    Logging.Log("Questor", "Time to stop. StopTimeSpecified and reached. Quitting game.", Logging.white);
                     Cache.Instance.ReasonToStopQuestor = "StopTimeSpecified and reached.";
                     Settings.Instance.AutoStart = false;
                     Cache.Instance.CloseQuestorCMDLogoff = false;
@@ -175,10 +185,43 @@ namespace Questor
                     return;
                 }
             }
+            if (DateTime.Now >= Cache.Instance.ManualRestartTime)
+            {
+                Logging.Log("Questor", "Time to stop. ManualRestartTime reached. Quitting game.", Logging.white);
+                Cache.Instance.ReasonToStopQuestor = "ManualRestartTime reached.";
+                Settings.Instance.AutoStart = true;
+                Cache.Instance.CloseQuestorCMDLogoff = false;
+                Cache.Instance.CloseQuestorCMDExitGame = true;
+                Cache.Instance.SessionState = "Exiting";
+                BeginClosingQuestor();
+                return;
+            }
+            if (DateTime.Now >= Cache.Instance.ManualStopTime)
+            {
+                Logging.Log("Questor", "Time to stop. ManualStopTime reached. Quitting game.", Logging.white);
+                Cache.Instance.ReasonToStopQuestor = "ManualStopTime reached.";
+                Settings.Instance.AutoStart = false;
+                Cache.Instance.CloseQuestorCMDLogoff = false;
+                Cache.Instance.CloseQuestorCMDExitGame = true;
+                Cache.Instance.SessionState = "Exiting";
+                BeginClosingQuestor();
+                return;
+            }
             if (Cache.Instance.ExitWhenIdle)
             {
                 Logging.Log("Questor", "ExitWhenIdle set to true.  Quitting game.", Logging.white);
-                Cache.Instance.ReasonToStopQuestor = "ExitWhenIdle se to true";
+                Cache.Instance.ReasonToStopQuestor = "ExitWhenIdle set to true";
+                Settings.Instance.AutoStart = false;
+                Cache.Instance.CloseQuestorCMDLogoff = false;
+                Cache.Instance.CloseQuestorCMDExitGame = true;
+                Cache.Instance.SessionState = "Exiting";
+                BeginClosingQuestor();
+                return;
+            }
+            if (Cache.Instance.MissionsThisSession > Cache.Instance.StopSessionAfterMissionNumber)
+            {
+                Logging.Log("Questor", "MissionsThisSession [" + Cache.Instance.MissionsThisSession + "] is greater than StopSessionAfterMissionNumber [" + Cache.Instance.StopSessionAfterMissionNumber + "].  Quitting game.", Logging.white);
+                Cache.Instance.ReasonToStopQuestor = "MissionsThisSession > StopSessionAfterMissionNumber";
                 Settings.Instance.AutoStart = false;
                 Cache.Instance.CloseQuestorCMDLogoff = false;
                 Cache.Instance.CloseQuestorCMDExitGame = true;
@@ -305,24 +348,47 @@ namespace Questor
             }
         }
 
-        private void OnFrame(object sender, EventArgs e)
+        public bool OnframeProcessEveryPulse()
         {
+            // New frame, invalidate old cache
+            Cache.Instance.InvalidateCache();
+
             var watch = new Stopwatch();
             Cache.Instance.LastFrame = DateTime.Now;
 
             // Only pulse state changes every 1.5s
             if (DateTime.Now.Subtract(_lastPulse).TotalMilliseconds < Time.Instance.QuestorPulse_milliseconds) //default: 1500ms
-                return;
+                return false;
             _lastPulse = DateTime.Now;
+
+            // Update settings (settings only load if character name changed)
+            if (!Settings.Instance.Defaultsettingsloaded)
+            {
+                Settings.Instance.LoadSettings();
+            }
+            CharacterName = Cache.Instance.DirectEve.Me.Name;
 
             if (DateTime.Now < Cache.Instance.QuestorStarted_DateTime.AddSeconds(30))
             {
                 Cache.Instance.LastKnownGoodConnectedTime = DateTime.Now;
             }
 
+            // Start _cleanup.ProcessState
+            // Description: Closes Windows, and eventually other things considered 'cleanup' useful to more than just Questor(Missions) but also Anomalies, Mining, etc
+            //
+            DebugPerformanceClearandStartTimer();
+            _cleanup.ProcessState();
+            DebugPerformanceStopandDisplayTimer("Cleanup.ProcessState");
+
+            if (Settings.Instance.DebugStates)
+                Logging.Log("Cleanup.State is", _States.CurrentCleanupState.ToString(), Logging.white);
+
+            // Done
+            // Cleanup State: ProcessState
+
             // Session is not ready yet, do not continue
             if (!Cache.Instance.DirectEve.Session.IsReady)
-                return;
+                return false;
 
             if (Cache.Instance.DirectEve.Session.IsReady)
                 Cache.Instance.LastSessionIsReady = DateTime.Now;
@@ -332,21 +398,11 @@ namespace Questor
             {
                 Cache.Instance.NextInSpaceorInStation = DateTime.Now.AddSeconds(12);
                 Cache.Instance.LastSessionChange = DateTime.Now;
-                return;
+                return false;
             }
 
             if (DateTime.Now < Cache.Instance.NextInSpaceorInStation)
-                return;
-
-            // New frame, invalidate old cache
-            Cache.Instance.InvalidateCache();
-
-            // Update settings (settings only load if character name changed)
-            if (!Settings.Instance.Defaultsettingsloaded)
-            {
-                Settings.Instance.LoadSettings();
-            }
-            CharacterName = Cache.Instance.DirectEve.Me.Name;
+                return false;
 
             // Check 3D rendering
             if (Cache.Instance.DirectEve.Session.IsInSpace &&
@@ -360,6 +416,13 @@ namespace Questor
                     (int)DateTime.Now.Subtract(Cache.Instance.QuestorStarted_DateTime).TotalMinutes;
                 Cache.Instance.LastupdateofSessionRunningTime = DateTime.Now;
             }
+            return true;
+        }
+
+        private void OnFrame(object sender, EventArgs e)
+        {
+            if (!OnframeProcessEveryPulse()) return;
+            if (Settings.Instance.DebugOnframe) Logging.Log("Questor", "Onframe: this is Questor.cs [" + DateTime.Now + "] by default the next pulse will be in [" + (int)Time.QuestorPulse_milliseconds + "]milliseconds", Logging.teal);
 
             if (!Cache.Instance.Paused)
             {
@@ -371,7 +434,7 @@ namespace Questor
 
             // We always check our defense state if we're in space, regardless of questor state
             // We also always check panic
-            if (Cache.Instance.InSpace)
+            if ((Cache.Instance.LastInSpace.AddSeconds(2) > DateTime.Now) && Cache.Instance.InSpace)
             {
                 DebugPerformanceClearandStartTimer();
                 if (!Cache.Instance.DoNotBreakInvul)
@@ -397,19 +460,6 @@ namespace Questor
                     BeginClosingQuestor();
                 }
             }
-
-            // Start _cleanup.ProcessState
-            // Description: Closes Windows, and eventually other things considered 'cleanup' useful to more than just Questor(Missions) but also Anomalies, Mining, etc
-            //
-            DebugPerformanceClearandStartTimer();
-            _cleanup.ProcessState();
-            DebugPerformanceStopandDisplayTimer("Cleanup.ProcessState");
-
-            if (Settings.Instance.DebugStates)
-                Logging.Log("Cleanup.State is", _States.CurrentCleanupState.ToString(), Logging.white);
-
-            // Done
-            // Cleanup State: ProcessState
 
             // When in warp there's nothing we can do, so ignore everything
             if (Cache.Instance.InWarp)
@@ -476,6 +526,11 @@ namespace Questor
                         _States.CurrentDirectionalScannerBehaviorState = DirectionalScannerBehaviorState.Idle;
                     }
                     _directionalScannerBehavior.ProcessState();
+                    break;
+
+                case QuestorState.DebugReloadAll:
+                    if (!Combat.ReloadAll(Cache.Instance.EntitiesNotSelf.OrderBy(t => t.Distance).FirstOrDefault(t => t.Distance < (double)Distance.OnGridWithMe))) return;
+                    _States.CurrentQuestorState = QuestorState.Start;
                     break;
 
                 case QuestorState.Start:

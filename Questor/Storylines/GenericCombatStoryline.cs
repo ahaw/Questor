@@ -80,7 +80,7 @@ namespace Questor.Storylines
                 _agentInteraction.AgentId = _agentId;
                 _agentInteraction.ForceAccept = true; // This makes agent interaction skip the offer-check
                 _States.CurrentAgentInteractionState = AgentInteractionState.Idle;
-                _agentInteraction.Purpose = AgentInteractionPurpose.AmmoCheck;
+                AgentInteraction.Purpose = AgentInteractionPurpose.AmmoCheck;
 
                 _arm.AgentId = _agentId;
                 _States.CurrentArmState = ArmState.Idle;

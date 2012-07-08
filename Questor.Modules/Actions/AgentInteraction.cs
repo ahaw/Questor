@@ -70,7 +70,7 @@ namespace Questor.Modules.Actions
 
         public bool ForceAccept { get; set; }
 
-        public AgentInteractionPurpose Purpose { get; set; }
+        public static AgentInteractionPurpose Purpose { get; set; }
 
         public List<Ammo> AmmoToLoad { get; private set; }
 
@@ -306,31 +306,31 @@ namespace Questor.Modules.Actions
             bool seven = false;
             if (!string.IsNullOrEmpty(html))
             {
-                //roguedrones |= html.Contains("Destroy the Rogue Drones");
-                //roguedrones |= html.Contains("Rogue Drone Harassment Objectives");
-                //roguedrones |= html.Contains("Air Show! Objectives");
-                //roguedrones |= html.Contains("Alluring Emanations Objectives");
-                //roguedrones |= html.Contains("Anomoly Objectives");
-                //roguedrones |= html.Contains("Attack of the Drones Objectives");
-                //roguedrones |= html.Contains("Drone Detritus Objectives");
-                //roguedrones |= html.Contains("Drone Infestation Objectives");
-                //roguedrones |= html.Contains("Evolution Objectives");
-                //roguedrones |= html.Contains("Infected Ruins Objectives");
-                //roguedrones |= html.Contains("Infiltrated Outposts Objectives");
-                //roguedrones |= html.Contains("Mannar Mining Colony");
-                //roguedrones |= html.Contains("Missing Convoy Objectives");
-                //roguedrones |= html.Contains("Onslaught Objectives");
-                //roguedrones |= html.Contains("Patient Zero Objectives");
-                //roguedrones |= html.Contains("Persistent Pests Objectives");
-                //roguedrones |= html.Contains("Portal to War Objectives");
-                //roguedrones |= html.Contains("Rogue Eradication Objectives");
-                //roguedrones |= html.Contains("Rogue Hunt Objectives");
-                //roguedrones |= html.Contains("Rogue Spy Objectives");
-                //roguedrones |= html.Contains("Roving Rogue Drones Objectives");
-                //roguedrones |= html.Contains("Soothe The Salvage Beast");
-                //roguedrones |= html.Contains("Wildcat Strike Objectives");
-                //eom |= html.Contains("Gone Berserk Objectives");
-                //seven |= html.Contains("The Damsel In Distress Objectives");
+                roguedrones |= html.Contains("Destroy the Rogue Drones");
+                roguedrones |= html.Contains("Rogue Drone Harassment Objectives");
+                roguedrones |= html.Contains("Air Show! Objectives");
+                roguedrones |= html.Contains("Alluring Emanations Objectives");
+                roguedrones |= html.Contains("Anomoly Objectives");
+                roguedrones |= html.Contains("Attack of the Drones Objectives");
+                roguedrones |= html.Contains("Drone Detritus Objectives");
+                roguedrones |= html.Contains("Drone Infestation Objectives");
+                roguedrones |= html.Contains("Evolution Objectives");
+                roguedrones |= html.Contains("Infected Ruins Objectives");
+                roguedrones |= html.Contains("Infiltrated Outposts Objectives");
+                roguedrones |= html.Contains("Mannar Mining Colony");
+                roguedrones |= html.Contains("Missing Convoy Objectives");
+                roguedrones |= html.Contains("Onslaught Objectives");
+                roguedrones |= html.Contains("Patient Zero Objectives");
+                roguedrones |= html.Contains("Persistent Pests Objectives");
+                roguedrones |= html.Contains("Portal to War Objectives");
+                roguedrones |= html.Contains("Rogue Eradication Objectives");
+                roguedrones |= html.Contains("Rogue Hunt Objectives");
+                roguedrones |= html.Contains("Rogue Spy Objectives");
+                roguedrones |= html.Contains("Roving Rogue Drones Objectives");
+                roguedrones |= html.Contains("Soothe The Salvage Beast");
+                roguedrones |= html.Contains("Wildcat Strike Objectives");
+                eom |= html.Contains("Gone Berserk Objectives");
+                seven |= html.Contains("The Damsel In Distress Objectives");
             }
 
             if (roguedrones)                                 
@@ -377,10 +377,12 @@ namespace Questor.Modules.Actions
                     if (faction != null)
                     {
                         Cache.Instance.FactionName = (string)faction.Attribute("name");
+                        Cache.Instance.DamageType = (DamageType)Enum.Parse(typeof(DamageType), (string)faction.Attribute("damagetype"));
                         return (DamageType)Enum.Parse(typeof(DamageType), (string)faction.Attribute("damagetype"));
                     }
                 }
             }
+            Cache.Instance.DamageType = DamageType.EM;
             return DamageType.EM;
         }
 
@@ -568,6 +570,7 @@ namespace Questor.Modules.Actions
                         IEnumerable<DamageType> damageTypes = missionXml.XPathSelectElements("//damagetype").Select(e => (DamageType)Enum.Parse(typeof(DamageType), (string)e, true)).ToList();
                         if (damageTypes.Any())
                         {
+                            Cache.Instance.DamageType = damageTypes.FirstOrDefault();
                             LoadSpecificAmmo(damageTypes.Distinct());
                             loadedAmmo = true;
                         }

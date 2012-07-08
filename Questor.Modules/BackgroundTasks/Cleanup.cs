@@ -358,6 +358,8 @@ namespace Questor.Modules.BackgroundTasks
         {
             if (DateTime.Now < _lastCleanupAction.AddMilliseconds(500))
                 return false;
+
+            _lastCleanupAction = DateTime.Now;
             //
             // go through *every* window
             //
@@ -483,6 +485,17 @@ namespace Questor.Modules.BackgroundTasks
                 _States.CurrentSalvageState = SalvageState.Idle;
                 return;
             }
+
+            if (!Cache.Instance.InSpace || !Cache.Instance.InStation)
+                return;
+
+            if (Cache.Instance.InSpace) 
+                if (DateTime.Now > Cache.Instance.LastInStation.AddSeconds(10))
+                    return;
+
+            if (Cache.Instance.InStation)
+                if (DateTime.Now > Cache.Instance.LastInSpace.AddSeconds(10))
+                    return;
 
             switch (_States.CurrentCleanupState)
             {

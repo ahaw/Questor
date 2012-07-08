@@ -21,6 +21,10 @@ namespace Questor.Modules.Lookup
     using System.Xml.Linq;
     using System.Xml.XPath;
 
+    //
+    // this file is not yet in use, and is meant to one day replace the equivalent code that is currently embedded in AgentInteraction.cs
+    //
+
     public class CombatMissionSettings
     {
         private void LoadSpecificAmmo(IEnumerable<DamageType> damageTypes)
@@ -39,7 +43,7 @@ namespace Questor.Modules.Lookup
             Cache.Instance.MissionAmmo = new List<Ammo>();
             if (File.Exists(Cache.Instance.missionXmlPath))
             {
-                Logging.Log("AgentInteraction", "Loading mission xml [" + missionName + "]", Logging.white);
+                Logging.Log("CombatMissionSettings", "Loading mission xml [" + missionName + "]", Logging.white);
                 //
                 // this loads the settings global to the mission, NOT individual pockets
                 //
@@ -69,13 +73,13 @@ namespace Questor.Modules.Lookup
                 }
                 catch (Exception ex)
                 {
-                    Logging.Log("AgentInteraction", "Error parsing damage types for mission [" + Cache.Instance.Mission.Name + "], " + ex.Message, Logging.white);
+                    Logging.Log("CombatMissionSettings", "Error parsing damage types for mission [" + Cache.Instance.Mission.Name + "], " + ex.Message, Logging.white);
                 }
             }
 
             if (!loadedAmmo)
             {
-                Logging.Log("AgentInteraction", "Detecting damage type for [" + missionName + "]", Logging.white);
+                Logging.Log("CombatMissionSettings", "Detecting damage type for [" + missionName + "]", Logging.white);
                 Cache.Instance.DamageType = GetMissionDamageType(html);
                 LoadSpecificAmmo(new[] { Cache.Instance.DamageType });
             }

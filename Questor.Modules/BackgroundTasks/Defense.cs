@@ -20,6 +20,9 @@ namespace Questor.Modules.BackgroundTasks
     public class Defense
     {
         private DateTime _lastSessionChange = DateTime.MinValue;
+        
+        private DateTime _lastPulse = DateTime.MinValue;
+
         private int ModuleNumber { get; set; }
 
         private void ActivateOnce()
@@ -235,6 +238,11 @@ namespace Questor.Modules.BackgroundTasks
 
         public void ProcessState()
         {
+            // Only pulse state changes every 1.5s
+            if (DateTime.Now.Subtract(_lastPulse).TotalMilliseconds < 500) //default: 500ms
+                return;
+            _lastPulse = DateTime.Now;
+
             // Thank god stations are safe ! :)
             if (Cache.Instance.InStation)
                 return;

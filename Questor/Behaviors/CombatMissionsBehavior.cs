@@ -218,6 +218,11 @@ namespace Questor.Behaviors
 
         public void ProcessState()
         {
+            // Only pulse state changes every 1.5s
+            if (DateTime.Now.Subtract(_lastPulse).TotalMilliseconds < (int)Time.QuestorPulse_milliseconds) //default: 1500ms
+                return;
+            _lastPulse = DateTime.Now;
+
             // Invalid settings, quit while we're ahead
             if (!ValidSettings)
             {
@@ -464,10 +469,30 @@ namespace Questor.Behaviors
                         }
                         Logging.Log("AgentInteraction", "Start conversation [Start Mission]", Logging.white);
                         _States.CurrentAgentInteractionState = AgentInteractionState.StartConversation;
-                        _agentInteraction.Purpose = AgentInteractionPurpose.StartMission;
+                        AgentInteraction.Purpose = AgentInteractionPurpose.StartMission;
                     }
 
                     _agentInteraction.ProcessState();
+
+                    if (AgentInteraction.Purpose == AgentInteractionPurpose.CompleteMission) //AgentInteractionPurpose was changed 'on the fly' by agentInteraction 
+                    {
+                        if (_States.CurrentAgentInteractionState == AgentInteractionState.Done)
+                        {
+                            _States.CurrentAgentInteractionState = AgentInteractionState.Idle;
+                            if (Cache.Instance.CourierMission)
+                            {
+                                Cache.Instance.CourierMission = false;
+                                _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.Idle;
+                                _States.CurrentQuestorState = QuestorState.Idle;
+                            }
+                            else
+                            {
+                                _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.UnloadLoot;
+                            }
+                            return;
+                        }
+                        break;
+                    }
 
                     if (Settings.Instance.DebugStates)
                         Logging.Log("AgentInteraction.State", "is " + _States.CurrentAgentInteractionState, Logging.white);
@@ -777,6 +802,8 @@ namespace Questor.Behaviors
                 case CombatMissionsBehaviorState.CompleteMission:
                     if (_States.CurrentAgentInteractionState == AgentInteractionState.Idle)
                     {
+                        if (DateTime.Now > Cache.Instance.LastInStation.AddSeconds(5) && Cache.Instance.InStation) //do not proceed until we have ben docked for at least a few seconds
+                            return;
                         //Logging.Log("CombatMissionsBehavior: Starting: Statistics.WriteDroneStatsLog");
                         if (!Statistics.WriteDroneStatsLog()) break;
                         //Logging.Log("CombatMissionsBehavior: Starting: Statistics.AmmoConsumptionStatistics");
@@ -785,7 +812,7 @@ namespace Questor.Behaviors
                         Logging.Log("AgentInteraction", "Start Conversation [Complete Mission]", Logging.white);
 
                         _States.CurrentAgentInteractionState = AgentInteractionState.StartConversation;
-                        _agentInteraction.Purpose = AgentInteractionPurpose.CompleteMission;
+                        AgentInteraction.Purpose = AgentInteractionPurpose.CompleteMission;
                     }
 
                     _agentInteraction.ProcessState();
