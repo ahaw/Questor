@@ -77,8 +77,12 @@ namespace Questor
             }
             else
             {
-                Cache.Instance.StopTime = DateTime.Now.AddHours(10);
-                Logging.Log("Questor", "Schedule: NOT setup correctly: stoptime is [" + Cache.Instance.StopTime.ToShortTimeString() + "]", Logging.orange);
+                Cache.Instance.StopTime = DateTime.Now.AddHours((int)Time.Instance.QuestorScheduleNotUsed_Hours);
+                Logging.Log("Questor", "Schedule: NOT setup correctly: stoptime  set to [" + (int)Time.Instance.QuestorScheduleNotUsed_Hours + "] hours from now at [" + Cache.Instance.StopTime.ToShortTimeString() + "]", Logging.orange);
+                Logging.Log("Questor", "You can correct this by editing schedules.xml to have an entry for this toon", Logging.orange);
+                Logging.Log("Questor", "Ex: <char user=\"" + Settings.Instance.CharacterName + "\" pw=\"MyPasswordForEVEHere\" name=\"MyLoginNameForEVEHere\" start=\"06:45\" stop=\"08:10\" start2=\"09:05\" stop2=\"14:20\"/>", Logging.orange);
+                Logging.Log("Questor", "make sure each toon has its own innerspace profile and specify the following startup program line:", Logging.orange);
+                Logging.Log("Questor", "dotnet questor questor -x -c \"MyEVECharacterName\"", Logging.orange);
             }
             Cache.Instance.StartTime = Program.StartTime;
             Cache.Instance.QuestorStarted_DateTime = DateTime.Now;

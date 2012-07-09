@@ -69,6 +69,16 @@ namespace Questor.Modules.Caching
         private List<EntityCache> _bigobjects;
 
         /// <summary>
+        ///   BigObjects we are likely to bump into (mainly LCOs)
+        /// </summary>
+        private List<EntityCache> _gates;
+
+        /// <summary>
+        ///   BigObjects we are likely to bump into (mainly LCOs)
+        /// </summary>
+        private List<EntityCache> _bigobjectsandgates;
+
+        /// <summary>
         ///   objects we are likely to bump into (Anything that isnt an NPC a wreck or a can)
         /// </summary>
         private List<EntityCache> _objects;
@@ -897,7 +907,13 @@ namespace Questor.Modules.Caching
         public bool Missionbookmarktimerset = false;
         public DateTime Missionbookmarktimeout = DateTime.MaxValue;
 
-        public string AgentStationID { get; set; }
+        public long AgentStationID { get; set; }
+
+        public string AgentStationName { get; set; }
+
+        public long AgentSolarSystemID { get; set; }
+
+        public string AgentSolarSystemName { get; set; }
 
         public string CurrentAgent_text = string.Empty;
         public string CurrentAgent
@@ -943,7 +959,6 @@ namespace Questor.Modules.Caching
                     try
                     {
                         agent = Settings.Instance.AgentsList.OrderBy(j => j.Priorit).FirstOrDefault();
-                        Cache.Instance.AgentStationID = Cache.Instance.DirectEve.GetLocationName(Cache.Instance.Agent.StationId);
                     }
                     catch (Exception)
                     {
@@ -995,11 +1010,20 @@ namespace Questor.Modules.Caching
                         if (_agent != null)
                         {
                             _agentId = _agent.AgentId;
+                            //Logging.Log("Cache: CurrentAgent", "Processing Agent Info...", Logging.white);
+                            Cache.Instance.AgentStationName = Cache.Instance.DirectEve.GetLocationName(Cache.Instance._agent.StationId);
+                            Cache.Instance.AgentStationID = Cache.Instance._agent.StationId;
+                            Cache.Instance.AgentSolarSystemName = Cache.Instance.DirectEve.GetLocationName(Cache.Instance._agent.SolarSystemId);
+                            Cache.Instance.AgentSolarSystemID = Cache.Instance._agent.SolarSystemId;
+                            //Logging.Log("Cache: CurrentAgent", "AgentStationName [" + Cache.Instance.AgentStationName + "]", Logging.white);
+                            //Logging.Log("Cache: CurrentAgent", "AgentStationID [" + Cache.Instance.AgentStationID + "]", Logging.white);
+                            //Logging.Log("Cache: CurrentAgent", "AgentSolarSystemName [" + Cache.Instance.AgentSolarSystemName + "]", Logging.white);
+                            //Logging.Log("Cache: CurrentAgent", "AgentSolarSystemID [" + Cache.Instance.AgentSolarSystemID + "]", Logging.white);
                         }
                     }
                     catch (Exception)
                     {
-                        Logging.Log("Cache", "SwitchAgent", "Unable to process agent section of [" + Settings.Instance.SettingsPath + "] make sure you have a valid agent listed! Pausing so you can fix it.");
+                        Logging.Log("Cache", "Agent", "Unable to process agent section of [" + Settings.Instance.SettingsPath + "] make sure you have a valid agent listed! Pausing so you can fix it.");
                         Cache.Instance.Paused = true;
                     }
                     return _agent ?? (_agent = DirectEve.GetAgentById(_agentId.Value));
@@ -1164,12 +1188,19 @@ namespace Questor.Modules.Caching
         {
             get
             {
-                if (DirectEve.Session.IsInSpace && !DirectEve.Session.IsInStation && DirectEve.Session.IsReady && DirectEve.ActiveShip.Entity != null)
+                try
                 {
-                    Cache.Instance.LastInSpace = DateTime.Now;
-                    return true;
+                    if (DirectEve.Session.IsInSpace && !DirectEve.Session.IsInStation && DirectEve.Session.IsReady && DirectEve.ActiveShip.Entity != null)
+                    {
+                        Cache.Instance.LastInSpace = DateTime.Now;
+                        return true;
+                    }
+                    return false;
                 }
-                return false;
+                catch (Exception)
+                {
+                    return false;
+                }
             }
         }
 
@@ -1177,12 +1208,19 @@ namespace Questor.Modules.Caching
         {
             get
             {
-                if (DirectEve.Session.IsInStation && !DirectEve.Session.IsInSpace && DirectEve.Session.IsReady)
+                try
                 {
-                    Cache.Instance.LastInStation = DateTime.Now;
-                    return true;
+                    if (DirectEve.Session.IsInStation && !DirectEve.Session.IsInSpace && DirectEve.Session.IsReady)
+                    {
+                        Cache.Instance.LastInStation = DateTime.Now;
+                        return true;
+                    }
+                    return false;
                 }
-                return false;
+                catch (Exception)
+                {
+                    return false;
+                }
             }
         }
 
@@ -1272,11 +1310,21 @@ namespace Questor.Modules.Caching
             }
         }
 
+        public IEnumerable<EntityCache> AccelerationGates
+        {
+            get
+            {
+                return _gates ?? (_gates = Entities.Where(e =>
+                       e.GroupId == (int)Group.AccellerationGate ||
+                       e.Distance < (double)Distance.OnGridWithMe).OrderBy(t => t.Distance).ToList());
+            }
+        }
+
         public IEnumerable<EntityCache> BigObjectsandGates
         {
             get
             {
-                return _bigobjects ?? (_bigobjects = Entities.Where(e =>
+                return _bigobjectsandgates ?? (_bigobjectsandgates = Entities.Where(e =>
                        e.GroupId == (int)Group.LargeCollidableStructure ||
                        e.GroupId == (int)Group.AccellerationGate ||
                        e.TypeId == 21609 || //Dysfunctional Solar Harvester in Gone Berserk (not an LCO)

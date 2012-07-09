@@ -161,6 +161,8 @@ namespace Questor
                 _nextUIDataRefresh = DateTime.Now.AddMilliseconds(1000);
                 try
                 {
+                    CurrentTimeData1.Text = DateTime.Now.ToLongTimeString();
+                    CurrentTimeData2.Text = DateTime.Now.ToLongTimeString();
                     NextOpenContainerInSpaceActionData.Text = Cache.Instance.NextOpenContainerInSpaceAction.ToLongTimeString();
                     NextOpenJournalWindowActionData.Text = Cache.Instance.NextOpenJournalWindowAction.ToLongTimeString();
                     NextOpenLootContainerActionData.Text = Cache.Instance.NextOpenLootContainerAction.ToLongTimeString();
@@ -909,7 +911,7 @@ namespace Questor
                 }
             }
 
-            if (DateTime.Now.Subtract(Cache.Instance.LastSessionIsReady).TotalSeconds > (Time.Instance.NoSessionIsReadyRestart_seconds + extraWaitSeconds) &&
+            if (DateTime.Now.Subtract(Cache.Instance.LastSessionIsReady).TotalSeconds > (Time.Instance.Instance.NoSessionIsReadyRestart_seconds + extraWaitSeconds) &&
                     DateTime.Now.Subtract(Program.AppStarted).TotalSeconds > 300)
             {
                 if (DateTime.Now.Subtract(Cache.Instance.LastLogMessage).TotalSeconds > 60)

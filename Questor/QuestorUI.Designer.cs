@@ -168,6 +168,10 @@
             this.BlacklistedMissionstextbox = new System.Windows.Forms.TextBox();
             this.GreyListedMissionsTextBox = new System.Windows.Forms.TextBox();
             this.TimeStamps = new System.Windows.Forms.TabPage();
+            this.CurrentTimelbl2 = new System.Windows.Forms.Label();
+            this.CurrentTimeData2 = new System.Windows.Forms.Label();
+            this.CurrentTimeData1 = new System.Windows.Forms.Label();
+            this.CurrentTimelbl = new System.Windows.Forms.Label();
             this.LastSessionChangeData = new System.Windows.Forms.Label();
             this.LastSessionChangelbl = new System.Windows.Forms.Label();
             this.NextStartupActionData = new System.Windows.Forms.Label();
@@ -270,10 +274,6 @@
             this.buttonQuestormanager = new System.Windows.Forms.Button();
             this.label25 = new System.Windows.Forms.Label();
             this.label26 = new System.Windows.Forms.Label();
-            this.CurrentTimelbl = new System.Windows.Forms.Label();
-            this.label30 = new System.Windows.Forms.Label();
-            this.label32 = new System.Windows.Forms.Label();
-            this.CurrentTimelbl2 = new System.Windows.Forms.Label();
             this.Console.SuspendLayout();
             this.Tabs.SuspendLayout();
             this.States.SuspendLayout();
@@ -1670,8 +1670,8 @@
             // TimeStamps
             // 
             this.TimeStamps.Controls.Add(this.CurrentTimelbl2);
-            this.TimeStamps.Controls.Add(this.label32);
-            this.TimeStamps.Controls.Add(this.label30);
+            this.TimeStamps.Controls.Add(this.CurrentTimeData2);
+            this.TimeStamps.Controls.Add(this.CurrentTimeData1);
             this.TimeStamps.Controls.Add(this.CurrentTimelbl);
             this.TimeStamps.Controls.Add(this.LastSessionChangeData);
             this.TimeStamps.Controls.Add(this.LastSessionChangelbl);
@@ -1744,6 +1744,42 @@
             this.TimeStamps.TabIndex = 6;
             this.TimeStamps.Text = "TimeStamps";
             this.TimeStamps.UseVisualStyleBackColor = true;
+            // 
+            // CurrentTimelbl2
+            // 
+            this.CurrentTimelbl2.AutoSize = true;
+            this.CurrentTimelbl2.Location = new System.Drawing.Point(314, 21);
+            this.CurrentTimelbl2.Name = "CurrentTimelbl2";
+            this.CurrentTimelbl2.Size = new System.Drawing.Size(87, 13);
+            this.CurrentTimelbl2.TabIndex = 284;
+            this.CurrentTimelbl2.Text = "DateTime (Now):";
+            // 
+            // CurrentTimeData2
+            // 
+            this.CurrentTimeData2.AutoSize = true;
+            this.CurrentTimeData2.Location = new System.Drawing.Point(493, 21);
+            this.CurrentTimeData2.Name = "CurrentTimeData2";
+            this.CurrentTimeData2.Size = new System.Drawing.Size(27, 13);
+            this.CurrentTimeData2.TabIndex = 282;
+            this.CurrentTimeData2.Text = "N/A";
+            // 
+            // CurrentTimeData1
+            // 
+            this.CurrentTimeData1.AutoSize = true;
+            this.CurrentTimeData1.Location = new System.Drawing.Point(214, 21);
+            this.CurrentTimeData1.Name = "CurrentTimeData1";
+            this.CurrentTimeData1.Size = new System.Drawing.Size(27, 13);
+            this.CurrentTimeData1.TabIndex = 281;
+            this.CurrentTimeData1.Text = "N/A";
+            // 
+            // CurrentTimelbl
+            // 
+            this.CurrentTimelbl.AutoSize = true;
+            this.CurrentTimelbl.Location = new System.Drawing.Point(35, 21);
+            this.CurrentTimelbl.Name = "CurrentTimelbl";
+            this.CurrentTimelbl.Size = new System.Drawing.Size(87, 13);
+            this.CurrentTimelbl.TabIndex = 280;
+            this.CurrentTimelbl.Text = "DateTime (Now):";
             // 
             // LastSessionChangeData
             // 
@@ -2698,42 +2734,6 @@
             this.label26.Text = "State:";
             this.label26.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
-            // CurrentTimelbl
-            // 
-            this.CurrentTimelbl.AutoSize = true;
-            this.CurrentTimelbl.Location = new System.Drawing.Point(35, 21);
-            this.CurrentTimelbl.Name = "CurrentTimelbl";
-            this.CurrentTimelbl.Size = new System.Drawing.Size(87, 13);
-            this.CurrentTimelbl.TabIndex = 280;
-            this.CurrentTimelbl.Text = "DateTime (Now):";
-            // 
-            // label30
-            // 
-            this.label30.AutoSize = true;
-            this.label30.Location = new System.Drawing.Point(214, 21);
-            this.label30.Name = "label30";
-            this.label30.Size = new System.Drawing.Size(27, 13);
-            this.label30.TabIndex = 281;
-            this.label30.Text = "N/A";
-            // 
-            // label32
-            // 
-            this.label32.AutoSize = true;
-            this.label32.Location = new System.Drawing.Point(493, 21);
-            this.label32.Name = "label32";
-            this.label32.Size = new System.Drawing.Size(27, 13);
-            this.label32.TabIndex = 282;
-            this.label32.Text = "N/A";
-            // 
-            // CurrentTimelbl2
-            // 
-            this.CurrentTimelbl2.AutoSize = true;
-            this.CurrentTimelbl2.Location = new System.Drawing.Point(314, 21);
-            this.CurrentTimelbl2.Name = "CurrentTimelbl2";
-            this.CurrentTimelbl2.Size = new System.Drawing.Size(87, 13);
-            this.CurrentTimelbl2.TabIndex = 284;
-            this.CurrentTimelbl2.Text = "DateTime (Now):";
-            // 
             // QuestorfrmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -3040,8 +3040,8 @@
         private System.Windows.Forms.Label AgentInteractionPurposelbl;
         private System.Windows.Forms.Label AgentInteractionPurposeData;
         private System.Windows.Forms.Label CurrentTimelbl2;
-        private System.Windows.Forms.Label label32;
-        private System.Windows.Forms.Label label30;
+        private System.Windows.Forms.Label CurrentTimeData2;
+        private System.Windows.Forms.Label CurrentTimeData1;
         private System.Windows.Forms.Label CurrentTimelbl;
     }
 }

@@ -39,6 +39,8 @@ namespace Questor.Behaviors
 
         private DateTime _lastPulse;
         private DateTime _lastSalvageTrip = DateTime.MinValue;
+        private DateTime _nextSetEVENavDestination = DateTime.MinValue;
+        private DateTime _nextGetDestinationPath = DateTime.MinValue;
         private readonly CombatMissionCtrl _combatMissionCtrl;
         private readonly Panic _panic;
         private readonly Storyline _storyline;
@@ -64,6 +66,8 @@ namespace Questor.Behaviors
         public bool CloseQuestorflag = true;
 
         public string CharacterName { get; set; }
+        
+        private List<long> EVENavdestination { get; set; }
 
         //DateTime _nextAction = DateTime.Now;
 
@@ -153,20 +157,19 @@ namespace Questor.Behaviors
                 ValidSettings = false;
             }
 
-            DirectAgent agent = Cache.Instance.DirectEve.GetAgentByName(Cache.Instance.CurrentAgent);
 
-            if (agent == null || !agent.IsValid)
+            if (Cache.Instance.Agent == null || !Cache.Instance.Agent.IsValid)
             {
                 Logging.Log("Settings", "Unable to locate agent [" + Cache.Instance.CurrentAgent + "]", Logging.white);
                 ValidSettings = false;
             }
             else
             {
-                _agentInteraction.AgentId = agent.AgentId;
-                _combatMissionCtrl.AgentId = agent.AgentId;
-                _arm.AgentId = agent.AgentId;
-                _statistics.AgentID = agent.AgentId;
-                AgentID = agent.AgentId;
+                _agentInteraction.AgentId = Cache.Instance.AgentId;
+                _combatMissionCtrl.AgentId = Cache.Instance.AgentId;
+                _arm.AgentId = Cache.Instance.AgentId;
+                _statistics.AgentID = Cache.Instance.AgentId;
+                AgentID = Cache.Instance.AgentId;
             }
         }
 
@@ -186,14 +189,14 @@ namespace Questor.Behaviors
 
         private void TravelToAgentsStation()
         {
-            var baseDestination = _traveler.Destination as StationDestination;
-            if (baseDestination == null || baseDestination.StationId != Cache.Instance.Agent.StationId)
-                _traveler.Destination = new StationDestination(Cache.Instance.Agent.SolarSystemId, Cache.Instance.Agent.StationId, Cache.Instance.DirectEve.GetLocationName(Cache.Instance.Agent.StationId));
-
-            if (Cache.Instance.InSpace)
+            //
+            // defending yourself is more important that the traveling part... so it comes first.
+            //
+            if (Cache.Instance.InSpace && Settings.Instance.DefendWhileTraveling)
             {
                 if (!Cache.Instance.DirectEve.ActiveShip.Entity.IsCloaked || (Cache.Instance.LastSessionChange.AddSeconds(60) > DateTime.Now))
                 {
+                    if (Settings.Instance.DebugGotobase) Logging.Log("CombatMissionsBehavior", "TravelToAgentsStation: _combat.ProcessState()", Logging.white);
                     _combat.ProcessState();
                     if (!Cache.Instance.TargetedBy.Any(t => t.IsWarpScramblingMe))
                     {
@@ -204,16 +207,99 @@ namespace Questor.Behaviors
                     else if (Cache.Instance.TargetedBy.Any(t => t.IsWarpScramblingMe))
                     {
                         Cache.Instance.IsMissionPocketDone = false;
+                        if (Settings.Instance.DebugGotobase) Logging.Log("CombatMissionsBehavior", "TravelToAgentsStation: we are scrambled", Logging.teal);
                         _drones.ProcessState();
                         return;
                     }
                 }
             }
-            _traveler.ProcessState();
-            if (Settings.Instance.DebugStates)
+            else if (Settings.Instance.DefendWhileTraveling)
             {
-                Logging.Log("Traveler.State", "is " + _States.CurrentTravelerState, Logging.white);
+                if (Settings.Instance.DebugGotobase) Logging.Log("CombatMissionsBehavior", "TravelToAgentsStation: Cache.Instance.LastInSpace is more than 2 seconds old: waiting", Logging.teal);
+                //return //we *need* to run _traveler.processState while in station to know that we are done traveling - do NOT return here.
             }
+
+
+            Cache.Instance.OpenWrecks = false;
+            bool SetEVENavDestination = false;
+
+            if (SetEVENavDestination)
+            {
+                
+                if (DateTime.Now > _nextGetDestinationPath || EVENavdestination == null)
+            {
+                    if (Settings.Instance.DebugGotobase) Logging.Log("CombatMissionsBehavior", "TravelToAgentsStation: EVENavdestination = Cache.Instance.DirectEve.Navigation.GetDestinationPath();", Logging.white);
+                    _nextGetDestinationPath = DateTime.Now.AddSeconds(20);
+                    _nextSetEVENavDestination = DateTime.Now.AddSeconds(4);
+                    EVENavdestination = Cache.Instance.DirectEve.Navigation.GetDestinationPath();
+                    if (Settings.Instance.DebugGotobase) if (EVENavdestination != null) Logging.Log("CombatMissionsBehavior", "TravelToAgentsStation: Cache.Instance.DirectEve.Navigation.GetLocation(EVENavdestination.Last()).LocationId [" + Cache.Instance.DirectEve.Navigation.GetLocation(EVENavdestination.Last()).LocationId + "]", Logging.white);
+                return;
+            }
+
+                if (Cache.Instance.DirectEve.Navigation.GetLocation(EVENavdestination.Last()).LocationId != Cache.Instance.AgentSolarSystemID)
+            {
+                    //Logging.Log("CombatMissionsBehavior", "TravelToAgentsStation: Cache.Instance.DirectEve.Navigation.GetLocation(EVENavdestination.Last()).LocationId [" + Cache.Instance.DirectEve.Navigation.GetLocation(EVENavdestination.Last()).LocationId + "]", Logging.white);
+                    //Logging.Log("CombatMissionsBehavior", "TravelToAgentsStation: EVENavdestination.LastOrDefault() [" + EVENavdestination.LastOrDefault() + "]", Logging.white);
+                    //Logging.Log("CombatMissionsBehavior", "TravelToAgentsStation: Cache.Instance.AgentSolarSystemID [" + Cache.Instance.AgentSolarSystemID + "]", Logging.white);
+                    if (DateTime.Now > _nextSetEVENavDestination)
+                    {
+                        if (Settings.Instance.DebugGotobase) Logging.Log("CombatMissionsBehavior", "TravelToAgentsStation: Cache.Instance.DirectEve.Navigation.SetDestination(Cache.Instance.AgentStationId);", Logging.white);
+                        _nextSetEVENavDestination = DateTime.Now.AddSeconds(7);
+                        Cache.Instance.DirectEve.Navigation.SetDestination(Cache.Instance.AgentStationID);
+                        Logging.Log("CombatMissionsBehavior.TravelToAgentsStation", "Setting EVEs Destination to [" + Cache.Instance.AgentStationName + "'s] Station", Logging.white);
+                return;
+            }
+                }
+                else if (EVENavdestination != null || EVENavdestination.Count != 0) 
+                {
+                    if (EVENavdestination.Count == 1 && EVENavdestination.First() == 0)
+                        EVENavdestination[0] = Cache.Instance.DirectEve.Session.SolarSystemId ?? -1;
+                }
+            }
+
+            if (Settings.Instance.DebugGotobase) Logging.Log("CombatMissionsBehavior", "TravelToAgentsStation:      Cache.Instance.AgentStationId [" + Cache.Instance.AgentStationID + "]", Logging.white);
+            if (Settings.Instance.DebugGotobase) Logging.Log("CombatMissionsBehavior", "TravelToAgentsStation:  Cache.Instance.AgentSolarSystemId [" + Cache.Instance.AgentSolarSystemID + "]", Logging.white);
+                
+            if (_traveler.Destination == null || _traveler.Destination.SolarSystemId != Cache.Instance.AgentSolarSystemID)
+            {
+                Logging.Log("CombatMissionsBehavior.TravelToAgentsStation", "Destination: [" + Cache.Instance.AgentStationName + "]", Logging.white);
+                _traveler.Destination = new StationDestination(Cache.Instance.AgentSolarSystemID, Cache.Instance.AgentStationID, Cache.Instance.AgentStationName);
+            }
+            else
+            {
+                //if (Settings.Instance.DebugGotobase) if (_traveler.Destination != null) Logging.Log("CombatMissionsBehavior", "TravelToAgentsStation: _traveler.Destination.SolarSystemId [" + _traveler.Destination.SolarSystemId + "]", Logging.white);
+            _traveler.ProcessState();
+
+                //we also assume you are connected during a manual set of questor into travel mode (safe assumption considering someone is at the kb)
+                Cache.Instance.LastKnownGoodConnectedTime = DateTime.Now;
+                Cache.Instance.MyWalletBalance = Cache.Instance.DirectEve.Me.Wealth;
+
+                if (_States.CurrentTravelerState == TravelerState.AtDestination)
+                {
+                    if (_States.CurrentCombatMissionCtrlState == CombatMissionCtrlState.Error)
+                    {
+                        Logging.Log("CombatMissionsBehavior.TravelToAgentsStation", "an error has occurred", Logging.white);
+                        if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.Traveler)
+                        {
+                            _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.Error;
+                        }
+                        return;
+                    }
+                    else if (Cache.Instance.InSpace)
+                    {
+                        Logging.Log("CombatMissionsBehavior.TravelToAgentsStation", "Arrived at destination (in space, Questor stopped)", Logging.white);
+                        if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.Traveler) _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.Error;
+                        return;
+                    }
+                    else
+            {
+                        Logging.Log("CombatMissionsBehavior.TravelToAgentsStation", "Arrived at destination", Logging.white);
+                        if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.Traveler) _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.Idle;
+                        return;
+                    }
+                }
+            }
+            return;
         }
 
         public void ProcessState()
@@ -373,6 +459,7 @@ namespace Questor.Behaviors
 
                     if (Settings.Instance.AutoStart)
                     {
+                        if (Settings.Instance.DebugAutoStart) Logging.Log("CombatMissionsBehavior", "Autostart is currently [" + Settings.Instance.AutoStart + "]", Logging.white);
                         // Don't start a new action an hour before downtime
                         if (DateTime.UtcNow.Hour == 10)
                         {
@@ -403,6 +490,7 @@ namespace Questor.Behaviors
                     }
                     else
                     {
+                        if (Settings.Instance.DebugAutoStart) Logging.Log("CombatMissionsBehavior", "Autostart is currently [" + Settings.Instance.AutoStart + "]", Logging.white);
                         Cache.Instance.LastScheduleCheck = DateTime.Now;
                         Questor.TimeCheck();   //Should we close questor due to stoptime or runtime?
                         //Questor.WalletCheck(); //Should we close questor due to no wallet balance change? (stuck?)
@@ -999,7 +1087,7 @@ namespace Questor.Behaviors
                     _traveler.ProcessState();
                     
                     
-                    if (_States.CurrentTravelerState == TravelerState.AtDestination || Cache.Instance.GateInGrid()) 
+                    if (_States.CurrentTravelerState == TravelerState.AtDestination || Cache.Instance.GateInGrid())
                     {
                         //we know we are connected if we were able to arm the ship - update the lastknownGoodConnectedTime
                         Cache.Instance.LastKnownGoodConnectedTime = DateTime.Now;

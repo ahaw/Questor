@@ -116,10 +116,10 @@ namespace Questor.Modules.Actions
                 return true;
             }
 
-            if (Cache.Instance.InStation)
+            if (Cache.Instance.InStation &&  DateTime.Now > Cache.Instance.LastInSpace.AddSeconds(10))
             {
                 // We are in a station, but not the correct station!
-                if (Cache.Instance.NextUndockAction < DateTime.Now)
+                if (DateTime.Now > Cache.Instance.NextUndockAction)
                 {
                     Logging.Log("TravelerDestination.StationDestination", "This is not the destination station, undocking from [" + Cache.Instance.DirectEve.GetLocationName(Cache.Instance.DirectEve.Session.StationId ?? 0) + "]", Logging.green);
 
@@ -144,13 +144,14 @@ namespace Questor.Modules.Actions
                     //else Logging.Log("TravelerDestination.StationDestination: UndockPrefix is not configured");
                     Cache.Instance.DirectEve.ExecuteCommand(DirectCmd.CmdExitStation);
                     Cache.Instance.NextUndockAction = DateTime.Now.AddSeconds(Time.Instance.TravelerExitStationAmIInSpaceYet_seconds);
+                    return false;
                 }
 
                 // We are not there yet
                 return false;
             }
 
-            if (!Cache.Instance.InSpace)
+            if ((DateTime.Now > Cache.Instance.LastInStation.AddSeconds(10)) && !Cache.Instance.InSpace)
             {
                 // We are not in station and not in space?  Wait for a bit
                 return false;
@@ -192,6 +193,7 @@ namespace Questor.Modules.Actions
                     Logging.Log("TravelerDestination.StationDestination", "Dock at [" + Logging.yellow + entity.Name + Logging.green + "] which is [" + Math.Round(entity.Distance / 1000, 0) + "k away]", Logging.green);
                     entity.Dock();
                     Cache.Instance.NextDockAction = DateTime.Now.AddSeconds(Time.Instance.DockingDelay_seconds);
+                    return false;
                 }
             }
             else if (entity.Distance < (int)Distance.WarptoDistance)
@@ -201,6 +203,7 @@ namespace Questor.Modules.Actions
                     Logging.Log("TravelerDestintion.StationDestination", "Approaching[" + Logging.yellow + entity.Name + Logging.green + "] which is [" + Math.Round(entity.Distance / 1000, 0) + "k away]", Logging.green);
                     entity.Approach();
                     Cache.Instance.NextDockAction = DateTime.Now.AddSeconds(Time.Instance.ApproachDelay_seconds);
+                    return false;
                 }
             }
             else
@@ -210,6 +213,7 @@ namespace Questor.Modules.Actions
                     Logging.Log("TravelerDestination.StationDestination", "Warp to and dock at [" + Logging.yellow + entity.Name + Logging.green + "][" + Math.Round((entity.Distance / 1000) / 149598000, 2) + " AU away]", Logging.green);
                     entity.WarpTo();
                     Cache.Instance.NextDockAction = DateTime.Now.AddSeconds(Time.Instance.WarptoDelay_seconds);
+                    return false;
                 }
             }
 

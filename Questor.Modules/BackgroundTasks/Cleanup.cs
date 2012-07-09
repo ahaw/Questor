@@ -482,20 +482,37 @@ namespace Questor.Modules.BackgroundTasks
             // When in warp there's nothing we can do, so ignore everything
             if (Cache.Instance.InWarp)
             {
+                if (Settings.Instance.DebugCleanup) Logging.Log("Cleanup", "Processstate: we are in warp: do nothing", Logging.teal);
                 _States.CurrentSalvageState = SalvageState.Idle;
                 return;
             }
 
-            if (!Cache.Instance.InSpace || !Cache.Instance.InStation)
+            if (DateTime.Now < Cache.Instance.LastSessionChange.AddSeconds(20))
+            {
+                if (Settings.Instance.DebugCleanup) Logging.Log("Cleanup", "last session change was at [" + Cache.Instance.LastSessionChange + "] waiting until 20 sec have passed", Logging.teal);
                 return;
+            }
+
 
             if (Cache.Instance.InSpace) 
-                if (DateTime.Now > Cache.Instance.LastInStation.AddSeconds(10))
+            {
+                if (Settings.Instance.DebugCleanup) Logging.Log("Cleanup", "Processstate: we are in space", Logging.teal);
+                if (DateTime.Now < Cache.Instance.LastInStation.AddSeconds(10))
+                {
+                    if (Settings.Instance.DebugCleanup) Logging.Log("Cleanup", "Processstate: last in station time is [" + Cache.Instance.LastInStation + " waiting until 10 seconds have passed", Logging.teal);
                     return;
+                }
+            }
 
             if (Cache.Instance.InStation)
-                if (DateTime.Now > Cache.Instance.LastInSpace.AddSeconds(10))
+            {
+                if (Settings.Instance.DebugCleanup) Logging.Log("Cleanup", "Processstate: we are in station", Logging.teal);
+                if (DateTime.Now < Cache.Instance.LastInSpace.AddSeconds(10))
+                {
+                    if (Settings.Instance.DebugCleanup) Logging.Log("Cleanup", "Processstate: last in space time is [" + Cache.Instance.LastInSpace + " waiting until 10 seconds have passed", Logging.teal);
                     return;
+                }
+            }
 
             switch (_States.CurrentCleanupState)
             {

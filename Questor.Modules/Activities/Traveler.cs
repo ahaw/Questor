@@ -57,17 +57,12 @@ namespace Questor.Modules.Activities
                 //Logging.Log("Traveler: will continue in [ " + Math.Round(_nextTravelerAction.Subtract(DateTime.Now).TotalSeconds, 0) + " ]sec");
                 return;
             }
+
             Cache.Instance.NextTravelerAction = DateTime.Now.AddSeconds(1);
             if (Settings.Instance.DebugTraveler) Logging.Log("Traveler", "NavigateToBookmarkSystem - Iterating- next iteration should be in no less than [1] second ", Logging.teal);
 
-            if (DateTime.Now > _nextGetDestinationPath || destination == null)
-            {
-                if (Settings.Instance.DebugTraveler) Logging.Log("Traveler", "NavigateToBookmarkSystem: getting destination path", Logging.teal);
-                _nextGetDestinationPath = DateTime.Now.AddSeconds(30);
                 destination = Cache.Instance.DirectEve.Navigation.GetDestinationPath();
-                Cache.Instance.NextTravelerAction = DateTime.Now.AddSeconds(4);
-                return;
-            }
+
             if (destination.Count == 0 || !destination.Any(d => d == solarSystemId))
             {
                 if (Settings.Instance.DebugTraveler) if (destination.Count == 0) Logging.Log("Traveler", "We have no destination", Logging.teal);
@@ -127,17 +122,8 @@ namespace Questor.Modules.Activities
                 
                 // Find the first waypoint
                 long waypoint = destination.First();
-
-                // Get the name of the next system
-                if (DateTime.Now > _nextGetLocationName || String.IsNullOrEmpty(locationName))
-                {
                     if (Settings.Instance.DebugTraveler) Logging.Log("Traveler", "NavigateToBookmarkSystem: getting next waypoints locationname", Logging.teal);
-                    _nextGetLocationName = DateTime.Now.AddSeconds(20);
                     locationName = Cache.Instance.DirectEve.Navigation.GetLocationName(waypoint);
-                    Cache.Instance.NextTravelerAction = DateTime.Now.AddSeconds(1);
-                    return;
-                }
-
                 // Find the stargate associated with it
                 IEnumerable<EntityCache> stargates = Cache.Instance.EntitiesByName(locationName).Where(e => e.GroupId == (int)Group.Stargate).ToList();
                 if (!stargates.Any())
@@ -180,13 +166,13 @@ namespace Questor.Modules.Activities
                             Logging.Log("Traveler",
                                         "Warping to [" + Logging.yellow + locationName + Logging.green + "][" + Logging.yellow + 
                                         Math.Round((stargate.Distance / 1000) / 149598000, 2) + Logging.green + " AU away]", Logging.green);
-                            if (!Combat.ReloadAll(Cache.Instance.EntitiesNotSelf.OrderBy(t => t.Distance).FirstOrDefault(t => t.Distance < (double)Distance.OnGridWithMe))) return;
                             stargate.WarpTo();
                             Cache.Instance.NextWarpTo = DateTime.Now.AddSeconds(Time.Instance.WarptoDelay_seconds);
                             return;
                         }
                         return;
                     }
+                    if (!Combat.ReloadAll(Cache.Instance.EntitiesNotSelf.OrderBy(t => t.Distance).FirstOrDefault(t => t.Distance < (double)Distance.OnGridWithMe))) return;
                     return;
                 }
             }

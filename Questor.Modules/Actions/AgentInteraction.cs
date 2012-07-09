@@ -172,26 +172,37 @@ namespace Questor.Modules.Actions
             {
                 if (accept != null && decline != null && delay != null)
                 {
+                    if (Purpose != AgentInteractionPurpose.StartMission)
+                    {
+                        Logging.Log("Agentinteraction", "ReplyToAgent: Found acceopt button, Changing Purpose to StartMission", Logging.white);
                     AgentWindowTimeStamp = DateTime.Now;
                     Purpose = AgentInteractionPurpose.StartMission;
-
+                    }
                 }
 
                 if (complete != null && quit != null && close != null && (Statistics.Instance.MissionCompletionErrors == 0))
                 {
-                    //we have a mission in progress here, attempt to complete it
-                    if (DateTime.Now > AgentWindowTimeStamp.AddSeconds(30))
+                    if (Purpose != AgentInteractionPurpose.CompleteMission)
                     {
-                        Purpose = AgentInteractionPurpose.CompleteMission;
+                        Logging.Log("Agentinteraction", "ReplyToAgent: Found complete button, Changing Purpose to CompleteMission", Logging.white);
+                        //we have a mission in progress here, attempt to complete it
+                        if (DateTime.Now > AgentWindowTimeStamp.AddSeconds(30))
+                        {
+                            Purpose = AgentInteractionPurpose.CompleteMission;
+                        }
                     }
                 }
 
                 if (request != null && close != null)
                 {
-                    //we do not have a mission yet, request one?
-                    if (DateTime.Now > AgentWindowTimeStamp.AddSeconds(30))
+                    if (Purpose != AgentInteractionPurpose.StartMission)
                     {
-                        Purpose = AgentInteractionPurpose.StartMission;
+                        Logging.Log("Agentinteraction", "ReplyToAgent: Found request button, Changing Purpose to StartMission", Logging.white);
+                        //we do not have a mission yet, request one?
+                        if (DateTime.Now > AgentWindowTimeStamp.AddSeconds(30))
+                        {
+                            Purpose = AgentInteractionPurpose.StartMission;
+                        }
                     }
                 }
             }

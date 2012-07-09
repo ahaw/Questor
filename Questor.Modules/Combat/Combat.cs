@@ -89,8 +89,8 @@ namespace Questor.Modules.Combat
                         {
                             if (Settings.Instance.Ammo.Any())
                             {
-                                DirectItem AvailableAmmo = cargo.Items.Where(a => Settings.Instance.Ammo.Any(i => i.TypeId == a.TypeId)).ToList().FirstOrDefault();
-                                Cache.Instance.DamageType = Settings.Instance.Ammo.ToList().Where(a => a.TypeId == AvailableAmmo.TypeId).FirstOrDefault().DamageType;
+                                DirectItem AvailableAmmo = cargo.Items.OrderByDescending(i => i.Quantity).Where(a => Settings.Instance.Ammo.Any(i => i.TypeId == a.TypeId)).ToList().FirstOrDefault();
+                                Cache.Instance.DamageType = Settings.Instance.Ammo.ToList().OrderByDescending(i => i.Quantity).Where(a => a.TypeId == AvailableAmmo.TypeId).ToList().FirstOrDefault().DamageType;
                                 Logging.Log("Combat", "ReloadNormalAmmo: found [" + AvailableAmmo.Quantity + "] units of  [" + AvailableAmmo.TypeName + "] changed DamageType to [" + Cache.Instance.DamageType.ToString() + "]", Logging.orange);
                                 return false;
                             }
@@ -876,7 +876,7 @@ namespace Questor.Modules.Combat
 
         public void ProcessState()
         {
-            if (DateTime.Now < _lastCombatProcessState.AddMilliseconds(100)) //if it has not been 100ms since the last time we ran this ProcessState return. We can't do anything that close together anyway
+            if (DateTime.Now < _lastCombatProcessState.AddMilliseconds(500)) //if it has not been 500ms since the last time we ran this ProcessState return. We can't do anything that close together anyway
                 return;
 
             _lastCombatProcessState = DateTime.Now;

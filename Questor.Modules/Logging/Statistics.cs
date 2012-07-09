@@ -223,12 +223,12 @@ namespace Questor.Modules.Logging
                 {
                     if (Cache.Instance.InvTypesById.ContainsKey(Settings.Instance.DroneTypeId))
                     {
-                        if (!Cache.Instance.OpenDroneBay("Statistics.WriteDroneStatsLog")) return false;
+                        if (!Cache.Instance.OpenDroneBay("Statistics: WriteDroneStatsLog")) return false;
                         if (Cache.Instance.DroneBay.Window == null) return true; //if the drone window does not exist, assume we cant log any drone stats
                         
                         InvType drone = Cache.Instance.InvTypesById[Settings.Instance.DroneTypeId];
                         Statistics.Instance.LostDrones = (int)Math.Floor((Cache.Instance.DroneBay.Capacity - Cache.Instance.DroneBay.UsedCapacity) / drone.Volume);
-                        Logging.Log("Statistics.WriteDroneStatsLog", "Logging the number of lost drones: " + Statistics.Instance.LostDrones.ToString(CultureInfo.InvariantCulture), Logging.white);
+                        Logging.Log("Statistics: WriteDroneStatsLog", "Logging the number of lost drones: " + Statistics.Instance.LostDrones.ToString(CultureInfo.InvariantCulture), Logging.white);
 
                         if (!File.Exists(Settings.Instance.DroneStatslogFile))
                             File.AppendAllText(Settings.Instance.DroneStatslogFile, "Date;Mission;Number of lost drones;# of Recalls\r\n");
@@ -287,7 +287,7 @@ namespace Questor.Modules.Logging
                     File.AppendAllText(Settings.Instance.SessionsLogFile, line);
 
                     Cache.Instance.SessionState = "";
-                    Logging.Log("Statistics", "Writing session data to [ " + Settings.Instance.SessionsLogFile + " ]", Logging.white);
+                    Logging.Log("Statistics: WriteSessionLogStarting", "Writing session data to [ " + Settings.Instance.SessionsLogFile + " ]", Logging.white);
                 }
             }
         }
@@ -332,11 +332,11 @@ namespace Questor.Modules.Logging
                 line += Cache.Instance.SessionTotalPerHrGenerated + ";\r\n";    // Total Per Hour This Session
 
                 // The mission is finished
-                Logging.Log("Statistics", line, Logging.white);
+                Logging.Log("Statistics: WriteSessionLogClosing", line, Logging.white);
                 File.AppendAllText(Settings.Instance.SessionsLogFile, line);
 
-                Logging.Log("Statistics", "Writing to session log [ " + Settings.Instance.SessionsLogFile, Logging.white);
-                Logging.Log("Statistics", "Questor is stopping because: " + Cache.Instance.ReasonToStopQuestor, Logging.white);
+                Logging.Log("Statistics: WriteSessionLogClosing", "Writing to session log [ " + Settings.Instance.SessionsLogFile, Logging.white);
+                Logging.Log("Statistics: WriteSessionLogClosing", "Questor is stopping because: " + Cache.Instance.ReasonToStopQuestor, Logging.white);
                 Settings.Instance.SessionsLog = false; //so we don't write the sessionlog more than once per session
             }
             return true;
@@ -383,7 +383,7 @@ namespace Questor.Modules.Logging
                 pocketstatsLine += "\r\n";
 
                 // The old pocket is finished
-                Logging.Log("Statistics", "Writing pocket statistics to [ " + Settings.Instance.PocketStatisticsFile + " ] and clearing stats for next pocket", Logging.white);
+                Logging.Log("Statistics: WritePocketStatistics", "Writing pocket statistics to [ " + Settings.Instance.PocketStatisticsFile + " ] and clearing stats for next pocket", Logging.white);
                 File.AppendAllText(Settings.Instance.PocketStatisticsFile, pocketstatsLine);
             }
             // Update statistic values for next pocket stats
@@ -403,7 +403,7 @@ namespace Questor.Modules.Logging
             //Logging.Log("StatisticsState: MissionLogCompleted is false: we still need to create the mission logs for this last mission");
             if ((DateTime.Now.Subtract(Statistics.Instance.FinishedSalvaging).TotalMinutes > 5 && DateTime.Now.Subtract(Statistics.Instance.FinishedMission).TotalMinutes > 45) || DateTime.Now.Subtract(Cache.Instance.StartTime).TotalMinutes < 5) //FinishedSalvaging is the later of the 2 timestamps (FinishedMission and FinishedSalvaging), if you aren't after mission salvaging this timestamp is the same as FinishedMission
             {
-                Logging.Log("Statistics", "It is unlikely a mission has been run yet this session... No Mission log needs to be written.", Logging.white);
+                Logging.Log("Statistics: WriteMissionStatistics", "It is unlikely a mission has been run yet this session... No Mission log needs to be written.", Logging.white);
                 Statistics.Instance.MissionLoggingCompleted = true; //if the mission was completed more than 10 min ago assume the logging has been done already.
                 return;
             }

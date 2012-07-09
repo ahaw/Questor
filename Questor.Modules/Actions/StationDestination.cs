@@ -77,6 +77,7 @@ namespace Questor.Modules.Actions
 
                     Cache.Instance.DirectEve.ExecuteCommand(DirectCmd.CmdExitStation);
                     Cache.Instance.NextUndockAction = DateTime.Now.AddSeconds(Time.Instance.TravelerExitStationAmIInSpaceYet_seconds);
+                    return false;
                 }
 
                 // We are not there yet
@@ -106,6 +107,7 @@ namespace Questor.Modules.Actions
                     Logging.Log("StationDestination.StationDestination", "Dock at [" + entity.Name + "] which is [" + Math.Round(entity.Distance / 1000, 0) + "k away]", Logging.white);
                     entity.Dock();
                     Cache.Instance.NextDockAction = DateTime.Now.AddSeconds(Time.Instance.DockingDelay_seconds);
+                    return false;
                 }
             }
             else if (entity.Distance < (int)Distance.WarptoDistance)
@@ -115,6 +117,7 @@ namespace Questor.Modules.Actions
                     Logging.Log("TravelerDestintion.StationDestination", "Approaching [" + entity.Name + "] which is [" + Math.Round(entity.Distance / 1000, 0) + "k away]", Logging.white);
                     entity.Approach();
                     Cache.Instance.NextDockAction = DateTime.Now.AddSeconds(Time.Instance.ApproachDelay_seconds);
+                    return false;
                 }
             }
             else
