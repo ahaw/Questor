@@ -158,6 +158,15 @@ namespace Questor
         public static void TimeCheck()
         {
             Cache.Instance.LastTimeCheckAction = DateTime.Now;
+            Logging.Log("Questor", "Checking schedules", Logging.green);
+            if (Settings.Instance.DebugScheduler)
+            {
+                Logging.Log("DebugSchedules", "Current time is:" + DateTime.Now.ToString(), Logging.white);
+                Logging.Log("DebugSchedules", "StopTimeSpecified ="+Cache.Instance.StopTimeSpecified, Logging.white);
+                Logging.Log("DebugSchedules", "StopTime = " + Cache.Instance.StopTime, Logging.white);
+                Logging.Log("DebugSchedules", "ManualStopTime = " + Cache.Instance.ManualStopTime, Logging.white);
+            }
+
             if (DateTime.Now.Subtract(Cache.Instance.QuestorStarted_DateTime).TotalMinutes >
                 Cache.Instance.MaxRuntime)
             {

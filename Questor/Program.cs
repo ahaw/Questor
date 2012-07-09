@@ -154,7 +154,7 @@ namespace Questor
                     
                     if (schedule.StartTimeSpecified)
                     {
-                        if (schedule.Start1 < schedule.Stop1) schedule.Stop1 = schedule.Stop1.AddDays(1);
+                        if (schedule.Start1 > schedule.Stop1) schedule.Stop1 = schedule.Stop1.AddDays(1);
                         if (DateTime.Now.AddHours(2) > schedule.Start1 && DateTime.Now < schedule.Stop1)
                         {
                             StartTime = schedule.Start1;

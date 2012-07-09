@@ -841,14 +841,14 @@ namespace Questor.Modules.Caching
                 _lastAction = DateTime.Now;
             }
         }
-
+        
         public DateTime LastLocalWatchAction = DateTime.Now;
         public DateTime LastWalletCheck = DateTime.Now;
         public DateTime LastScheduleCheck = DateTime.Now;
 
         public DateTime LastupdateofSessionRunningTime;
         public DateTime NextInSpaceorInStation;
-        public DateTime LastTimeCheckAction;
+        public DateTime LastTimeCheckAction = DateTime.MinValue;
 
         public DateTime LastFrame = DateTime.Now;
         public DateTime LastSessionIsReady = DateTime.Now;
