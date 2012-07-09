@@ -911,7 +911,7 @@ namespace Questor
                 }
             }
 
-            if (DateTime.Now.Subtract(Cache.Instance.LastSessionIsReady).TotalSeconds > (Time.Instance.Instance.NoSessionIsReadyRestart_seconds + extraWaitSeconds) &&
+            if (DateTime.Now.Subtract(Cache.Instance.LastSessionIsReady).TotalSeconds > (Time.Instance.NoSessionIsReadyRestart_seconds + extraWaitSeconds) &&
                     DateTime.Now.Subtract(Program.AppStarted).TotalSeconds > 300)
             {
                 if (DateTime.Now.Subtract(Cache.Instance.LastLogMessage).TotalSeconds > 60)

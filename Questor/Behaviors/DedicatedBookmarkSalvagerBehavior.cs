@@ -561,7 +561,7 @@ namespace Questor.Behaviors
                             return;
                         }
                         else
-                    if (_States.CurrentTravelerState == TravelerState.AtDestination || !Cache.Instance.GateInGrid())
+                    if (_States.CurrentTravelerState == TravelerState.AtDestination)
                         {
                             Logging.Log("DedicatedBookmarkSalvagerBehavior", "GotoSalvageBookmark: Gate not found, we can start salvaging", Logging.white);
                             

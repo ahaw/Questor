@@ -67,6 +67,7 @@ namespace Questor.Modules.Lookup
         public int NoFramesRestart_seconds = 45;
         public int NoFramesReallyRestart_seconds = 90;
         public int QuestorScheduleNotUsed_Hours = 10;
+        public int NoSessionIsReadyRestart_seconds = 120;
         public int NoSessionIsReadyReallyRestart_seconds = 120;
         public int Marketlookupdelay_seconds = 3;
         public int Marketsellorderdelay_seconds = 5;
