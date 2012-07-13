@@ -26,9 +26,8 @@ namespace Questor.Modules.Activities
         private TravelerDestination _destination;
         private DateTime _nextTravelerAction;
         private DateTime _lastPulse;
-        private DateTime _nextGetDestinationPath;
         private DateTime _nextGetLocation;
-        private DateTime _nextGetLocationName;
+        
         private List<long> destination = null;
         private DirectLocation location;
         private string locationName;
@@ -67,7 +66,7 @@ namespace Questor.Modules.Activities
             {
                 if (Settings.Instance.DebugTraveler) if (destination.Count == 0) Logging.Log("Traveler", "We have no destination", Logging.teal);
                 if (Settings.Instance.DebugTraveler) if (!destination.Any(d => d == solarSystemId)) Logging.Log("Traveler", "the destination is not currently set to solarsystemId [" + solarSystemId + "]", Logging.teal);
-                _nextGetDestinationPath = DateTime.Now;
+                
                 // We do not have the destination set
                 if (DateTime.Now > _nextGetLocation || location == null)
                 {
@@ -129,7 +128,7 @@ namespace Questor.Modules.Activities
                 if (!stargates.Any())
                 {
                     // not found, that cant be true?!?!?!?!
-                    Logging.Log("Traveler", "Error [" + Logging.yellow + locationName + Logging.green + "] not found, most likely lag waiting [" + (int)Time.Instance.TravelerNoStargatesFoundRetryDelay_seconds + "] seconds.", Logging.red);
+                    Logging.Log("Traveler", "Error [" + Logging.yellow + locationName + Logging.green + "] not found, most likely lag waiting [" + Time.Instance.TravelerNoStargatesFoundRetryDelay_seconds + "] seconds.", Logging.red);
                     _nextTravelerAction = DateTime.Now.AddSeconds(Time.Instance.TravelerNoStargatesFoundRetryDelay_seconds);
                     return;
                 }

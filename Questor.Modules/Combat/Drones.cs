@@ -43,13 +43,13 @@ namespace Questor.Modules.Combat
         public bool Recall; //false
         public bool WarpScrambled; //false
         private DateTime _lastDronesProcessState;
-        private DateTime _nextWrapScrambledWarning = DateTime.MinValue;
+        private DateTime _nextWarpScrambledWarning = DateTime.MinValue;
 
         private void GetDamagedDrones()
         {
-            foreach (EntityCache Drone in Cache.Instance.ActiveDrones)
+            foreach (EntityCache drone in Cache.Instance.ActiveDrones)
             {
-                if (Settings.Instance.DebugDroneHealth) Logging.Log("Drones: GetDamagedDrones", "Health[" + Drone.Health + "]" + "S[" + Math.Round(Drone.ShieldPct,3) + "]" + "A[" + Math.Round(Drone.ArmorPct,3) + "]" + "H[" + Math.Round(Drone.StructurePct,3) + "][ID" + Drone.Id + "]", Logging.white);
+                if (Settings.Instance.DebugDroneHealth) Logging.Log("Drones: GetDamagedDrones", "Health[" + drone.Health + "]" + "S[" + Math.Round(drone.ShieldPct,3) + "]" + "A[" + Math.Round(drone.ArmorPct,3) + "]" + "H[" + Math.Round(drone.StructurePct,3) + "][ID" + drone.Id + "]", Logging.white);
             }
             Cache.Instance.DamagedDrones = Cache.Instance.ActiveDrones.Where(d => d.Health < Settings.Instance.BelowThisHealthLevelRemoveFromDroneBay);
         }
@@ -286,9 +286,9 @@ namespace Questor.Modules.Combat
                         if (Cache.Instance.Targets.Any(pt => pt.IsWarpScramblingMe))
                         {
                             EntityCache warpscrambledby = Cache.Instance.Targets.FirstOrDefault(pt => pt.IsWarpScramblingMe);
-                            if (warpscrambledby != null && _nextWrapScrambledWarning > DateTime.Now)
+                            if (warpscrambledby != null && DateTime.Now > _nextWarpScrambledWarning)
                             {
-                                _nextWrapScrambledWarning = DateTime.Now.AddSeconds(20);
+                                _nextWarpScrambledWarning = DateTime.Now.AddSeconds(20);
                                 Logging.Log("Drones", "We are scrambled by: [" + Logging.white + warpscrambledby.Name + Logging.orange + "][" + Logging.white + Math.Round(warpscrambledby.Distance, 0) + Logging.orange + "][" + Logging.white + warpscrambledby.Id + Logging.orange + "]",
                                             Logging.orange);
                                 Recall = false;

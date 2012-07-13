@@ -8,6 +8,7 @@
 //   </copyright>
 // -------------------------------------------------------------------------------
 
+using System.Globalization;
 using Questor.Behaviors;
 using Questor.Modules.Combat;
 
@@ -33,14 +34,12 @@ namespace Questor
         private readonly DirectEve _directEve;
 
         private DateTime _lastPulse;
-        private DateTime _lastSalvageTrip = DateTime.MinValue;
         private readonly CombatMissionsBehavior _combatMissionsBehavior;
         private readonly CombatHelperBehavior _combatHelperBehavior;
         private readonly DedicatedBookmarkSalvagerBehavior _dedicatedBookmarkSalvagerBehavior;
         private readonly DirectionalScannerBehavior _directionalScannerBehavior;
         private readonly Cleanup _cleanup;
 
-        public DateTime LastFrame;
         public DateTime LastAction;
 
         public bool Panicstatereset = false;
@@ -77,7 +76,7 @@ namespace Questor
             }
             else
             {
-                Cache.Instance.StopTime = DateTime.Now.AddHours((int)Time.Instance.QuestorScheduleNotUsed_Hours);
+                Cache.Instance.StopTime = DateTime.Now.AddHours(Time.Instance.QuestorScheduleNotUsed_Hours);
                 Logging.Log("Questor", "Schedule: NOT setup correctly: stoptime  set to [" + (int)Time.Instance.QuestorScheduleNotUsed_Hours + "] hours from now at [" + Cache.Instance.StopTime.ToShortTimeString() + "]", Logging.orange);
                 Logging.Log("Questor", "You can correct this by editing schedules.xml to have an entry for this toon", Logging.orange);
                 Logging.Log("Questor", "Ex: <char user=\"" + Settings.Instance.CharacterName + "\" pw=\"MyPasswordForEVEHere\" name=\"MyLoginNameForEVEHere\" start=\"06:45\" stop=\"08:10\" start2=\"09:05\" stop2=\"14:20\"/>", Logging.orange);
@@ -161,18 +160,17 @@ namespace Questor
 
         public static void TimeCheck()
         {
-            Cache.Instance.LastTimeCheckAction = DateTime.Now;
-            Logging.Log("Questor", "Checking schedules", Logging.green);
-            if (Settings.Instance.DebugScheduler)
-            {
-                Logging.Log("DebugSchedules", "Current time is:" + DateTime.Now.ToString(), Logging.white);
-                Logging.Log("DebugSchedules", "StopTimeSpecified ="+Cache.Instance.StopTimeSpecified, Logging.white);
-                Logging.Log("DebugSchedules", "StopTime = " + Cache.Instance.StopTime, Logging.white);
-                Logging.Log("DebugSchedules", "ManualStopTime = " + Cache.Instance.ManualStopTime, Logging.white);
-            }
+            if (DateTime.Now < Cache.Instance.NextTimeCheckAction)
+                return;
 
-            if (DateTime.Now.Subtract(Cache.Instance.QuestorStarted_DateTime).TotalMinutes >
-                Cache.Instance.MaxRuntime)
+            Cache.Instance.NextTimeCheckAction = DateTime.Now.AddMinutes(5);
+            Logging.Log("Questor",
+                        "Checking: Current time [" + DateTime.Now.ToString(CultureInfo.InvariantCulture) +
+                        "] StopTimeSpecified [" + Cache.Instance.StopTimeSpecified +
+                        "] StopTime [ " + Cache.Instance.StopTime +
+                        "] ManualStopTime = " + Cache.Instance.ManualStopTime, Logging.white);
+
+            if (DateTime.Now.Subtract(Cache.Instance.QuestorStarted_DateTime).TotalMinutes > Cache.Instance.MaxRuntime)
             {
                 // quit questor
                 Logging.Log("Questor", "Maximum runtime exceeded.  Quiting...", Logging.white);
@@ -482,18 +480,23 @@ namespace Questor
             switch (_States.CurrentQuestorState)
             {
                 case QuestorState.Idle:
-                    // Every 5 min of idle check and make sure we aren't supposed to stop...
-                    if (Math.Round(DateTime.Now.Subtract(Cache.Instance.LastTimeCheckAction).TotalMinutes) > 5)
-                    {
-                        TimeCheck(); //Should we close questor due to stoptime or runtime?
-                    }
+                    TimeCheck(); //Should we close questor due to stoptime or runtime?
+
                     if (Cache.Instance.StopBot)
+                    {
+                        if (Settings.Instance.DebugIdle) Logging.Log("Questor", "Cache.Instance.StopBot = true - this is set by the localwatch code so that we stay in station when local is unsafe", Logging.orange);
                         return;
+                    }
 
                     if (_States.CurrentQuestorState == QuestorState.Idle && Settings.Instance.CharacterMode != "none")
                     {
                         _States.CurrentQuestorState = QuestorState.Start;
                         return;
+                    }
+                    else
+                    {
+                        Logging.Log("Questor", "Settings.Instance.CharacterMode = [" + Settings.Instance.CharacterMode + "]", Logging.orange);
+                        _States.CurrentQuestorState = QuestorState.Error;
                     }
                     break;
 

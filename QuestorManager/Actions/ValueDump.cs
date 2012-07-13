@@ -95,7 +95,7 @@ namespace QuestorManager.Actions
                 case ValueDumpState.GetMineralPrice:
                     if (marketWindow == null)
                     {
-                        if (DateTime.Now.Subtract(_lastExecute).TotalSeconds > (int)Time.Instance.Marketlookupdelay_seconds)
+                        if (DateTime.Now.Subtract(_lastExecute).TotalSeconds > Time.Instance.Marketlookupdelay_seconds)
                         {
                             Cache.Instance.DirectEve.ExecuteCommand(DirectCmd.OpenMarket);
                             _lastExecute = DateTime.Now;
@@ -106,7 +106,7 @@ namespace QuestorManager.Actions
 
                     if (marketWindow.DetailTypeId != _currentMineral.Id)
                     {
-                        if (DateTime.Now.Subtract(_lastExecute).TotalSeconds < (int)Time.Instance.Marketlookupdelay_seconds)
+                        if (DateTime.Now.Subtract(_lastExecute).TotalSeconds < Time.Instance.Marketlookupdelay_seconds)
                             return;
 
                         Logging.Log("ValueDump", "Loading orders for " + _currentMineral.Name, Logging.white);

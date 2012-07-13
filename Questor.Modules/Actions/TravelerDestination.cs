@@ -364,6 +364,14 @@ namespace Questor.Modules.Actions
 
             if (Math.Round((distance / 1000)) < (int)Distance.MaxPocketsDistance && gates.Count()!=0)
             {
+                Logging.Log("QuestorManager.BookmarkDestination",
+                "Warp to bookmark in same pocket requested but acceleration gate found delaying."
+                , Logging.white);
+                return true;
+            }
+
+            if (Math.Round((distance / 1000)) < (int)Distance.MaxPocketsDistance && gates.Count()!=0)
+            {
                 
                 Logging.Log("QuestorManager.BookmarkDestination",
                 "Warp to bookmark in same pocket requested but acceleration gate found delaying."

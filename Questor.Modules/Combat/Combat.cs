@@ -151,7 +151,7 @@ namespace Questor.Modules.Combat
             {
                 if (DateTime.Now.Subtract(Cache.Instance.LastLoggingAction).TotalSeconds > 10)
                 {
-                    Cache.Instance.TimeSpentReloading_seconds = Cache.Instance.TimeSpentReloading_seconds + (int)Time.Instance.ReloadWeaponDelayBeforeUsable_seconds;
+                    Cache.Instance.TimeSpentReloading_seconds = Cache.Instance.TimeSpentReloading_seconds + Time.Instance.ReloadWeaponDelayBeforeUsable_seconds;
                     Cache.Instance.LastLoggingAction = DateTime.Now;
                 }
                 Logging.Log("Combat", "Changing [" + weaponNumber + "] with [" + charge.TypeName + "][" + Math.Round((double)ammo.Range / 1000, 0) + "][TypeID: " + charge.TypeId + "] so we can hit [" + entity.Name + "][" + Math.Round(entity.Distance / 1000, 0) + "k]", Logging.teal);

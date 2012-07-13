@@ -400,6 +400,12 @@ namespace Questor.Modules.Logging
 
         public static void WriteMissionStatistics()
         {
+            if (Cache.Instance.InSpace)
+            {
+                Logging.Log("Statistics","We've started questor in space, assume we do not need to write any statistics at the moment.",Logging.teal);
+                Statistics.Instance.MissionLoggingCompleted = true; //if the mission was completed more than 10 min ago assume the logging has been done already.
+                return;
+            }
             //Logging.Log("StatisticsState: MissionLogCompleted is false: we still need to create the mission logs for this last mission");
             if ((DateTime.Now.Subtract(Statistics.Instance.FinishedSalvaging).TotalMinutes > 5 && DateTime.Now.Subtract(Statistics.Instance.FinishedMission).TotalMinutes > 45) || DateTime.Now.Subtract(Cache.Instance.StartTime).TotalMinutes < 5) //FinishedSalvaging is the later of the 2 timestamps (FinishedMission and FinishedSalvaging), if you aren't after mission salvaging this timestamp is the same as FinishedMission
             {

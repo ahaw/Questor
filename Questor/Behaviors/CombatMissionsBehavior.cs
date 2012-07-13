@@ -53,7 +53,6 @@ namespace Questor.Behaviors
         private int _randomDelay;
         public static long AgentID;
         private readonly Stopwatch _watch;
-        
 
         private double _lastX;
         private double _lastY;
@@ -305,9 +304,9 @@ namespace Questor.Behaviors
         public void ProcessState()
         {
             // Only pulse state changes every 1.5s
-            if (DateTime.Now.Subtract(_lastPulse).TotalMilliseconds < (int)Time.Instance.QuestorPulse_milliseconds) //default: 1500ms
-                return;
-            _lastPulse = DateTime.Now;
+            //if (DateTime.Now.Subtract(_lastPulse).TotalMilliseconds < (int)Time.Instance.QuestorPulse_milliseconds) //default: 1500ms
+            //    return;
+            //_lastPulse = DateTime.Now;
 
             // Invalid settings, quit while we're ahead
             if (!ValidSettings)
@@ -431,7 +430,7 @@ namespace Questor.Behaviors
                         // Questor does not handle in space starts very well, head back to base to try again
                         Logging.Log("CombatMissionsBehavior", "Started questor while in space, heading back to base in 15 seconds", Logging.white);
                         LastAction = DateTime.Now;
-                        if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.Idle) _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.DelayedGotoBase;
+                        _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.DelayedGotoBase;
                         break;
                     }
                     else
@@ -502,8 +501,7 @@ namespace Questor.Behaviors
                         break;
 
                     _storyline.Reset();
-                    if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.DelayedStart)
-                        _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.Cleanup;
+                    _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.Cleanup;
                     break;
 
                 case CombatMissionsBehaviorState.DelayedGotoBase:
@@ -511,8 +509,7 @@ namespace Questor.Behaviors
                         break;
 
                     Logging.Log("CombatMissionsBehavior", "Heading back to base", Logging.white);
-                    if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.DelayedGotoBase) 
-                        _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.GotoBase;
+                    _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.GotoBase;
                     break;
 
                 case CombatMissionsBehaviorState.Cleanup:
@@ -957,7 +954,7 @@ namespace Questor.Behaviors
                         //This salvaging decision tree does not belong here and should be separated out into a different questorstate
                         if (Settings.Instance.AfterMissionSalvaging)
                         {
-                            if (Cache.Instance.BookmarksByLabel(Settings.Instance.BookmarkPrefix + " ").Count == 0)
+                            if (Cache.Instance.GetSalvagingBookmark == null)
                             {
                                 Logging.Log("CombatMissionsBehavior.Unloadloot", " No more salvaging bookmarks. Setting FinishedSalvaging Update.", Logging.white);
                                 //if (Settings.Instance.CharacterMode == "Salvager")
@@ -1085,8 +1082,7 @@ namespace Questor.Behaviors
 
                 case CombatMissionsBehaviorState.GotoSalvageBookmark:
                     _traveler.ProcessState();
-                    
-                    
+
                     if (_States.CurrentTravelerState == TravelerState.AtDestination || Cache.Instance.GateInGrid())
                     {
                         //we know we are connected if we were able to arm the ship - update the lastknownGoodConnectedTime
@@ -1109,25 +1105,25 @@ namespace Questor.Behaviors
                     Cache.Instance.SalvageAll = true;
                     Cache.Instance.OpenWrecks = true;
 
-                    const int distancetoccheck = (int)Distance.OnGridWithMe;
-                    // is there any NPCs within distancetoconsidertargets?
-                    EntityCache deadlyNPC = Cache.Instance.Entities.Where(t => t.Distance < distancetoccheck && !t.IsEntityIShouldLeaveAlone && !t.IsContainer && t.IsNpc && t.CategoryId == (int)CategoryID.Entity && t.GroupId != (int)Group.LargeCollidableStructure).OrderBy(t => t.Distance).FirstOrDefault();
-
+                    EntityCache deadlyNPC = Cache.Instance.Entities.Where(t => t.Distance < (int)Distance.OnGridWithMe && !t.IsEntityIShouldLeaveAlone && !t.IsContainer && t.IsNpc && t.CategoryId == (int)CategoryID.Entity && t.GroupId != (int)Group.LargeCollidableStructure).OrderBy(t => t.Distance).FirstOrDefault();
                     if (deadlyNPC != null)
                     {
 
                         // found NPCs that will likely kill out fragile salvage boat!
                         List<DirectBookmark> missionSalvageBookmarks = Cache.Instance.BookmarksByLabel(Settings.Instance.BookmarkPrefix + " ");
-                        var bookmark = missionSalvageBookmarks.OrderBy(b => b.CreatedOn).FirstOrDefault(); Logging.Log("CombatMissionsBehavior.Salvage", "could not be completed because of NPCs left in the mission: deleting salvage bookmarks", Logging.white);
-                        if (bookmark != null)
+                        Logging.Log("CombatMissionsBehavior.Salvage", "could not be completed because of NPCs left in the mission: deleting on grid salvage bookmark", Logging.white);
+                        
                         if (Settings.Instance.DeleteBookmarksWithNPC)
                         {
-                            Cache.Instance.DeleteBookmarksOnGrid("CombatMissionsBehavior.Salvage");
-                            return;
+                            if (!Cache.Instance.DeleteBookmarksOnGrid("CombatMissionsBehavior.Salvage")) return;
+                            _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.GotoSalvageBookmark;
+                            DirectBookmark bookmark = missionSalvageBookmarks.OrderBy(i => i.CreatedOn).FirstOrDefault();
+                            _traveler.Destination = new BookmarkDestination(bookmark);
+                            break;
                             }
                         else
                         {
-                            Logging.Log("CombatMissionsBehavior.Salvage", "could not be completed because of NPCs left in the mission: salvage bookmarks deleted", Logging.orange);
+                            Logging.Log("CombatMissionsBehavior.Salvage", "could not be completed because of NPCs left in the mission: on grid salvage bookmark not deleted", Logging.orange);
                             Cache.Instance.SalvageAll = false;
                             Statistics.Instance.FinishedSalvaging = DateTime.Now;
                             _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.GotoBase;
@@ -1159,21 +1155,10 @@ namespace Questor.Behaviors
                         if (!Cache.Instance.UnlootedContainers.Any())
                         {
                             Logging.Log("CombatMissionsBehavior.Salvage", "Finished salvaging the room", Logging.white);
+                            if(!Cache.Instance.DeleteBookmarksOnGrid("CombatMissionsBehavior.Salvage")) return;
+                            Statistics.Instance.FinishedSalvaging = DateTime.Now;
 
-                            DirectBookmark onGridBookmark = Cache.Instance.AfterMissionSalvageBookmarks.FirstOrDefault(b => Cache.Instance.DistanceFromMe(b.X ?? 0, b.Y ?? 0, b.Z ?? 0) < (int)Distance.OnGridWithMe);
-
-                            if (onGridBookmark != null)
-                            {
-                                
-                                Cache.Instance.DeleteBookmarksOnGrid("CombatMissionsBehavior.Salvage");
-                                return;
-                            }
-                            else
-                            {
-                                Statistics.Instance.FinishedSalvaging = DateTime.Now;
-                            }
-
-                            if (Cache.Instance.AfterMissionSalvageBookmarks.Count() == 0 && !Cache.Instance.GateInGrid())
+                            if (!Cache.Instance.AfterMissionSalvageBookmarks.Any() && !Cache.Instance.GateInGrid())
                             {
                                 Logging.Log("CombatMissionsBehavior.Salvage", "We have salvaged all bookmarks, go to base", Logging.white);
                                 Cache.Instance.SalvageAll = false;
@@ -1183,8 +1168,7 @@ namespace Questor.Behaviors
                             }
                             else
                             {
-
-                                if (Cache.Instance.GateInGrid())
+                                if (!Cache.Instance.GateInGrid()) //no acceleration gate found
                                 {
                                     Logging.Log("CombatMissionsBehavior.Salvage", "Go to the next salvage bookmark", Logging.white);
                                     DirectBookmark bookmark;
@@ -1199,12 +1183,12 @@ namespace Questor.Behaviors
                                     _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.GotoSalvageBookmark;
                                     _traveler.Destination = new BookmarkDestination(bookmark);
                                 }
-                                else if (Settings.Instance.UseGatesInSalvage)
+                                else if (Settings.Instance.UseGatesInSalvage) // acceleration gate found, are we configured to use it or not?
                                 {
                                     Logging.Log("CombatMissionsBehavior.Salvage", "Acceleration gate found - moving to next pocket", Logging.white);
                                     _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.SalvageUseGate;
                                 }
-                                else
+                                else //acceleration gate found but we are configured to not use it, gotobase instead
                                 {
                                     Logging.Log("CombatMissionsBehavior.Salvage", "Acceleration gate found, useGatesInSalvage set to false - Returning to base", Logging.white);
                                     Statistics.Instance.FinishedSalvaging = DateTime.Now;
@@ -1238,12 +1222,10 @@ namespace Questor.Behaviors
                     Cache.Instance.OpenWrecks = true;
                     var gates = Cache.Instance.Entities.Where(a => a.GroupId == (int)Group.AccellerationGate);
 
-                    if (gates == null || !gates.Any())
+
+                    if (Cache.Instance.AccelerationGates == null || !Cache.Instance.AccelerationGates.Any())
                     {
-                        if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.SalvageUseGate)
-                        {
-                            _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.GotoSalvageBookmark;
-                        }
+                       _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.GotoSalvageBookmark;   
                         return;
                     }
 
@@ -1251,7 +1233,7 @@ namespace Questor.Behaviors
                     _lastY = Cache.Instance.DirectEve.ActiveShip.Entity.Y;
                     _lastZ = Cache.Instance.DirectEve.ActiveShip.Entity.Z;
 
-                    EntityCache closest = gates.OrderBy(t => t.Distance).First();
+                    EntityCache closest = Cache.Instance.AccelerationGates.OrderBy(t => t.Distance).First();
                     if (closest.Distance < (int)Distance.DecloakRange)
                     {
                         Logging.Log("CombatMissionsBehavior.Salvage", "Acceleration gate found - GroupID=" + closest.GroupId, Logging.white);
@@ -1262,7 +1244,7 @@ namespace Questor.Behaviors
                         // Do not change actions, if NextPocket gets a timeout (>2 mins) then it reverts to the last action
                         Logging.Log("CombatMissionsBehavior.Salvage", "Activate [" + closest.Name + "] and change States.CurrentCombatMissionBehaviorState to 'NextPocket'", Logging.white);
 
-                        if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.SalvageUseGate) _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.SalvageNextPocket;
+                        _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.SalvageNextPocket;
                         _lastPulse = DateTime.Now;
                         return;
                     }
@@ -1303,7 +1285,7 @@ namespace Questor.Behaviors
 
                         Logging.Log("CombatMissionsBehavior.Salvage", "We've moved to the next Pocket [" + Math.Round(distance / 1000, 0) + "k away]", Logging.white);
 
-                        if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.SalvageNextPocket) _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.Salvage;
+                        _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.Salvage;
                         return;
                     }
                     else //we have not moved to the next pocket quite yet

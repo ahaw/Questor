@@ -159,6 +159,7 @@ namespace Questor
                         {
                             StartTime = schedule.Start1;
                             StopTime = schedule.Stop1;
+                            StopTimeSpecified = true;
                             Logging.Log("Startup", "Schedule1: Start1: " + schedule.Start1 + " Stop1: " + schedule.Stop1, Logging.white);
                         }
                     }
@@ -171,6 +172,7 @@ namespace Questor
                             {
                                 StartTime = schedule.Start2;
                                 StopTime = schedule.Stop2;
+                                StopTimeSpecified = true;
                                 Logging.Log("Startup", "Schedule2: Start2: " + schedule.Start2 + " Stop2: " + schedule.Stop2, Logging.white);
                             }
                         }
@@ -184,6 +186,7 @@ namespace Questor
                             {
                                 StartTime = schedule.Start3;
                                 StopTime = schedule.Stop3;
+                                StopTimeSpecified = true;
                                 Logging.Log("Startup",
                                             "Schedule3: Start3: " + schedule.Start3 + " Stop3: " + schedule.Stop3,
                                             Logging.white);
@@ -322,6 +325,12 @@ namespace Questor
 
         private static void OnFrame(object sender, EventArgs e)
         {
+            // New frame, invalidate old cache
+            Cache.Instance.InvalidateCache();
+
+            Cache.Instance.LastFrame = DateTime.Now;
+            Cache.Instance.LastSessionIsReady = DateTime.Now; //update this reguardless before we login there is no session
+
             if (!_readyToStart || _humaninterventionrequired)
             {
                 //Logging.Log("if (!_readyToStart) then return");
@@ -346,6 +355,7 @@ namespace Questor
             if (_directEve.Session.IsReady)
             {
                 Logging.Log("Startup", "We've successfully logged in", Logging.white);
+                Cache.Instance.LastSessionIsReady = DateTime.Now;
                 _done = true;
                 return;
             }

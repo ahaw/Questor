@@ -38,6 +38,8 @@ namespace Questor.Modules.Actions
         public const string Delay = "Delay";
         public const string Quit = "Quit";
 
+        public string missionName;
+
         private DateTime _nextAgentAction;
         bool _agentStandingsCheckFlag;  //false;
         DateTime _agentStandingsCheckTimeOut = DateTime.MaxValue;
@@ -365,7 +367,8 @@ namespace Questor.Modules.Actions
                 return;
             }
 
-            Logging.Log("AgentInteraction", "Unable to find the faction for this mission when searching through the html (listed below)", Logging.orange);
+            Logging.Log("AgentInteraction", "Unable to find the faction for [" + missionName  + "] when searching through the html (listed below)", Logging.orange);
+
             Logging.Log("AgentInteraction", html, Logging.white);
             return;
         }
@@ -462,7 +465,7 @@ namespace Questor.Modules.Actions
                 _waitingonmission = false;
             }
 
-            string missionName = Cache.Instance.FilterPath(Cache.Instance.Mission.Name);
+            missionName = Cache.Instance.FilterPath(Cache.Instance.Mission.Name);
 
             Logging.Log("AgentInteraction", "[" + Agent.Name + "] standing toward me is [" + Cache.Instance.AgentEffectiveStandingtoMe_text + "], minAgentGreyListStandings: [" + Settings.Instance.MinAgentGreyListStandings + "]", Logging.yellow);
             string html = agentWindow.Objective;

@@ -503,17 +503,18 @@ namespace Questor.Modules.BackgroundTasks
                         }
 
                         if (moveTheseItems.Count > 0)
-                        {
+                        {                        
                             // jettison loot
-                                if (DateTime.Now.Subtract(Cache.Instance.LastJettison).TotalSeconds < Time.Instance.DelayBetweenJetcans_seconds)
+                            if (DateTime.Now.Subtract(Cache.Instance.LastJettison).TotalSeconds < Time.Instance.DelayBetweenJetcans_seconds)
                                 return;
+                            Cache.Instance.LootedContainers.Add(containerEntity.Id); //new add
 
                             Logging.Log("Salvage", "Jettisoning [" + moveTheseItems.Count + "] items to make room for the more valuable loot", Logging.white);
                             // Note: This could (in theory) fuck up with the bot jettison an item and
                             // then picking it up again :/ (granted it should never happen unless
                             // mission item volume > reserved volume
                             Cache.Instance.CargoHold.Jettison(moveTheseItems.Select(i => i.ItemId));
-                            Cache.Instance.NextLootAction = DateTime.Now.AddMilliseconds((int)Time.Instance.LootingDelay_milliseconds);
+                            Cache.Instance.NextLootAction = DateTime.Now.AddMilliseconds(Time.Instance.LootingDelay_milliseconds);
                             Cache.Instance.LastJettison = DateTime.Now;
                             return;
                         }
@@ -659,7 +660,6 @@ namespace Questor.Modules.BackgroundTasks
 
             if (!Cache.Instance.OpenCargoHold("Salvge")) 
                 return;
-
             switch (_States.CurrentSalvageState)
             {
                 case SalvageState.TargetWrecks:
