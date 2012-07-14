@@ -3546,8 +3546,6 @@ namespace Questor.Modules.Caching
                 {
                     Logging.Log(module, "Finished salvaging the room: removing salvage bookmark:" + onGridBookmark.Title, Logging.white);
                     onGridBookmark.Delete();
-                    _nextBookmarkDeletionAttempt = DateTime.Now.AddSeconds(10);
-                
                 }
                 else if (DateTime.Now > _nextBookmarkDeletionAttempt)
                 {

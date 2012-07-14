@@ -603,7 +603,7 @@ namespace ValueDump
                     break;
 
                 case ValueDumpState.RefineItems:
-                    bool refine = true;
+                   bool refine = true;
                     if (refine)
                     {
                         if (reprorcessingWindow == null)
@@ -611,9 +611,8 @@ namespace ValueDump
                             if (DateTime.Now.Subtract(_lastExecute).TotalSeconds > Time.Instance.Marketlookupdelay_seconds)
                             {
                                 IEnumerable<DirectItem> refineItems = Cache.Instance.ItemHangar.Items.Where(i => ItemsToRefine.Any(r => r.Id == i.ItemId));
-
                                 Cache.Instance.DirectEve.ReprocessStationItems(refineItems);
-                            
+
                                 _lastExecute = DateTime.Now;
                             }
                             return;
@@ -643,27 +642,6 @@ namespace ValueDump
                             // TODO: We should wait for the items to appear in our hangar and then sell them...
                             reprorcessingWindow.Reprocess();
                             _States.CurrentValueDumpState = ValueDumpState.Idle;
-                        }
-                    }
-                    else
-                    {
-                        IEnumerable<DirectItem> refineItems = Cache.Instance.ItemHangar.Items.Where(i => ItemsToRefine.Any(r => r.Id == i.ItemId));
-                        if (!Cache.Instance.OpenCargoHold("ValueDump")) break;
-
-                        if (!Cache.Instance.OpenAmmoHangar("ValueDump")) break;
-                        if (refineItems != null)
-                        {
-                            Logging.Log("Arm", "Moving loot to refine to CargoHold", Logging.white);
-
-                            Cache.Instance.CargoHold.Add(refineItems);
-                            _lastExecute = DateTime.Now;
-                            break;
-                        }
-                        else
-                        {
-                            _States.CurrentValueDumpState = ValueDumpState.Idle;
-                        }
-
                         }
                     }
                     else

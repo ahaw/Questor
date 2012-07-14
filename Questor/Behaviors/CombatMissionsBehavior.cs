@@ -1108,7 +1108,6 @@ namespace Questor.Behaviors
                     EntityCache deadlyNPC = Cache.Instance.Entities.Where(t => t.Distance < (int)Distance.OnGridWithMe && !t.IsEntityIShouldLeaveAlone && !t.IsContainer && t.IsNpc && t.CategoryId == (int)CategoryID.Entity && t.GroupId != (int)Group.LargeCollidableStructure).OrderBy(t => t.Distance).FirstOrDefault();
                     if (deadlyNPC != null)
                     {
-
                         // found NPCs that will likely kill out fragile salvage boat!
                         List<DirectBookmark> missionSalvageBookmarks = Cache.Instance.BookmarksByLabel(Settings.Instance.BookmarkPrefix + " ");
                         Logging.Log("CombatMissionsBehavior.Salvage", "could not be completed because of NPCs left in the mission: deleting on grid salvage bookmark", Logging.white);
@@ -1120,7 +1119,7 @@ namespace Questor.Behaviors
                             DirectBookmark bookmark = missionSalvageBookmarks.OrderBy(i => i.CreatedOn).FirstOrDefault();
                             _traveler.Destination = new BookmarkDestination(bookmark);
                             break;
-                            }
+                        }
                         else
                         {
                             Logging.Log("CombatMissionsBehavior.Salvage", "could not be completed because of NPCs left in the mission: on grid salvage bookmark not deleted", Logging.orange);
@@ -1128,17 +1127,6 @@ namespace Questor.Behaviors
                             Statistics.Instance.FinishedSalvaging = DateTime.Now;
                             _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.GotoBase;
                             return;
-                        }
-                        else
-                        {
-                            if (_States.CurrentCombatMissionBehaviorState == CombatMissionsBehaviorState.Salvage)
-                            {
-                                _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.GotoSalvageBookmark;
-                            }
-                            bookmark = missionSalvageBookmarks.OrderBy(i => i.CreatedOn).FirstOrDefault();
-
-                            _traveler.Destination = new BookmarkDestination(bookmark);
-
                         }
                     }
                     else
