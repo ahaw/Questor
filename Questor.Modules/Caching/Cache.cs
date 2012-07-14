@@ -3479,7 +3479,7 @@ namespace Questor.Modules.Caching
                 {
                     return
                         Cache.Instance.BookmarksByLabel(Settings.Instance.BookmarkPrefix + " ").Where(
-                            e => e.CreatedOn != null && e.CreatedOn.Value.CompareTo(_agedDate) > 0).ToList(); 
+                            e => e.CreatedOn != null && e.CreatedOn.Value.CompareTo(AgedDate) < 0).ToList(); 
                 }
                 else
                 {
@@ -3490,35 +3490,38 @@ namespace Questor.Modules.Caching
             }
         }
 
-        private DateTime _agedDate = DateTime.UtcNow.AddMinutes(-Settings.Instance.AgeofBookmarksForSalvageBehavior);
+        //Represents date when bookmarks are eligble for salvage. This should not be confused with when the bookmarks are too old to salvage.
         public DateTime AgedDate
         {
             get
             {
-                return _agedDate;
+                return DateTime.UtcNow.AddMinutes(-Settings.Instance.AgeofBookmarksForSalvageBehavior);
             }
         }
+
 
         public DirectBookmark GetSalvagingBookmark
         {
             get
             {
-                List<DirectBookmark> List_oldBktoDelete = Cache.Instance.BookmarksByLabel(Settings.Instance.BookmarkPrefix + " ").Where(e => e.CreatedOn != null && e.CreatedOn.Value.CompareTo(_agedDate) < 0).ToList();
+                //Delete bookmarks older than 2 hours.
+                DateTime bmExpirationDate = DateTime.UtcNow.AddMinutes(-Settings.Instance.AgeofSalvageBookmarksToExpire);
+                List<DirectBookmark> List_oldBktoDelete = Cache.Instance.BookmarksByLabel(Settings.Instance.BookmarkPrefix + " ").Where(e => e.CreatedOn != null && e.CreatedOn.Value.CompareTo(bmExpirationDate) < 0).ToList();
                 foreach (DirectBookmark oldBktoDelete in List_oldBktoDelete)
                 {
-                    Logging.Log("CombatMissionsBehavior.BeginAftermissionSalvaging", "Remove old Bookmark: " + oldBktoDelete.Title + " Created: " + oldBktoDelete.CreatedOn.Value.ToShortTimeString(), Logging.teal);
+                    Logging.Log("CombatMissionsBehavior.BeginAftermissionSalvaging", "Remove old Bookmark: " + oldBktoDelete.Title + " BookmarExpirationDate: " + bmExpirationDate, Logging.teal);
                     oldBktoDelete.Delete();
                 }
 
                 if (Settings.Instance.FirstSalvageBookmarksInSystem)
                 {
                     Logging.Log("CombatMissionsBehavior.BeginAftermissionSalvaging", "Salvaging at first bookmark from system", Logging.white);
-                    return Cache.Instance.BookmarksByLabel(Settings.Instance.BookmarkPrefix + " ").OrderBy(b => b.CreatedOn).FirstOrDefault(c => c.LocationId == Cache.Instance.DirectEve.Session.SolarSystemId && c.CreatedOn != null && c.CreatedOn.Value.CompareTo(_agedDate) > 0);
+                    return Cache.Instance.BookmarksByLabel(Settings.Instance.BookmarkPrefix + " ").OrderBy(b => b.CreatedOn).FirstOrDefault(c => c.LocationId == Cache.Instance.DirectEve.Session.SolarSystemId);
                 }
                 else
                 {
                     Logging.Log("CombatMissionsBehavior.BeginAftermissionSalvaging", "Salvaging at first oldest bookmarks", Logging.white);
-                    return Cache.Instance.BookmarksByLabel(Settings.Instance.BookmarkPrefix + " ").OrderBy(b => b.CreatedOn).FirstOrDefault(e => e.CreatedOn != null && e.CreatedOn.Value.CompareTo(_agedDate) > 0);
+                    return Cache.Instance.BookmarksByLabel(Settings.Instance.BookmarkPrefix + " ").OrderBy(b => b.CreatedOn).FirstOrDefault();
 
                 } 
             }
