@@ -195,6 +195,7 @@ namespace Questor
                     NextDroneRecallData.Text = Cache.Instance.NextDroneRecall.ToLongTimeString();
                     NextStartupActionData.Text = Cache.Instance.NextStartupAction.ToLongTimeString();
                     LastSessionChangeData.Text = Cache.Instance.LastSessionChange.ToLongTimeString();
+                    AutostartData.Text = Settings.Instance.AutoStart.ToString(CultureInfo.InvariantCulture);
 
                     DamageTypeData.Text = Cache.Instance.DamageType.ToString();
                     //OrbitDistanceData.Text = Cache.Instance.OrbitDistance.ToString(CultureInfo.InvariantCulture);
