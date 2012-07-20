@@ -527,6 +527,22 @@ namespace Questor.Modules.BackgroundTasks
                     //
                     // go through *every* window
                     //
+                    if (!Cache.Instance.InSpace && !Cache.Instance.InStation)
+                    {
+                        Logging.Log("Cleanup", "CheckModalWindows: We are in a session change, waiting 4 seconds", Logging.white);
+                        _lastCleanupAction = DateTime.Now;
+                        _States.CurrentCleanupState = CleanupState.Idle;
+                        return;
+                    }
+
+                    if (Cache.Instance.Windows == null)
+                    {
+                        Logging.Log("Cleanup","CheckModalWindows: Cache.intance.windows returned null",Logging.white);
+                        _lastCleanupAction = DateTime.Now;
+                        _States.CurrentCleanupState = CleanupState.Idle;
+                        return;
+                    }
+
                     foreach (DirectWindow window in Cache.Instance.Windows)
                     {
                         // Telecom messages are generally mission info messages: close them

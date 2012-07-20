@@ -19,9 +19,9 @@ namespace Questor.Modules.BackgroundTasks
 
     public class Defense
     {
-        private DateTime _lastSessionChange = DateTime.MinValue;
+        private DateTime _lastSessionChange = Cache.Instance.StartTime;
         
-        private DateTime _lastPulse = DateTime.MinValue;
+        private DateTime _lastPulse = DateTime.Now;
 
         private int ModuleNumber { get; set; }
 

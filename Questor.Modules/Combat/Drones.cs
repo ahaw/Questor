@@ -283,7 +283,7 @@ namespace Questor.Modules.Combat
                     }
                     else
                     {
-                        if (Cache.Instance.Targets.Any(pt => pt.IsWarpScramblingMe))
+                        if (Cache.Instance.PriorityTargets.Any(pt => pt.IsWarpScramblingMe))
                         {
                             EntityCache warpscrambledby = Cache.Instance.Targets.FirstOrDefault(pt => pt.IsWarpScramblingMe);
                             if (warpscrambledby != null && DateTime.Now > _nextWarpScrambledWarning)

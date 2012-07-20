@@ -23,8 +23,8 @@ namespace Questor.Storylines
         private readonly Traveler _traveler;
         private readonly AgentInteraction _agentInteraction;
 
-        private DateTime _nextAction = DateTime.MinValue;
-        private DateTime _nextStoryLineAttempt = DateTime.MinValue;
+        private DateTime _nextAction = DateTime.Now;
+        private DateTime _nextStoryLineAttempt = DateTime.Now;
 
         public Storyline()
         {

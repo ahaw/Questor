@@ -82,6 +82,9 @@ namespace Questor.Modules.Lookup
         Billboard = 323,
         Merchant = 297,
 
+        Shuttle = 31,
+        Industrial = 28,
+        TransportShip = 380,
         Frigate = 25,
         AssaultShip = 324,
         Destroyer = 420,

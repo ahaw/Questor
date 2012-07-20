@@ -98,6 +98,7 @@ namespace Questor.Modules.Combat
                         catch (Exception)
                         {
                             Logging.Log("Combat", "ReloadNormalAmmo: unable to find any alternate ammo in your cargo", Logging.teal);
+                            _States.CurrentCombatState = CombatState.OutOfAmmo;
                         }
                         return false;
                     }

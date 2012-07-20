@@ -270,7 +270,7 @@
             // tUpdateUI
             // 
             this.tUpdateUI.Enabled = true;
-            this.tUpdateUI.Interval = 50;
+            this.tUpdateUI.Interval = 100;
             this.tUpdateUI.Tick += new System.EventHandler(this.UpdateUiTick);
             // 
             // DamageTypeComboBox

@@ -13,7 +13,7 @@ namespace Questor.Modules.BackgroundTasks
 
     public class NavigateOnGrid
     {
-        public static DateTime AvoidBumpingThingsTimeStamp = DateTime.MinValue;
+        public static DateTime AvoidBumpingThingsTimeStamp = Cache.Instance.StartTime;
         public static int SafeDistanceFromStructureMultiplier = 1;
         public static bool AvoidBumpoingThingsWarningSent = false;
         
@@ -33,7 +33,7 @@ namespace Questor.Modules.BackgroundTasks
                     if (thisBigObject.Distance >= (int)Distance.TooCloseToStructure)
                     {
                         //we are no longer "too close" and can proceed.
-                        AvoidBumpingThingsTimeStamp = DateTime.MinValue;
+                        AvoidBumpingThingsTimeStamp = DateTime.Now;
                         SafeDistanceFromStructureMultiplier = 1;
                         AvoidBumpoingThingsWarningSent = false;
                     }

@@ -762,6 +762,8 @@ namespace Questor.Behaviors
 
                 case CombatMissionsBehaviorState.GotoMission:
                     Statistics.Instance.MissionLoggingCompleted = false;
+                    Cache.Instance.IsMissionPocketDone = false;
+                    
                     var missionDestination = _traveler.Destination as MissionBookmarkDestination;
 
                     if (missionDestination == null || missionDestination.AgentId != AgentID) // We assume that this will always work "correctly" (tm)
@@ -1031,6 +1033,8 @@ namespace Questor.Behaviors
 
                 case CombatMissionsBehaviorState.BeginAfterMissionSalvaging:
                     Statistics.Instance.StartedSalvaging = DateTime.Now; //this will be reset for each "run" between the station and the field if using <unloadLootAtStation>true</unloadLootAtStation>
+                    Cache.Instance.IsMissionPocketDone = false;
+                    
                     if (DateTime.Now.Subtract(_lastSalvageTrip).TotalMinutes < Time.Instance.DelayBetweenSalvagingSessions_minutes && Settings.Instance.CharacterMode.ToLower() == "salvage".ToLower())
                     {
                         Logging.Log("CombatMissionsBehavior.BeginAftermissionSalvaging", "Too early for next salvage trip", Logging.white);

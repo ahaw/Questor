@@ -174,12 +174,12 @@
        and the action is finished as soon as the mission item is in the ship's cargo, if turned
        on then the bot will loot all wrecks/cans before finishing the loot-action -->
   <lootEverything>true</lootEverything>
-  <!-- This is the age bookmarks have to reach in minutes before the dedicated salvager will attempt to use the bookmark -->
+  <!-- This is the age bookmarks have to reach in minutes before the dedicated salvager will attempt to use the bookmark: expressed in minutes -->
   <!-- It is HIGHLY recommended that you leave this at greater than 30 min - wrecks roughly (exactly?) 2 hours -->
   <ageofBookmarksForSalvageBehavior>45</ageofBookmarksForSalvageBehavior>
-  <!-- This is the age bookmarks have to reach in order to be considered expired and will be deleted without salvaging -->
-  <!-- This is recommended for dedicated salvagers in order to not get stuck in bookmarks that have gates for long periods of time.-->
+  <!-- Any bookmarks over this age will be deleted without warping there first because the wrecks despawn after ~2 hours anyway: expressed in minutes-->
   <ageofSalvageBookmarksToExpire>120</ageofSalvageBookmarksToExpire>
+
 
   <!--                                                -->
   <!--    UNDOCKING SETTINGS     -->

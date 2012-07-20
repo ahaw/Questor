@@ -8,7 +8,6 @@
 //   </copyright>
 // -------------------------------------------------------------------------------
 
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -53,7 +52,7 @@ namespace Questor.Behaviors
 
         public DirectionalScannerBehavior()
         {
-            _lastPulse = DateTime.MinValue;
+            _lastPulse = DateTime.Now;
             _random = new Random();
             _salvage = new Salvage();
             _combat = new Combat();

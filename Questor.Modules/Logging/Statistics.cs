@@ -218,8 +218,12 @@ namespace Questor.Modules.Logging
             if (Settings.Instance.DroneStatsLog && !Statistics.Instance.DroneLoggingCompleted)
             {
                 // Lost drone statistics
-                // (inelegantly located here so as to avoid the necessity to switch to a combat ship after salvaging)
-                if (Settings.Instance.UseDrones && (Cache.Instance.DirectEve.ActiveShip.GroupId != 31 && Cache.Instance.DirectEve.ActiveShip.GroupId != 28 && Cache.Instance.DirectEve.ActiveShip.GroupId != 380))
+                if (Settings.Instance.UseDrones && 
+                     Cache.Instance.DirectEve.ActiveShip.GivenName.ToLower() != Settings.Instance.TransportShipName.ToLower() &&
+                     Cache.Instance.DirectEve.ActiveShip.GivenName.ToLower() != Settings.Instance.SalvageShipName.ToLower() &&
+                     Cache.Instance.DirectEve.ActiveShip.GroupId != (int)Group.Shuttle && 
+                     Cache.Instance.DirectEve.ActiveShip.GroupId != (int)Group.Industrial && 
+                     Cache.Instance.DirectEve.ActiveShip.GroupId != (int)Group.TransportShip)
                 {
                     if (Cache.Instance.InvTypesById.ContainsKey(Settings.Instance.DroneTypeId))
                     {
@@ -244,6 +248,11 @@ namespace Questor.Modules.Logging
                     {
                         Logging.Log("DroneStats", "Couldn't find the drone TypeID specified in the character settings xml; this shouldn't happen!", Logging.white);
                     }
+                }
+                else
+                {
+                    Logging.Log("DroneStats", "We do not use drones in this type of ship, skipping dronestats", Logging.white);
+                    Statistics.Instance.DroneLoggingCompleted = true;
                 }
             }
             // Lost drone statistics stuff ends here

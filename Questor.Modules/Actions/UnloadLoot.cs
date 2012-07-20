@@ -24,7 +24,7 @@ namespace Questor.Modules.Actions
     {
         public const int StationContainer = 17366;
 
-        private static DateTime _nextUnloadAction = DateTime.MinValue;
+        private static DateTime _nextUnloadAction = DateTime.Now;
         private static DateTime _lastUnloadAction = DateTime.MinValue;
         private static int _lootToMoveWillStillNotFitCount = 0;
         private static DateTime _lastPulse;

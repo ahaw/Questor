@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //  <copyright from='2010' to='2015' company='THEHACKERWITHIN.COM'>
 //    Copyright (c) TheHackerWithin.COM. All Rights Reserved.
 //
@@ -56,10 +56,10 @@ namespace Questor
         private static readonly Random R = new Random();
         public static bool StopTimeSpecified; //false;
 
-        private static DateTime _lastPulse;
+        private static DateTime _nextPulse;
         public static DateTime StartTime = DateTime.MaxValue;
         public static DateTime StopTime = DateTime.MinValue;
-        
+
         public static int MaxRuntime
         {
             get
@@ -142,7 +142,7 @@ namespace Questor
                     return;
                 }
                 else
-                { 
+                {
                     if (schedule.User == null || schedule.PW == null)
                     {
                         Logging.Log("Startup", "Error - Login details not specified in Schedules.xml!", Logging.red);
@@ -151,10 +151,10 @@ namespace Questor
                     _username = schedule.User;
                     _password = schedule.PW;
                     Logging.Log("Startup", "User: " + schedule.User + " Name: " + schedule.Name, Logging.white);
-                    
+
                     if (schedule.StartTimeSpecified)
                     {
-                        if (schedule.Start1 > schedule.Stop1) schedule.Stop1 = schedule.Stop1.AddDays(1); 
+                        if (schedule.Start1 > schedule.Stop1) schedule.Stop1 = schedule.Stop1.AddDays(1);
                         if (DateTime.Now.AddHours(2) > schedule.Start1 && DateTime.Now < schedule.Stop1)
                         {
                             StartTime = schedule.Start1;
@@ -203,7 +203,7 @@ namespace Questor
                         Logging.Log("Startup", "Forcing Schedule 1 because none of the schedules started within 2 hours or were already in progress", Logging.white);
                         Logging.Log("Startup", "Schedule 1: Start1: " + schedule.Start1 + " Stop1: " + schedule.Stop1, Logging.white);
                     }
-                    
+
                     if (schedule.StartTimeSpecified || schedule.StartTime2Specified || schedule.StartTime3Specified)
                         StartTime = StartTime.AddSeconds(R.Next(0, (RandStartDelay * 60)));
 
@@ -331,7 +331,14 @@ namespace Questor
             Cache.Instance.LastFrame = DateTime.Now;
             Cache.Instance.LastSessionIsReady = DateTime.Now; //update this reguardless before we login there is no session
 
-            if (!_readyToStart || _humaninterventionrequired)
+            if (DateTime.Now < _nextPulse)
+            {
+                //Logging.Log("if (DateTime.Now.Subtract(_lastPulse).TotalSeconds < _pulsedelay) then return");
+                return;
+            }
+            _nextPulse = DateTime.Now.AddSeconds(_pulsedelay);
+
+            if (!_readyToStart)
             {
                 //Logging.Log("if (!_readyToStart) then return");
                 return;
@@ -343,13 +350,11 @@ namespace Questor
                 return;
             }
 
-            if (DateTime.Now.Subtract(_lastPulse).TotalSeconds < _pulsedelay)
+            if (_humaninterventionrequired)
             {
-                //Logging.Log("if (DateTime.Now.Subtract(_lastPulse).TotalSeconds < _pulsedelay) then return");
+                //Logging.Log("Startup", "Onframe: _humaninterventionrequired is true (this will spam every second or so)", Logging.orange);
                 return;
             }
-
-            _lastPulse = DateTime.Now;
 
             // If the session is ready, then we are done :)
             if (_directEve.Session.IsReady)
