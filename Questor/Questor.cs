@@ -50,7 +50,7 @@ namespace Questor
         public Questor(QuestorfrmMain form1)
         {
             m_Parent = form1;
-            _lastPulse = DateTime.MinValue;
+            _lastPulse = DateTime.Now;
 
             _defense = new Defense();
             _localwatch = new LocalWatch();
@@ -127,12 +127,28 @@ namespace Questor
                         //enable windowtaskbar = on, so that minimized windows do not make us die in a fire.
                         Logging.Log("Questor", "Running Innerspace command: windowtaskbar on" + Settings.Instance.CharacterName, Logging.white);
                         LavishScript.ExecuteCommand("windowtaskbar on" + Settings.Instance.CharacterName);
+                        if (Settings.Instance.LoginQuestorArbitraryOSCmd)
+                        {
+                            Logging.Log("Questor", "After Questor Login: executing LoginQuestorArbitraryOSCmd", Logging.white);
+                            LavishScript.ExecuteCommand("Echo [${Time}] OSExecute " + Settings.Instance.LoginQuestorOSCmdContents.ToString(CultureInfo.InvariantCulture));
+                            LavishScript.ExecuteCommand("OSExecute " + Settings.Instance.LoginQuestorOSCmdContents.ToString(CultureInfo.InvariantCulture));
+                            Logging.Log("Questor", "Done: executing LoginQuestorArbitraryOSCmd", Logging.white);
+                        }
+                        if (Settings.Instance.LoginQuestorLavishScriptCmd)
+                        {
+                            Logging.Log("Questor", "After Questor Login: executing LoginQuestorLavishScriptCmd", Logging.white);
+                            LavishScript.ExecuteCommand("Echo [${Time}] runscript " + Settings.Instance.LoginQuestorLavishScriptContents.ToString(CultureInfo.InvariantCulture));
+                            LavishScript.ExecuteCommand("runscript " + Settings.Instance.LoginQuestorLavishScriptContents.ToString(CultureInfo.InvariantCulture));
+                            Logging.Log("Questor", "Done: executing LoginQuestorLavishScriptCmd", Logging.white);
+                        }
                     }
                 }
                 else
                 {
                     Logging.Log("Questor", "RunOnce30SecAfterStartup: Settings.Instance.CharacterName is still null", Logging.orange);
                     Cache.Instance.NextStartupAction = DateTime.Now.AddSeconds(30);
+                    _runOnce30SecAfterStartupalreadyProcessed = false;
+                    return;
                 }
             }
         }
@@ -267,34 +283,27 @@ namespace Questor
             }
             else if (Settings.Instance.Walletbalancechangelogoffdelay != 0)
             {
-                Logging.Log(
-                    "Questor", String.Format(
-                        "Questor: Wallet Balance Has Not Changed in [ {0} ] minutes. Switching to QuestorState.CloseQuestor",
-                        Math.Round(
-                            DateTime.Now.Subtract(Cache.Instance.LastKnownGoodConnectedTime).TotalMinutes, 0)), Logging.white);
-                Cache.Instance.ReasonToStopQuestor = "Wallet Balance did not change for over " +
-                                                     Settings.Instance.Walletbalancechangelogoffdelay + "min";
-
-                if (Settings.Instance.WalletbalancechangelogoffdelayLogofforExit == "logoff")
+                if ((Cache.Instance.InStation) || (Math.Round(DateTime.Now.Subtract(Cache.Instance.LastKnownGoodConnectedTime).TotalMinutes) > Settings.Instance.Walletbalancechangelogoffdelay + 5))
                 {
-                    Logging.Log("Questor", "walletbalancechangelogoffdelayLogofforExit is set to: " +
-                                Settings.Instance.WalletbalancechangelogoffdelayLogofforExit, Logging.white);
-                    Cache.Instance.CloseQuestorCMDLogoff = true;
-                    Cache.Instance.CloseQuestorCMDExitGame = false;
-                    Cache.Instance.SessionState = "LoggingOff";
-                }
-                if (Settings.Instance.WalletbalancechangelogoffdelayLogofforExit == "exit")
-                {
-                    Logging.Log("Questor", "walletbalancechangelogoffdelayLogofforExit is set to: " +
-                                Settings.Instance.WalletbalancechangelogoffdelayLogofforExit, Logging.white);
+                    Logging.Log("Questor", String.Format("Questor: Wallet Balance Has Not Changed in [ {0} ] minutes. Switching to QuestorState.CloseQuestor", Math.Round(DateTime.Now.Subtract(Cache.Instance.LastKnownGoodConnectedTime).TotalMinutes, 0)), Logging.white);
+                    Cache.Instance.ReasonToStopQuestor = "Wallet Balance did not change for over " + Settings.Instance.Walletbalancechangelogoffdelay + "min";
                     Cache.Instance.CloseQuestorCMDLogoff = false;
                     Cache.Instance.CloseQuestorCMDExitGame = true;
                     Cache.Instance.SessionState = "Exiting";
+                    BeginClosingQuestor();
+                    return;
                 }
-                BeginClosingQuestor();
+
+                //
+                // it is assumed if you got this far that you are in space. If you are 'stuck' in a session change then you'll be stuck another 5 min until the timeout above. 
+                //
+                _States.CurrentDedicatedBookmarkSalvagerBehaviorState = DedicatedBookmarkSalvagerBehaviorState.GotoBase;
+                _States.CurrentCombatMissionBehaviorState = CombatMissionsBehaviorState.GotoBase;
+                _States.CurrentCombatHelperBehaviorState = CombatHelperBehaviorState.GotoBase;
                 return;
             }
         }
+
         public static void CheckEVEStatus()
         {
             // get the current process
@@ -304,26 +313,6 @@ namespace Questor
             Cache.Instance.TotalMegaBytesOfMemoryUsed = ((currentProcess.WorkingSet64 / 1024) / 1024);
             Logging.Log("Questor", "EVE instance: totalMegaBytesOfMemoryUsed - " +
                         Cache.Instance.TotalMegaBytesOfMemoryUsed + " MB", Logging.white);
-
-            // If Questor window not visible, schedule a restart of questor in the uplink so that the GUI will start normally
-
-            /*
-             *
-             if (!m_Parent.Visible)
-            //GUI isn't visible and CloseQuestorflag is true, so that his code block only runs once
-            {
-                //m_Parent.Visible = true; //this does not work for some reason - innerspace issue?
-                Cache.Instance.ReasonToStopQuestor =
-                    "The Questor GUI is not visible: did EVE get restarted due to a crash or lag?";
-                Logging.Log("ReasonToStopQuestor" + Cache.Instance.ReasonToStopQuestor);
-                Cache.Instance.CloseQuestorCMDLogoff = false;
-                Cache.Instance.CloseQuestorCMDExitGame = true;
-                Cache.Instance.SessionState = "Exiting";
-                BeginClosingQuestor();
-            }
-            else
-
-             */
 
             if (Cache.Instance.TotalMegaBytesOfMemoryUsed > (Settings.Instance.EVEProcessMemoryCeiling - 50) &&
                         Settings.Instance.EVEProcessMemoryCeilingLogofforExit != "")

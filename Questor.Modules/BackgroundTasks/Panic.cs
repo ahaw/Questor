@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 //   <copyright from='2010' to='2015' company='THEHACKERWITHIN.COM'>
 //     Copyright (c) TheHackerWithin.COM. All Rights Reserved.
 //
@@ -26,11 +26,11 @@ namespace Questor.Modules.BackgroundTasks
         private double _lastNormalZ;
 
         private DateTime _resumeTime;
-        private DateTime _nextWrapScrambledWarning = DateTime.MinValue;
+        private DateTime _nextWrapScrambledWarning = DateTime.Now;
         private DateTime _lastPulse;
 
         //private DateTime _lastDockedorJumping;
-        private DateTime _lastWarpScrambled = DateTime.MinValue;
+        private DateTime _lastWarpScrambled = DateTime.Now;
         private bool _delayedResume;
         private int _randomDelay;
 

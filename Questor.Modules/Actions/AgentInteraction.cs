@@ -573,13 +573,23 @@ namespace Questor.Modules.Actions
                     {
                         XDocument missionXml = XDocument.Load(Cache.Instance.missionXmlPath);
                         //load mission specific ammo and weapongroupid if specified in the mission xml
-                        XElement ammoTypes = missionXml.Root.Element("missionammo");
-                        if (ammoTypes != null)
-                            foreach (XElement ammo in ammoTypes.Elements("ammo"))
-                                Cache.Instance.MissionAmmo.Add(new Ammo(ammo));
-                        Cache.Instance.MissionWeaponGroupId = (int?)missionXml.Root.Element("weaponGroupId") ?? 0;
-                        Cache.Instance.MissionUseDrones = (bool?)missionXml.Root.Element("useDrones"); //do not set default here, use character level settings if avail
-                        Cache.Instance.MissionKillSentries = (bool?)missionXml.Root.Element("killSentries"); //do not set default here, use character level settings if avail
+                        if (missionXml.Root != null)
+                        {
+                            XElement ammoTypes = missionXml.Root.Element("missionammo");
+                            if (ammoTypes != null)
+                            {
+                                foreach (XElement ammo in ammoTypes.Elements("ammo"))
+                                {
+                                    Cache.Instance.MissionAmmo.Add(new Ammo(ammo));
+                                }
+                                //Cache.Instance.DamageType
+                            }
+
+                            Cache.Instance.MissionWeaponGroupId = (int?)missionXml.Root.Element("weaponGroupId") ?? 0;
+                            Cache.Instance.MissionUseDrones = (bool?)missionXml.Root.Element("useDrones"); //do not set default here, use character level settings if avail
+                            Cache.Instance.MissionKillSentries = (bool?)missionXml.Root.Element("killSentries"); //do not set default here, use character level settings if avail
+                        }
+
                         //Cache.Instance.MissionDroneTypeID = (int?)missionXml.Root.Element("DroneTypeId") ?? Settings.Instance.DroneTypeId;
                         IEnumerable<DamageType> damageTypes = missionXml.XPathSelectElements("//damagetype").Select(e => (DamageType)Enum.Parse(typeof(DamageType), (string)e, true)).ToList();
                         if (damageTypes.Any())

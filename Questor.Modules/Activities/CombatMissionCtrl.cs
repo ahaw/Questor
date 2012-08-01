@@ -203,15 +203,11 @@ namespace Questor.Modules.Activities
                     if (Settings.Instance.CreateSalvageBookmarks)
                         BookmarkPocketForSalvaging();
 
-                    // Reload weapons and activate gate to move to the next pocket
-                    if (DateTime.Now > Cache.Instance.NextReload)
-                    {
-                        //Logging.Log("CombatMissionCtrl", "Activate: Reload before moving to next pocket", Logging.teal);
-                        if (!Combat.ReloadAll(closest)) return;
-                    }
+                    //Logging.Log("CombatMissionCtrl", "Activate: Reload before moving to next pocket", Logging.teal);
+                    if (!Combat.ReloadAll(closest)) return;
+                    
                     if (DateTime.Now > Cache.Instance.NextActivateAction)
                     {
-                        if (!Combat.ReloadAll(closest)) return;
                         Logging.Log("CombatMissionCtrl", "Activate: [" + closest.Name + "] Move to next pocket after reload command and change state to 'NextPocket'", Logging.green);
                         closest.Activate();
 

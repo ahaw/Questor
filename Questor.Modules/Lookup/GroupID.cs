@@ -66,6 +66,8 @@ namespace Questor.Modules.Lookup
         EnergyNeutralizingBattery = 837,
 
         LargeCollidableStructure = 319,
+        LargeCollidableObject = 226,
+        LargeCollidableShip = 784,
 
         CargoContainer = 12,
         SpawnContainer = 306,

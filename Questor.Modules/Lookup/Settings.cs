@@ -273,6 +273,14 @@ namespace Questor.Modules.Lookup
 
         public string CloseQuestorOSCmdContents { get; set; }
 
+        public bool LoginQuestorArbitraryOSCmd { get; set; }
+
+        public string LoginQuestorOSCmdContents { get; set; }
+
+        public bool LoginQuestorLavishScriptCmd { get; set; }
+
+        public string LoginQuestorLavishScriptContents { get; set; }
+        
         public int SecondstoWaitAfterExteringCloseQuestorBeforeExitingEVE = 240;
 
         public string LavishIsBoxerCharacterSet { get; set; }
@@ -636,6 +644,11 @@ namespace Questor.Modules.Lookup
                 CloseQuestorOSCmdContents = string.Empty;
                 //the above setting can be set to any script or commands available on the system. make sure you test it from a command prompt while in your .net programs directory
 
+                LoginQuestorArbitraryOSCmd = false;
+                LoginQuestorOSCmdContents = String.Empty;
+                LoginQuestorLavishScriptCmd = false;
+                LoginQuestorLavishScriptContents = string.Empty;
+                
                 Walletbalancechangelogoffdelay = 30;
                 WalletbalancechangelogoffdelayLogofforExit = "exit";
                 SecondstoWaitAfterExteringCloseQuestorBeforeExitingEVE = 240;
@@ -931,10 +944,10 @@ namespace Questor.Modules.Lookup
                     //
                     // Ship Names
                     //
-                    CombatShipName = (string)xml.Element("combatShipName") ?? "";
-                    SalvageShipName = (string)xml.Element("salvageShipName") ?? "";
-                    TransportShipName = (string)xml.Element("transportShipName") ?? "";
-                    TravelShipName = (string)xml.Element("travelShipName") ?? "";
+                    CombatShipName = (string)xml.Element("combatShipName") ?? "My frigate of doom";
+                    SalvageShipName = (string)xml.Element("salvageShipName") ?? "My Destroyer of salvage";
+                    TransportShipName = (string)xml.Element("transportShipName") ?? "My Hauler of transportation";
+                    TravelShipName = (string)xml.Element("travelShipName") ?? "My Shuttle of traveling";
 
                     //
                     // Storage Location for Loot, Ammo, Bookmarks
@@ -984,6 +997,17 @@ namespace Questor.Modules.Lookup
                     //true or false
                     CloseQuestorOSCmdContents = (string)xml.Element("CloseQuestorOSCmdContents") ??
                                                 "cmd /k (date /t && time /t && echo. && echo. && echo Questor is configured to use the feature: CloseQuestorArbitraryOSCmd && echo But No actual command was specified in your characters settings xml! && pause)";
+
+                    LoginQuestorArbitraryOSCmd = (bool?)xml.Element("LoginQuestorArbitraryOSCmd") ?? false;
+                    //true or false
+                    LoginQuestorOSCmdContents = (string)xml.Element("LoginQuestorOSCmdContents") ??
+                                                "cmd /k (date /t && time /t && echo. && echo. && echo Questor is configured to use the feature: LoginQuestorArbitraryOSCmd && echo But No actual command was specified in your characters settings xml! && pause)";
+                    LoginQuestorLavishScriptCmd = (bool?)xml.Element("LoginQuestorLavishScriptCmd") ?? false;
+                    //true or false
+                    LoginQuestorLavishScriptContents = (string)xml.Element("LoginQuestorLavishScriptContents") ??
+                                                "echo Questor is configured to use the feature: LoginQuestorLavishScriptCmd && echo But No actual command was specified in your characters settings xml! && pause)";
+
+
                     //the above setting can be set to any script or commands available on the system. make sure you test it from a command prompt while in your .net programs directory
 
                     Walletbalancechangelogoffdelay = (int?)xml.Element("walletbalancechangelogoffdelay") ?? 30;

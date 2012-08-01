@@ -24,8 +24,8 @@ namespace Questor.Modules.BackgroundTasks
         public static HashSet<int> Salvagers = new HashSet<int> { 25861, 26983, 30836 };
         public static HashSet<int> TractorBeams = new HashSet<int> { 24348, 24620, 24622, 24644, 4250 };
 
-        private DateTime _lastJettison = DateTime.MinValue;
-        private DateTime _nextSalvageAction = DateTime.MinValue;
+        private DateTime _lastJettison = DateTime.Now;
+        private DateTime _nextSalvageAction = DateTime.Now;
         private DateTime _lastSalvageProcessState;
 
         /// <summary>

@@ -40,13 +40,13 @@ namespace Questor.Behaviors
         private readonly Traveler _traveler;
         private readonly UnloadLoot _unloadLoot;
         public DateTime LastAction;
-        private DateTime _nextBookmarksrefresh = DateTime.MinValue;
+        private DateTime _nextBookmarksrefresh = DateTime.Now;
 
         //private readonly Random _random;
         public static long AgentID;
 
         private readonly Stopwatch _watch;
-        private DateTime _nextBookmarkRefreshCheck = DateTime.MinValue;
+        private DateTime _nextBookmarkRefreshCheck = DateTime.Now;
 
         public bool Panicstatereset = false;
 
@@ -64,7 +64,7 @@ namespace Questor.Behaviors
 
         public DedicatedBookmarkSalvagerBehavior()
         {
-            _lastPulse = DateTime.MinValue;
+            _lastPulse = DateTime.Now;
 
             //_random = new Random();
             _salvage = new Salvage();

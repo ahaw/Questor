@@ -208,6 +208,12 @@
   <CloseQuestorArbitraryOSCmd>false</CloseQuestorArbitraryOSCmd> <!-- default is: false -->
   <CloseQuestorOSCmdContents></CloseQuestorOSCmdContents> <!-- contains the command to be executed, must be valid in a cmd shell executed in the IS directory -->
 
+  
+  <LoginQuestorArbitraryOSCmd>false</LoginQuestorArbitraryOSCmd> <!-- default is: false -->
+  <LoginQuestorOSCmdContents></LoginQuestorOSCmdContents> <!-- contains the command to be executed, must be valid in a cmd shell executed in the IS directory -->
+  <LoginQuestorLavishScriptCmd>false</LoginQuestorLavishScriptCmd> <!-- default is: false -->
+  <LoginQuestorLavishScriptContents></LoginQuestorLavishScriptContents> <!-- contains the command to be executed, must be valid in a cmd shell executed in the IS directory -->
+
   <!--                                                -->
   <!--        WRECKS SETTINGS        -->
   <!--                                                -->

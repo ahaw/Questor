@@ -89,9 +89,16 @@ namespace Questor.Modules.Combat
                         {
                             if (Settings.Instance.Ammo.Any())
                             {
-                                DirectItem AvailableAmmo = cargo.Items.OrderByDescending(i => i.Quantity).Where(a => Settings.Instance.Ammo.Any(i => i.TypeId == a.TypeId)).ToList().FirstOrDefault();
-                                Cache.Instance.DamageType = Settings.Instance.Ammo.ToList().OrderByDescending(i => i.Quantity).Where(a => a.TypeId == AvailableAmmo.TypeId).ToList().FirstOrDefault().DamageType;
-                                Logging.Log("Combat", "ReloadNormalAmmo: found [" + AvailableAmmo.Quantity + "] units of  [" + AvailableAmmo.TypeName + "] changed DamageType to [" + Cache.Instance.DamageType.ToString() + "]", Logging.orange);
+                                DirectItem availableAmmo = cargo.Items.OrderByDescending(i => i.Quantity).Where(a => Settings.Instance.Ammo.Any(i => i.TypeId == a.TypeId)).ToList().FirstOrDefault();
+                                if (availableAmmo != null)
+                                {
+                                    Cache.Instance.DamageType = Settings.Instance.Ammo.ToList().OrderByDescending(i => i.Quantity).Where(a => a.TypeId == availableAmmo.TypeId).ToList().FirstOrDefault().DamageType;
+                                    Logging.Log("Combat", "ReloadNormalAmmo: found [" + availableAmmo.Quantity + "] units of  [" + availableAmmo.TypeName + "] changed DamageType to [" + Cache.Instance.DamageType.ToString() + "]", Logging.orange);
+                                    return false;
+                                }
+
+                                Logging.Log("Combat", "ReloadNormalAmmo: unable to find any alternate ammo in your cargo", Logging.teal);
+                                _States.CurrentCombatState = CombatState.OutOfAmmo;
                                 return false;
                             }
                         }

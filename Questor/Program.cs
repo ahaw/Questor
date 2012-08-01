@@ -10,6 +10,7 @@
 
 using System.Globalization;
 using LavishScriptAPI;
+using Questor.Modules.BackgroundTasks;
 using Questor.Modules.Caching;
 
 namespace Questor
@@ -263,7 +264,15 @@ namespace Questor
                 }
                 catch (Exception ex)
                 {
+                    Logging.Log("Startup", "Error on Loading DirectEve, maybe server is down", Logging.orange);
                     Logging.Log("Startup", string.Format("DirectEVE: Exception {0}...", ex), Logging.white);
+                    Cache.Instance.CloseQuestorCMDLogoff = false;
+                    Cache.Instance.CloseQuestorCMDExitGame = true;
+                    Cache.Instance.CloseQuestorEndProcess = true;
+                    Settings.Instance.AutoStart = true;
+                    Cache.Instance.ReasonToStopQuestor = "Error on Loading DirectEve, maybe server is down";
+                    Cache.Instance.SessionState = "Quitting";
+                    Cleanup.CloseQuestor();
                 }
 
                 try
@@ -279,6 +288,7 @@ namespace Questor
                 {
                     System.Threading.Thread.Sleep(50);
                 }
+
                 try
                 {
                     _directEve.Dispose();
@@ -299,9 +309,25 @@ namespace Questor
                 }
                 catch (Exception ex)
                 {
+                    Logging.Log("Startup", "Error on Loading DirectEve, maybe server is down", Logging.orange);
                     Logging.Log("Startup", string.Format("DirectEVE: Exception {0}...", ex), Logging.white);
+                    Cache.Instance.CloseQuestorCMDLogoff = false;
+                    Cache.Instance.CloseQuestorCMDExitGame = true;
+                    Cache.Instance.CloseQuestorEndProcess = true;
+                    Settings.Instance.AutoStart = true;
+                    Cache.Instance.ReasonToStopQuestor = "Error on Loading DirectEve, maybe server is down";
+                    Cache.Instance.SessionState = "Quitting";
+                    Cleanup.CloseQuestor();
                 }
-                _directEve.OnFrame += OnFrame;
+                
+                try
+                {
+                    _directEve.OnFrame += OnFrame;
+                }
+                catch (Exception ex)
+                {
+                    Logging.Log("Startup", string.Format("DirectEVE.OnFrame: Exception {0}...", ex), Logging.white);
+                }
 
                 // Sleep until we're done
                 while (!_done)
@@ -309,7 +335,14 @@ namespace Questor
                     System.Threading.Thread.Sleep(50);
                 }
 
-                _directEve.Dispose();
+                try
+                {
+                    _directEve.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    Logging.Log("Startup", string.Format("DirectEVE.Dispose: Exception {0}...", ex), Logging.white);
+                }
 
                 // If the last parameter is false, then we only auto-login
                 if (_loginOnly)

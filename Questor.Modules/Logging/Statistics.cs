@@ -18,10 +18,10 @@ namespace Questor.Modules.Logging
         //private DateTime _lastStatisticsAction;
         public DateTime MissionLoggingStartedTimestamp { get; set; }
 
-        public DateTime StartedMission = DateTime.MinValue;
-        public DateTime FinishedMission = DateTime.MinValue;
-        public DateTime StartedSalvaging = DateTime.MinValue;
-        public DateTime FinishedSalvaging = DateTime.MinValue;
+        public DateTime StartedMission = DateTime.Now;
+        public DateTime FinishedMission = DateTime.Now;
+        public DateTime StartedSalvaging = DateTime.Now;
+        public DateTime FinishedSalvaging = DateTime.Now;
 
         public DateTime StartedPocket = DateTime.Now;
 
@@ -40,6 +40,8 @@ namespace Questor.Modules.Logging
         public int MissionsThisSession { get; set; }
 
         public int MissionCompletionErrors { get; set; }
+
+        public static int AgentLPRetrivalAttempts { get; set; }
 
         public bool MissionLoggingCompleted; //false
         public bool DroneLoggingCompleted; //false
@@ -219,9 +221,10 @@ namespace Questor.Modules.Logging
             {
                 // Lost drone statistics
                 if (Settings.Instance.UseDrones && 
-                     Cache.Instance.DirectEve.ActiveShip.GivenName.ToLower() != Settings.Instance.TransportShipName.ToLower() &&
-                     Cache.Instance.DirectEve.ActiveShip.GivenName.ToLower() != Settings.Instance.SalvageShipName.ToLower() &&
+                     (Cache.Instance.DirectEve.ActiveShip.GivenName.ToLower() != null && !string.IsNullOrEmpty(Settings.Instance.TransportShipName) && Cache.Instance.DirectEve.ActiveShip.GivenName.ToLower() != Settings.Instance.TransportShipName.ToLower()) &&
+                     (Cache.Instance.DirectEve.ActiveShip.GivenName.ToLower() != null && !string.IsNullOrEmpty(Settings.Instance.SalvageShipName)   && Cache.Instance.DirectEve.ActiveShip.GivenName.ToLower() != Settings.Instance.SalvageShipName.ToLower()) &&
                      Cache.Instance.DirectEve.ActiveShip.GroupId != (int)Group.Shuttle && 
+                     Cache.Instance.DirectEve.ActiveShip.GroupId != (int)Group.Frigate && 
                      Cache.Instance.DirectEve.ActiveShip.GroupId != (int)Group.Industrial && 
                      Cache.Instance.DirectEve.ActiveShip.GroupId != (int)Group.TransportShip)
                 {
@@ -478,12 +481,22 @@ namespace Questor.Modules.Logging
             }
             if (!string.IsNullOrEmpty(Cache.Instance.MissionName) && (Cache.Instance.Mission == null || (Cache.Instance.Mission.State != (int)MissionState.Accepted)))
             {
+                if (AgentLPRetrivalAttempts > 20)
+                {
+                    Logging.Log("Statistics", "WriteMissionStatistics: We do not have loyalty points with the current agent yet, still -1, attempt # [" +  AgentLPRetrivalAttempts + "] giving up", Logging.white);
+                    AgentLPRetrivalAttempts = 0;
+                    Statistics.Instance.MissionLoggingCompleted = true; //if it isn't true - this means we shouldn't be trying to log mission stats atm
+                    return;
+                }
+
                 // Seeing as we completed a mission, we will have loyalty points for this agent
                 if (Cache.Instance.Agent.LoyaltyPoints == -1)
                 {
-                    Logging.Log("Statistics", "WriteMissionStatistics: We do not have loyalty points with the current agent yet, still -1", Logging.white);
+                    AgentLPRetrivalAttempts++;
+                    Logging.Log("Statistics", "WriteMissionStatistics: We do not have loyalty points with the current agent yet, still -1, attempt # [" + AgentLPRetrivalAttempts + "] retrying...", Logging.white);
                     return;
                 }
+                AgentLPRetrivalAttempts = 0;
 
                 Statistics.Instance.MissionsThisSession = Statistics.Instance.MissionsThisSession + 1;
                 if (Statistics.Instance.DebugMissionStatistics) Logging.Log("Statistics", "We jumped through all the hoops: now do the mission logging", Logging.white);
