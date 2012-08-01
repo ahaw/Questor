@@ -166,7 +166,6 @@ namespace Questor.Modules.Activities
                                         "Warping to [" + Logging.yellow + locationName + Logging.green + "][" + Logging.yellow + 
                                         Math.Round((stargate.Distance / 1000) / 149598000, 2) + Logging.green + " AU away]", Logging.green);
                             stargate.WarpTo();
-                            Cache.Instance.NextWarpTo = DateTime.Now.AddSeconds(Time.Instance.WarptoDelay_seconds);
                             return;
                         }
                         return;

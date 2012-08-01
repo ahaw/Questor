@@ -788,7 +788,10 @@ namespace Questor.Modules.Caching
         public void WarpTo()
         {
             if (_directEntity != null)
+            {
+                Cache.Instance.NextWarpTo = DateTime.Now.AddSeconds(Time.Instance.WarptoDelay_seconds);
                 _directEntity.WarpTo();
+            }
         }
 
         public void AlignTo()
@@ -800,13 +803,21 @@ namespace Questor.Modules.Caching
         public void WarpToAndDock()
         {
             if (_directEntity != null)
+            {
+                Cache.Instance.NextWarpTo = DateTime.Now.AddSeconds(Time.Instance.WarptoDelay_seconds);
+                Cache.Instance.NextDockAction = DateTime.Now.AddSeconds(Time.Instance.DockingDelay_seconds);
                 _directEntity.WarpToAndDock();
+                
+            }
         }
 
         public void Dock()
         {
             if (_directEntity != null)
+            {
                 _directEntity.Dock();
+                Cache.Instance.NextDockAction = DateTime.Now.AddSeconds(Time.Instance.DockingDelay_seconds);
+            }
         }
 
         public void OpenCargo()

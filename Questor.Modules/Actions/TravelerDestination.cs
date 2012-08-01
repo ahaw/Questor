@@ -192,7 +192,7 @@ namespace Questor.Modules.Actions
                 {
                     Logging.Log("TravelerDestination.StationDestination", "Dock at [" + Logging.yellow + entity.Name + Logging.green + "] which is [" + Math.Round(entity.Distance / 1000, 0) + "k away]", Logging.green);
                     entity.Dock();
-                    Cache.Instance.NextDockAction = DateTime.Now.AddSeconds(Time.Instance.DockingDelay_seconds);
+                    
                     return false;
                 }
             }
@@ -202,7 +202,7 @@ namespace Questor.Modules.Actions
                 {
                     Logging.Log("TravelerDestintion.StationDestination", "Approaching[" + Logging.yellow + entity.Name + Logging.green + "] which is [" + Math.Round(entity.Distance / 1000, 0) + "k away]", Logging.green);
                     entity.Approach();
-                    Cache.Instance.NextDockAction = DateTime.Now.AddSeconds(Time.Instance.ApproachDelay_seconds);
+                    Cache.Instance.NextApproachAction = DateTime.Now.AddSeconds(Time.Instance.ApproachDelay_seconds);
                     return false;
                 }
             }
@@ -211,8 +211,7 @@ namespace Questor.Modules.Actions
                 if (DateTime.Now > Cache.Instance.NextDockAction)
                 {
                     Logging.Log("TravelerDestination.StationDestination", "Warp to and dock at [" + Logging.yellow + entity.Name + Logging.green + "][" + Math.Round((entity.Distance / 1000) / 149598000, 2) + " AU away]", Logging.green);
-                    entity.WarpTo();
-                    Cache.Instance.NextDockAction = DateTime.Now.AddSeconds(Time.Instance.WarptoDelay_seconds);
+                    entity.WarpToAndDock();
                     return false;
                 }
             }

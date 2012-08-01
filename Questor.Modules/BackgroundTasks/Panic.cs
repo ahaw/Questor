@@ -237,7 +237,6 @@ namespace Questor.Modules.BackgroundTasks
                                     Logging.Log("Panic", "Warping to [" + station.Name + "][" + Math.Round((station.Distance / 1000) / 149598000, 2) + " AU away]", Logging.red);
                                     Cache.Instance.IsMissionPocketDone = true;
                                     station.WarpToAndDock();
-                                    Cache.Instance.NextWarpTo = DateTime.Now.AddSeconds(Time.Instance.WarptoDelay_seconds);
                                     //_nextDock = DateTime.MinValue;
                                 }
                                 else
@@ -254,7 +253,6 @@ namespace Questor.Modules.BackgroundTasks
                                 {
                                     Logging.Log("Panic", "Docking with [" + station.Name + "][" + Math.Round((station.Distance / 1000) / 149598000, 2) + " AU away]", Logging.red);
                                     station.Dock();
-                                    Cache.Instance.NextUndockAction = DateTime.Now.AddSeconds(Time.Instance.DockingDelay_seconds);
                                 }
                                 else
                                 {
@@ -311,7 +309,6 @@ namespace Questor.Modules.BackgroundTasks
                             Logging.Log("Panic", "Warping to [" + Cache.Instance.Star.Name + "][" + Math.Round((Cache.Instance.Star.Distance / 1000) / 149598000, 2) + " AU away]", Logging.red);
                             Cache.Instance.IsMissionPocketDone = true;
                             Cache.Instance.Star.WarpTo();
-                            Cache.Instance.NextWarpTo = DateTime.Now.AddSeconds(Time.Instance.WarptoDelay_seconds);
                         }
                         else
                         {

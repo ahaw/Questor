@@ -59,7 +59,6 @@ namespace Questor.Modules.BackgroundTasks
                     {
                         Logging.Log("Salvage.NavigateIntorangeOfWrecks", "Warping to [" + closestWreck.Name + "] which is [" + Math.Round(closestWreck.Distance / 1000, 0) + "k away]", Logging.white);
                         closestWreck.WarpTo();
-                        Cache.Instance.NextWarpTo = DateTime.Now.AddSeconds(Time.Instance.WarptoDelay_seconds);
                     }
                 }
                 else
